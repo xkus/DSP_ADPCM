@@ -204,7 +204,7 @@ void config_interrupts(void)
 
 void EDMA_interrupt_service(void)
 {
-	xxx int rcvPingDone=0;
+	xxx int rcvPingDone=0;	//static
 	xxx int rcvPongDone=0;
 	xxx int xmtPingDone=0;
 	xxx int xmtPongDone=0;
@@ -218,7 +218,7 @@ void EDMA_interrupt_service(void)
 		rcvPongDone=1;
 	}
 	
-	...........
+	//...........
 	
 	if(rcvPingDone && xmtPingDone) {
 		rcvPingDone=0;
@@ -236,6 +236,8 @@ void EDMA_interrupt_service(void)
 
 void process_ping_SWI(void)
 {
+	//golden Wire?
+	//do Process here?
 	int i;
 	for(i=0; i<BUFFER_LEN; i++)
 		*(Buffer_out_ping+i) = *(Buffer_in_ping+i); 
