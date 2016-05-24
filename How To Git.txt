@@ -1,0 +1,12 @@
+****** Neues File Gitten ********
+
+- git pull						// Dateien vom Server aktualisieren
+- git add -A					// Änderungen hinzufügen
+- git commit -m"Kommentar"		// Aktueller Stand Committen
+- git push						// Auf server hochladen
+
+
+*********************************************************************
+
+gitk				Benutzeroberfläche zeigt Änderungen und 
+
