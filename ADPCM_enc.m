@@ -57,7 +57,6 @@ bf = zeros(2,7);
 
 % ADPCM decoder
 
-
 for k = 1:length(e)
     ef(7) = e(k);  % Neuer Wert
     
