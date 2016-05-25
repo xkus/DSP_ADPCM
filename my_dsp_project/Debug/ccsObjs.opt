@@ -1,1 +1,1 @@
-"./config_AIC23.obj" "./main.obj" "./my_dsp_projectcfg.obj" "./my_dsp_projectcfg_c.obj" "./skeleton.obj" -l"./my_dsp_projectcfg.cmd" -l"libc.a" 
+"./config_AIC23.obj" "./main.obj" "./my_dsp_projectcfg.obj" "./my_dsp_projectcfg_c.obj" "./skeleton.obj" -l"./my_dsp_projectcfg.cmd" -llibc.a 
