@@ -6,6 +6,8 @@
 *  corrected and completed by the students.
 *
 *   F. Quint, HsKA
+*
+*   Von mir gegittet!
 ************************************************************/
 
 #include <my_dsp_projectcfg.h>

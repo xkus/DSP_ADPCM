@@ -1,4 +1,0 @@
-SECTION
-{
-	.Datenpuffer {} > IRAM
-}
