@@ -8,11 +8,14 @@
 *   F. Quint, HsKA
 ************************************************************/
 
-
+#include <my_dsp_projectcfg.h>
+#include <std.h>
 #include <csl.h>
 #include <csl_mcbsp.h>
 #include <csl_irq.h>
 #include <csl_edma.h>
+#include <swi.h>
+#include <sem.h>
 #include <dsk6713_led.h>
 #include "config_AIC23.h"
 #include "skeleton.h"
@@ -30,13 +33,13 @@ short Buffer_out_ping[BUFFER_LEN];
 short Buffer_out_pong[BUFFER_LEN];
 
 //Configuration for McBSP1 (data-interface)
-MCBSP_Config datainterface_config = {
-		/* McBSP Control Register */
+//MCBSP_Config datainterface_config = {
+		/* McBSP Control Register
         MCBSP_FMKS(SPCR, FREE, NO)              |	//  Freilauf
-        MCBSP_FMKS(SPCR, SOFT, xxxxxx)          |
+        MCBSP_FMKS(SPCR, SOFT, YES)		        |	// YES:  Soft mode is enabled. During emulation halt, serial port clock stops after completion of current transmission.
         MCBSP_FMKS(SPCR, FRST, YES)             |	// Framesync ist ein
         MCBSP_FMKS(SPCR, GRST, YES)             |	// Reset aus, damit läuft der Samplerate- Generator
-        MCBSP_FMKS(SPCR, XINTM, xxxxx)          |
+        MCBSP_FMKS(SPCR, XINTM, XRDY)           |	// XINT is driven by XRDY (end-of-word) and end-of-frame in A-bis mode.
         MCBSP_FMKS(SPCR, XSYNCERR, NO)          |	// empfängerseitig keine Überwachung der Synchronisation
         MCBSP_FMKS(SPCR, XRST, YES)             |	// Sender läuft (kein Reset- Status)	
         MCBSP_FMKS(SPCR, DLB, OFF)              |	// Loopback (Kurschluss) nicht aktiv
@@ -46,7 +49,7 @@ MCBSP_Config datainterface_config = {
         MCBSP_FMKS(SPCR, RINTM, RRDY)           |	// Sender Interrupt wird durch "RRDY-Bit" ausgelöst
         MCBSP_FMKS(SPCR, RSYNCERR, NO)          |	// senderseitig keine Überwachung der Synchronisation
         MCBSP_FMKS(SPCR, RRST, YES),			// Empfänger läuft (kein Reset- Status)
-		/* Empfangs-Control Register */
+		/* Empfangs-Control Register
         MCBSP_FMKS(RCR, RPHASE, SINGLE)         |	// Nur eine Phase pro Frame
         MCBSP_FMKS(RCR, RFRLEN2, DEFAULT)       |	// Länge in Phase 2, unrelevant
         MCBSP_FMKS(RCR, RWDLEN2, DEFAULT)       |	// Wortlänge in Phase 2, unrelevant
@@ -56,7 +59,7 @@ MCBSP_Config datainterface_config = {
         MCBSP_FMKS(RCR, RFRLEN1, OF(1))         |	// Länge der Phase 1 --> 1 Wort
         MCBSP_FMKS(RCR, RWDLEN1, xxxxx)         |	//
         MCBSP_FMKS(RCR, RWDREVRS, DISABLE),		// 32-bit Reversal nicht genutzt
-		/* Sende-Control Register */
+		/* Sende-Control Register
         MCBSP_FMKS(XCR, XPHASE, xxxxxx)         |	//
         MCBSP_FMKS(XCR, XFRLEN2, DEFAULT)       |	// Länge in Phase 2, unrelevant
         MCBSP_FMKS(XCR, XWDLEN2, DEFAULT)       |	// Wortlänge in Phase 2, unrelevant
@@ -66,7 +69,7 @@ MCBSP_Config datainterface_config = {
         MCBSP_FMKS(XCR, XFRLEN1, OF(1))         |	// Länge der Phase 1 --> 1 Wort
         MCBSP_FMKS(XCR, XWDLEN1, 16BIT)         |	// Wortlänge in Phase 1 --> 16 bit
         MCBSP_FMKS(XCR, XWDREVRS, DISABLE),		// 32-bit Reversal nicht genutzt
-		/* Sample Rate Generator Register */
+		/* Sample Rate Generator Register
         MCBSP_FMKS(SRGR, GSYNC, DEFAULT)        |	// Einstellungen nicht relevant da
         MCBSP_FMKS(SRGR, CLKSP, DEFAULT)        |	// der McBSP1 als Slave läuft
         MCBSP_FMKS(SRGR, CLKSM, DEFAULT)        |	// und den Takt von aussen 
@@ -74,11 +77,11 @@ MCBSP_Config datainterface_config = {
         MCBSP_FMKS(SRGR, FPER, DEFAULT)         |	// --
         MCBSP_FMKS(SRGR, FWID, DEFAULT)         |	// --
         MCBSP_FMKS(SRGR, CLKGDV, DEFAULT),		// --
-		/* Mehrkanal */
+		/* Mehrkanal
         MCBSP_MCR_DEFAULT,				// Mehrkanal wird nicht verwendet
         MCBSP_RCER_DEFAULT,				// dito
         MCBSP_XCER_DEFAULT,				// dito
-		/* Pinout Control Register */
+		/* Pinout Control Register
         MCBSP_FMKS(PCR, XIOEN, SP)              |	// Pin wird für serielle Schnittstelle verwendet (alternativ GPIO)
         MCBSP_FMKS(PCR, RIOEN, SP)              |	// Pin wird für serielle Schnittstelle verwendet (alternativ GPIO)
         MCBSP_FMKS(PCR, FSXM, EXTERNAL)         |	// Framesync- Signal für Sender kommt von extern (Slave)
@@ -92,8 +95,9 @@ MCBSP_Config datainterface_config = {
         MCBSP_FMKS(PCR, CLKXP, FALLING)         |	// Datum wird bei fallender Flanke gesendet
         MCBSP_FMKS(PCR, CLKRP, RISING)			// Datum wird bei steigender Flanke übernommen
 };
+*/
+/* template for a EDMA configuration
 
-/* template for a EDMA configuration */
 EDMA_Config configEDMARcv = {
     EDMA_FMKS(OPT, PRI, LOW)          |  // auf beide Queues verteilen
     EDMA_FMKS(OPT, ESIZE, xxxxx)       |  // Element size
@@ -120,6 +124,8 @@ EDMA_Config configEDMARcv = {
     EDMA_FMK (RLD, LINK, NULL)            // Reload Link
 };
 
+
+*/
 /* Transfer-Complete-Codes for EDMA-Jobs */
 int tccRcvPing;
 
@@ -132,85 +138,52 @@ EDMA_Handle hEdmaReload;
 								
 main()
 {
-	MCBSP_Handle hMcbsp=0;
-	
-	
+
 	CSL_init();  
 	
 	/* Configure McBSP0 and AIC23 */
-	Config_DSK6713_AIC23();
+	//Config_DSK6713_AIC23();
 	
 	/* Configure McBSP1*/
-	hMcbsp = MCBSP_open(MCBSP_DEV1, MCBSP_OPEN_RESET);
-    MCBSP_config(hMcbsp, &datainterface_config);
+	//hMcbsp = MCBSP_open(MCBSP_DEV1, MCBSP_OPEN_RESET);
+    //MCBSP_config(hMcbsp, &datainterface_config);
     
 	/* configure EDMA */
-    config_EDMA();
+    //config_EDMA();
 
     /* finally the interrupts */
     config_interrupts();
 
-    MCBSP_start(hMcbsp, xxxxxx, 0xffffffff);
-    MCBSP_write(hMcbsp, 0x0); 	/* one shot */
+    //MCBSP_start(hMcbsp, MCBSP_XMIT_START | MCBSP_RCV_START, 0xffffffff);		// Start Audio IN & OUT transmision
+    //MCBSP_write(hMcbsp, 0x0); 	/* one shot */
 } /* finished*/
 
 
 
-void config_EDMA(void)
-{
-	/* Konfiguration der EDMA zum Lesen*/
-	hEdmaRcv = EDMA_open(EDMA_CHA_REVT1, EDMA_OPEN_RESET);  // EDMA Channel for REVT1
-	hEdmaReload = EDMA_allocTable(-1);               // Reload-Parameters
-
-
-	configEDMARcv.src = MCBSP_getRcvAddr(hMcbsp);          //  source addr
-
-	tccRcvPing = EDMA_intAlloc(-1);                        // next available TCC
-	configEDMARcv.opt |= EDMA_FMK(OPT,TCC,tccRcvPing);     // set it
-	
-	/* configure */
-	EDMA_config(hEdmaRcv, &configEDMARcv);
-	EDMA_config(hEdmaReload, &configEDMARcv);
-	/* could we need also some other EDMA read job?*/
-
-
-
-	
-	/* link transfers ping -> pong -> ping */
-	EDMA_link(hEdmaRcv,xxxxxxx);  /* is that all? */
-
-
-	/* do you want to hear music? */
-
-
-	/* enable EDMA TCC */
-	EDMA_intClear(tccRcvPing);
-	EDMA_intEnable(tccRcvPing);
-	/* some more? */
-
-	/* which EDMAs do we have to enable? */
-	EDMA_enableChannel(hEdmaRcv);
-}
 
 
 void config_interrupts(void)
 {
-	IRQ_map(IRQ_EVT_xxxx, 123456);
-	IRQ_clear(xxxxx);
-	IRQ_enable(xxxxx);
+	IRQ_map(IRQ_EVT_EDMAINT, 8);		// CHECK same settings in BIOS!!!
+	IRQ_clear(IRQ_EVT_EDMAINT);
+	IRQ_enable(IRQ_EVT_EDMAINT);
+
+	SWI_enable();
+
 	IRQ_globalEnable();
 }
 
 
-void EDMA_interrupt_service(void)
+void EDMA_ISR(void)
 {
-	xxx int rcvPingDone=0;	//static
-	xxx int rcvPongDone=0;
-	xxx int xmtPingDone=0;
-	xxx int xmtPongDone=0;
+	/*
+	static int rcvPingDone=0;	//static
+	static int rcvPongDone=0;
+	static int xmtPingDone=0;
+	static int xmtPongDone=0;
 	
 	if(EDMA_intTest(tccRcvPing)) {
-		EDMA_intClear(tccRcvPing); /* clear is mandatory */
+		EDMA_intClear(tccRcvPing); // clear is mandatory
 		rcvPingDone=1;
 	}
 	else if(xxxxxxxxx) {
@@ -232,6 +205,7 @@ void EDMA_interrupt_service(void)
 		// processing in SWI
 		SWI_post(&SWI_process_pong);
 	}
+*/
 }
 
 void process_ping_SWI(void)
@@ -250,6 +224,7 @@ void process_pong_SWI(void)
 		*(Buffer_out_pong+i) = *(Buffer_in_pong+i); 
 }
 
+/* Periodic Function */
 void SWI_LEDToggle(void)
 {
 	SEM_postBinary(&SEM_LEDToggle);	
@@ -263,7 +238,9 @@ void tsk_led_toggle(void)
 	/* process */
 	while(1) {
 		SEM_pendBinary(&SEM_LEDToggle, SYS_FOREVER);
-		
+		DSK6713_LED_toggle(0);
 		DSK6713_LED_toggle(1);
+		DSK6713_LED_toggle(2);
+		DSK6713_LED_toggle(3);
 	}
 }

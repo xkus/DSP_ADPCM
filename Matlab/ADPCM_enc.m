@@ -1,11 +1,11 @@
 % ADPCM Encoder
 clear all
 % read wave file
-[a, Fs] = audioread('R.I.O. feat. U-Jean - Summer Jam.wav');
+[a, Fs] = audioread('Say My Name.mp3');
 
 % 50ms sample of wave file
 anz = Fs * 100;
-pos = Fs * 10;  % Set cut offset (Cut of top of song)
+pos = Fs * 50;  % Set cut offset (Cut of top of song)
 x = a(pos:pos+anz-1, 1);    % left channel
 %sound(x,Fs);
 
@@ -65,8 +65,8 @@ for i = N:-1:1
    bf(1,i+1) = ef(i)*(-y(i))+bf(1,i);
 end;
 bf(1,1) = ef(1);
-x(k) = ef(1);
+x1(k) = ef(1);
 end;
 
-sound(x,Fs);
+sound(x1,Fs);
 

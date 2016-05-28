@@ -71,6 +71,7 @@ _SDRAM = SDRAM;
 _IRAM = IRAM;
 _MYBUFFERS = MYBUFFERS;
 _PRD_clock = PRD_clock;
+_PRD_LEDToggle = PRD_LEDToggle;
 _RTA_fromHost = RTA_fromHost;
 _RTA_toHost = RTA_toHost;
 _HWI_RESET = HWI_RESET;
@@ -89,12 +90,15 @@ _HWI_INT12 = HWI_INT12;
 _HWI_INT13 = HWI_INT13;
 _HWI_INT14 = HWI_INT14;
 _HWI_INT15 = HWI_INT15;
+_PRD_swi = PRD_swi;
 _KNL_swi = KNL_swi;
 _TSK_idle = TSK_idle;
+_TSK_LEDTOGGLE = TSK_LEDTOGGLE;
 _IDL_cpuLoad = IDL_cpuLoad;
 _LNK_dataPump = LNK_dataPump;
 _RTA_dispatcher = RTA_dispatcher;
 _LOG_system = LOG_system;
+_SEM_LEDToggle = SEM_LEDToggle;
 _IDL_busyObj = IDL_busyObj;
 
 /* MODULE GBL */
@@ -144,7 +148,7 @@ SECTIONS {
    .prd: RUN_START(PRD_A_TABBEG), RUN_END(PRD_A_TABEND) {
    } > IRAM
 }
-PRD_A_TABLEN = 0;
+PRD_A_TABLEN = 1;
 
 /* MODULE RTDX */
 _RTDX_interrupt_mask = 0x0;
@@ -171,7 +175,7 @@ SECTIONS {
    .swi: RUN_START(SWI_A_TABBEG), RUN_END(SWI_A_TABEND) {
    } > IRAM
 }
-SWI_A_TABLEN = 1;
+SWI_A_TABLEN = 2;
 
 /* MODULE TSK */
 SECTIONS {
@@ -205,6 +209,8 @@ SECTIONS {
         .sysdata: {} > IRAM
 
         .dsm: {} > IRAM
+
+        .sem: {} > IRAM
 
         frt:    {} > IRAM
 
@@ -244,6 +250,10 @@ SECTIONS {
 
         .TSK_idle$stk: {
             *(.TSK_idle$stk)
+        } > IRAM
+
+        .TSK_LEDTOGGLE$stk: {
+            *(.TSK_LEDTOGGLE$stk)
         } > IRAM
 
         /* LOG_system buffer */

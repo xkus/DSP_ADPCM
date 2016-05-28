@@ -76,6 +76,13 @@
 	.global	_DHL_FXNS
 	.global	_DPI_FXNS
 	.global	_GBL_setPLLto225MHz
+	.global	_my_interrupt_func
+	.global	led_toggle
+	.global	_EDMA_ISR
+	.global	_task_led_toggle
+	.global	HWI_unused
+	.global	_SWI_LEDToggle
+	.global	_tsk_led_toggle
 
 ;; MODULE PARAMETERS
 GBL$                .set 1
@@ -134,7 +141,7 @@ CLK_LTIMEDIV        .set 01H
 CLK_LTIMEMULT       .set 036ee8H
 CLK_HTIMEPERLTIME   .set 0dbbaH
 PRD$                .set 1
-PRD_SCALAR          .set 04000H
+PRD_SCALAR          .set 08H
 RTDX$               .set 1
 RTDX_USERTDX        .set 01H
 RTDX_USERTEXECUTION .set 00H
@@ -153,7 +160,7 @@ HWI_GENERATE_RESET_VEC .set 00H
 HWI_POLARITYMASK    .set 00H
 HWI_INTRMULTLOW     .set 0310718a4H
 HWI_INTRMULTHIGH    .set 082039a3H
-HWI_CFGDISPATCHED   .set 04008H
+HWI_CFGDISPATCHED   .set 05108H
 SWI$                .set 1
 TSK$                .set 1
 TSK_STACKSIZE       .set 0400H
@@ -171,7 +178,7 @@ PIP$                .set 0
 PIP_gNumEmbed       .set 02H
 PIP_gNextId         .set 00H
 PIP_OBJSIZE         .set 064H
-SEM$                .set 0
+SEM$                .set 1
 MBX$                .set 0
 QUE$                .set 1
 LCK$                .set 1

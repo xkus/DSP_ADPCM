@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Wed Apr 06 09:22:06 2016", VERS$DATE
+	.asg "Sat May 28 16:11:45 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -54,7 +54,7 @@ BUF$NUMOF           .set 0
 BUF$SETOF           .set 00H
 CLK$NUMOF           .set 1
 CLK$SETOF           .set 00H
-PRD$NUMOF           .set 0
+PRD$NUMOF           .set 1
 PRD$SETOF           .set 00H
 RTDX$NUMOF          .set 0
 RTDX$SETOF          .set 00H
@@ -62,9 +62,9 @@ HST$NUMOF           .set 2
 HST$SETOF           .set 03H
 HWI$NUMOF           .set 16
 HWI$SETOF           .set 0ffffH
-SWI$NUMOF           .set 1
+SWI$NUMOF           .set 2
 SWI$SETOF           .set 00H
-TSK$NUMOF           .set 1
+TSK$NUMOF           .set 2
 TSK$SETOF           .set 00H
 IDL$NUMOF           .set 3
 IDL$SETOF           .set 00H
@@ -74,7 +74,7 @@ LOG$NUMOF           .set 1
 LOG$SETOF           .set 00H
 PIP$NUMOF           .set 0
 PIP$SETOF           .set 00H
-SEM$NUMOF           .set 0
+SEM$NUMOF           .set 1
 SEM$SETOF           .set 00H
 MBX$NUMOF           .set 0
 MBX$SETOF           .set 00H
@@ -244,7 +244,7 @@ HOOK$SETOF          .set 00H
 	.global PIP_OBJSIZE              ; my_dsp_projectcfg.h62
 
 ;; module SEM ()
-	.global SEM$                     ; == 0
+	.global SEM$                     ; == 1
 
 ;; module MBX ()
 	.global MBX$                     ; == 0
@@ -380,7 +380,7 @@ HOOK$SETOF          .set 00H
 	CLK_config  _INTBIT, _REGS, _TIMERNUM, _USETIMER, _MICROSECS, _TCR, _TDDR, _TDDRHIGH, _PRD, _PRDHIGH, _COUNTSPMS, _COUNTSPMSHIGH, _TIMEFXN, _HOOKFXN, _CALDIV, _CALMULT, _HTIMEDIV, _HTIMEMULT, _LTIMEDIV, _LTIMEMULT, _HTIMEPERLTIME
 
 ;; ======== PRD_config ========
-	.asg 04000H, _SCALAR
+	.asg 08H, _SCALAR
 	.asg _KNL_tick, _THOOKFXN
 	PRD_config  _SCALAR, _THOOKFXN
 
@@ -408,7 +408,7 @@ HOOK$SETOF          .set 00H
 	.asg 00H, _POLARITYMASK
 	.asg 0310718a4H, _INTRMULTLOW
 	.asg 082039a3H, _INTRMULTHIGH
-	.asg 04008H, _CFGDISPATCHED
+	.asg 05108H, _CFGDISPATCHED
 	HWI_config  _ZEROTAB, _GENERATE_RESET_VEC, _POLARITYMASK, _INTRMULTLOW, _INTRMULTHIGH, _CFGDISPATCHED
 
 ;; ======== SWI_config ========
@@ -551,6 +551,24 @@ HOOK$SETOF          .set 00H
 	.global PRD_clock
 	.asg PRD_F_tick, _function
 	CLK_Obj 1, PRD_clock, 0, _function
+
+;; ======== PRD_Obj PRD_LEDToggle ========
+;; <add comments here>
+;;
+;; PRD_Obj PRD_LEDToggle (period, mode, function, arg0, arg1, Order, filter, maxformat, sumformat, avgformat, unittype)
+	.global PRD_LEDToggle
+	.asg 03e8H, _period
+	.asg "continuous", _mode
+	.asg _SWI_LEDToggle, _function
+	.asg 00H, _arg0
+	.asg 00H, _arg1
+	.asg 02H, _Order
+	.asg 00H, _filter
+	.asg "%g ticks", _maxformat
+	.asg "%g ticks", _sumformat
+	.asg "%.2f ticks", _avgformat
+	.asg 02H, _unittype
+	PRD_Obj 1, PRD_LEDToggle, 0, _period, _mode, _function, _arg0, _arg1, _Order, _filter, _maxformat, _sumformat, _avgformat, _unittype
 
 ;; ======== HST_Obj RTA_fromHost ========
 ;; Used to access LOG and STS data
@@ -735,13 +753,13 @@ HOOK$SETOF          .set 00H
 ;;
 ;; HWI_Obj HWI_INT8 (function, monitor, addr, dataType, operation, client, iUseDispatcher, iArg, IntrMask, iCCBitMask, iLoadTrack)
 	.global HWI_INT8
-	.asg HWI_unused, _function
+	.asg _EDMA_ISR, _function
 	.asg "Nothing", _monitor
 	.asg 00H, _addr
 	.asg "signed", _dataType
 	.asg "STS_add(*addr)", _operation
 	.asg "USER", _client
-	.asg 00H, _iUseDispatcher
+	.asg 01H, _iUseDispatcher
 	.asg 00H, _iArg
 	.asg 0100H, _IntrMask
 	.asg 01H, _iCCBitMask
@@ -813,7 +831,7 @@ HOOK$SETOF          .set 00H
 	.asg "signed", _dataType
 	.asg "STS_add(*addr)", _operation
 	.asg "USER", _client
-	.asg 00H, _iUseDispatcher
+	.asg 01H, _iUseDispatcher
 	.asg 00H, _iArg
 	.asg 01000H, _IntrMask
 	.asg 01H, _iCCBitMask
@@ -874,6 +892,27 @@ HOOK$SETOF          .set 00H
 	.asg 00H, _iLoadTrack
 	HWI_Obj 1, HWI_INT15, 15, _function, _monitor, _addr, _dataType, _operation, _client, _iUseDispatcher, _iArg, _IntrMask, _iCCBitMask, _iLoadTrack
 
+;; ======== SWI_Obj PRD_swi ========
+;; This Software ISR executes all configured PRD functions
+;;
+;; SWI_Obj PRD_swi (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global PRD_swi
+	.asg PRD_F_swi, _function
+	.asg 01H, _pri
+	.asg 00H, _mailbox
+	.asg 00H, _arg0
+	.asg 00H, _arg1
+	.asg 01H, _dorta
+	.asg 01H, _Order
+	.asg 02H, _filter
+	.asg "%g inst", _maxformat
+	.asg "%g inst", _sumformat
+	.asg "%.2f inst", _avgformat
+	.asg 01H, _filtmaxmult
+	.asg 01H, _filtsummult
+	.asg 00H, _unittype
+	SWI_Obj 1, PRD_swi, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+
 ;; ======== SWI_Obj KNL_swi ========
 ;; This Software Interrupt calls the TSK scheduler
 ;;
@@ -885,7 +924,7 @@ HOOK$SETOF          .set 00H
 	.asg 00H, _arg0
 	.asg 00H, _arg1
 	.asg 01H, _dorta
-	.asg 00H, _Order
+	.asg 02H, _Order
 	.asg 02H, _filter
 	.asg "%g inst", _maxformat
 	.asg "%g inst", _sumformat
@@ -918,7 +957,7 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _iEXITFLAG
 	.asg 00H, _iUSETSKNAME
 	.asg 00H, _iSTATREG
-	.asg 00H, _Order
+	.asg 01H, _Order
 	.asg 02H, _filter
 	.asg "%g inst", _maxformat
 	.asg "%g inst", _sumformat
@@ -927,6 +966,39 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _filtsummult
 	.asg 00H, _unittype
 	TSK_Obj 1, TSK_idle, 0, _iFXN, _iARG0, _iARG1, _iARG2, _iARG3, _iARG4, _iARG5, _iARG6, _iARG7, _iAUTOSTK, _iMANSTK, _iSTKSZ, _iSTKSEG, _iPRI, _iENV, _iEXITFLAG, _iUSETSKNAME, _iSTATREG, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+
+;; ======== TSK_Obj TSK_LEDTOGGLE ========
+;; <add comments here>
+;;
+;; TSK_Obj TSK_LEDTOGGLE (iFXN, iARG0, iARG1, iARG2, iARG3, iARG4, iARG5, iARG6, iARG7, iAUTOSTK, iMANSTK, iSTKSZ, iSTKSEG, iPRI, iENV, iEXITFLAG, iUSETSKNAME, iSTATREG, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global TSK_LEDTOGGLE
+	.asg _tsk_led_toggle, _iFXN
+	.asg 00H, _iARG0
+	.asg 00H, _iARG1
+	.asg 00H, _iARG2
+	.asg 00H, _iARG3
+	.asg 00H, _iARG4
+	.asg 00H, _iARG5
+	.asg 00H, _iARG6
+	.asg 00H, _iARG7
+	.asg 01H, _iAUTOSTK
+	.asg null, _iMANSTK
+	.asg 0400H, _iSTKSZ
+	.asg IRAM, _iSTKSEG
+	.asg 02H, _iPRI
+	.asg 00H, _iENV
+	.asg 01H, _iEXITFLAG
+	.asg 00H, _iUSETSKNAME
+	.asg 00H, _iSTATREG
+	.asg 03H, _Order
+	.asg 02H, _filter
+	.asg "%g inst", _maxformat
+	.asg "%g inst", _sumformat
+	.asg "%.2f inst", _avgformat
+	.asg 01H, _filtmaxmult
+	.asg 01H, _filtsummult
+	.asg 00H, _unittype
+	TSK_Obj 1, TSK_LEDTOGGLE, 0, _iFXN, _iARG0, _iARG1, _iARG2, _iARG3, _iARG4, _iARG5, _iARG6, _iARG7, _iAUTOSTK, _iMANSTK, _iSTKSZ, _iSTKSEG, _iPRI, _iENV, _iEXITFLAG, _iUSETSKNAME, _iSTATREG, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
 
 ;; ======== IDL_Obj IDL_cpuLoad ========
 ;; This object is required by the system to acquire CPU load data
@@ -966,6 +1038,14 @@ HOOK$SETOF          .set 00H
 	.asg "system", _iType
 	.asg "0x%x, 0x%x, 0x%x", _iFormat
 	LOG_Obj 1, LOG_system, 0, _bufseg, _buflen, _logtype, _iType, _iFormat
+
+;; ======== SEM_Obj SEM_LEDToggle ========
+;; <add comments here>
+;;
+;; SEM_Obj SEM_LEDToggle (iCount)
+	.global SEM_LEDToggle
+	.asg 00H, _iCount
+	SEM_Obj 1, SEM_LEDToggle, 0, _iCount
 
 ;; ======== STS_Obj IDL_busyObj ========
 ;; This object is required by the system to accumulate CPU load statistics

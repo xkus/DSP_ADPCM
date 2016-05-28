@@ -25,17 +25,17 @@ static unsigned short myAIC23_registers[10] = { \
 	            /* XX      00         reserved */                                \
 	            /* RIV     10111      right line input volume: 0 dB */           \
 	                                                                             \
-	    0x0xx, /* Set-Up Reg 2       Left channel headphone volume control */   \
+		0x01f9, /* Set-Up Reg 2       Left channel headphone volume control */   \
 	            /* LRS     0          simultaneous left/right volume: disabled */ \
 	            /* LZC     1          left channel zero-cross detect: enabled */ \
 	            /* LHV     1111001    left headphone volume: 0 dB */             \
 	                                                                             \
-	    0x1f9, /* Set-Up Reg 3       Right channel headphone volume control */  \
+	    0x01f9, /* Set-Up Reg 3       Right channel headphone volume control */  \
 	            /* RLS     0          simultaneous right/left volume:disnabled */ \
 	            /* RZC     1          right channel zero-cross detect: enabled */\
 	            /* RHV     1111001    right headphone volume: 0 dB */            \
 	                                                                             \
-	    0xxxxx, /* Set-Up Reg 4       Analog audio path control */               \
+	    0x0011, /* Set-Up Reg 4       Analog audio path control */               \
 	            /* X       0          reserved */                                \
 	            /* STA     00         sidetone attenuation: -6 dB */             \
 	            /* STE     0          sidetone: disabled */                      \
@@ -86,11 +86,11 @@ static MCBSP_Config mcbspforAIC23Cfg = {
         /* McBSP Control Register */
 		MCBSP_FMKS(SPCR, FREE, NO)              |	// Deaktivierter Freilauf
         MCBSP_FMKS(SPCR, SOFT, NO)              |	// Clock stoppt beim debuggen (sofort)
-        MCBSP_FMKS(SPCR, FRST, xxx)             |	//
+        MCBSP_FMKS(SPCR, FRST, NO)              |	// Kein Frame-Sync Signal da SLAVE
         MCBSP_FMKS(SPCR, GRST, YES)             |	// Reset aus, damit läuft der Samplerate- Generator
         MCBSP_FMKS(SPCR, XINTM, XRDY)           |	// Sender Interrupt wird durch "XRDY-Bit" ausgelöst
         MCBSP_FMKS(SPCR, XSYNCERR, NO)          |	// keine Überwachung der Synchronisation
-        MCBSP_FMKS(SPCR, XRST, xxx)             |	//
+        MCBSP_FMKS(SPCR, XRST, NO)              |	// Reset des SPI, löscht Error-Register
         MCBSP_FMKS(SPCR, DLB, OFF)              |	// Loopback  nicht aktiv
         MCBSP_FMKS(SPCR, RJUST, RZF)            |	// Right justify and zero fill
         MCBSP_FMKS(SPCR, CLKSTP, NODELAY)       |	// Clock startet ohne Verzögerung auf fallenden Flanke (siehe auch PCR-Register)
@@ -160,9 +160,9 @@ void Config_DSK6713_AIC23(void)
 	MCBSP_Handle hMcbsp0;
 	unsigned short i;
 
-	hMcbsp0 = MCBSP_open(MCBSP_xxx, xxxxxx);
-    MCBSP_config(hMcbsp0, xxxxx);
-    MCBSP_start(hMcbsp0, xxxxxx, 220);
+	hMcbsp0 = MCBSP_open(MCBSP_DEV0, MCBSP_OPEN_RESET);
+    MCBSP_config(hMcbsp0, &mcbspforAIC23Cfg);
+    MCBSP_start(hMcbsp0,  MCBSP_XMIT_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC , 220);
   
 	/* jetzt alle Register konfigurieren */
 	/* ein Reset am Anfang ist immer gut, Register 15 --> 0 */
@@ -194,8 +194,12 @@ static void set_aic23_register(MCBSP_Handle hMcbsp,unsigned short regnum, unsign
     regval &= 0x1ff;
     
     /* warten */
-    while (?????MCBSP_xrdy(xxxx));
+    while (!MCBSP_xrdy(hMcbsp));
     
     /* schreiben */
-    MCBSP_write(hMcbsp, xxxxxxx);
+   /*The control word is divided into two parts. The first part is the address block, the second part is the data block:
+		B[15:9] Control Address Bits
+		B[8:0] Control Data Bits
+    */
+    MCBSP_write(hMcbsp, (regnum << 9) | regval);
 }

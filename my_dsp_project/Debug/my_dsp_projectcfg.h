@@ -6,21 +6,27 @@
 
 /*  Include Header Files  */
 #include <std.h>
+#include <prd.h>
 #include <hst.h>
 #include <swi.h>
 #include <tsk.h>
 #include <log.h>
+#include <sem.h>
 #include <sts.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+extern far PRD_Obj PRD_LEDToggle;
 extern far HST_Obj RTA_fromHost;
 extern far HST_Obj RTA_toHost;
+extern far SWI_Obj PRD_swi;
 extern far SWI_Obj KNL_swi;
 extern far TSK_Obj TSK_idle;
+extern far TSK_Obj TSK_LEDTOGGLE;
 extern far LOG_Obj LOG_system;
+extern far SEM_Obj SEM_LEDToggle;
 extern far STS_Obj IDL_busyObj;
 
 
