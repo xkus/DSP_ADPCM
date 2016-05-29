@@ -14,3 +14,5 @@ gitk				Benutzeroberfläche zeigt Änderungen und
 
 Proxy:
 git config --global http.proxy http://NAME:PASSWORT@proxy.hs-karlsruhe.de:8888
+
+git config --global --unset http.proxy
