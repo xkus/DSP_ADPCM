@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/c6000_7.4.16
+CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/c6000_7.4.14
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := -l"./my_dsp_projectcfg.cmd"
@@ -16,13 +16,9 @@ ORDERED_OBJS += \
 "./skeleton.obj" \
 "../linker_cmd.cmd" \
 $(GEN_CMDS__FLAG) \
-<<<<<<< HEAD
 -l"libc.a" \
 -l"C:\ti\C6xCSL\lib_3x\csl6713.lib" \
 -l"C:\ti\DSK6713\c6000\dsk6713\lib\dsk6713bsl.lib" \
-=======
--llibc.a \
->>>>>>> 3f42e8c19c4faaa53298f6f7917dfba923762007
 
 -include ../makefile.init
 
@@ -53,9 +49,6 @@ ifneq ($(strip $(ASM_DEPS)),)
 endif
 ifneq ($(strip $(CC_DEPS)),)
 -include $(CC_DEPS)
-endif
-ifneq ($(strip $(SV7A_DEPS)),)
--include $(SV7A_DEPS)
 endif
 ifneq ($(strip $(S55_DEPS)),)
 -include $(S55_DEPS)
@@ -148,32 +141,22 @@ all: my_dsp_project.out
 my_dsp_project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C6000 Linker'
-<<<<<<< HEAD
 	"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/bin/cl6x" -mv6700 --abi=coffabi -g --define=CHIP_6713 --display_error_number --diag_warning=225 --diag_wrap=off -z --stack_size=0x800 -m"my_dsp_project.map" --heap_size=0x800 -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/lib" -i"C:/ti/C6xCSL/include" -i"C:/ti/DSK6713/c6000/dsk6713/include" -i"C:/ti/DSK6713/c6000/dsk6713/lib" -i"C:/ti/C6xCSL/lib_3x" -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include" -i"C:/ti/bios_5_42_01_09/packages/ti/rtdx/lib/c6000" -i"C:/ti/bios_5_42_01_09/packages/ti/bios/lib" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="my_dsp_project_linkInfo.xml" --rom_model -o "my_dsp_project.out" $(ORDERED_OBJS)
-=======
-	"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --define=c6713 --define=CHIP_6713 --display_error_number --diag_warning=225 --diag_wrap=off -z --stack_size=0x800 -m"my_dsp_project.map" --heap_size=0x800 -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib" -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" -i"C:/ti/bios_5_42_01_09/packages/ti/rtdx/lib/c6000" -i"C:/ti/bios_5_42_01_09/packages/ti/bios/lib" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="my_dsp_project_linkInfo.xml" --rom_model -o "my_dsp_project.out" $(ORDERED_OBJS)
->>>>>>> 3f42e8c19c4faaa53298f6f7917dfba923762007
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 my_dsp_project.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: C6000 Hex Utility'
-	"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/hex6x"  -o "my_dsp_project.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/bin/hex6x"  -o "my_dsp_project.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(GEN_HDRS__QUOTED)$(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_CMDS__QUOTED)
-<<<<<<< HEAD
 	-$(RM) "config_AIC23.pp" "my_dsp_projectcfg_c.pp" "skeleton.pp" 
 	-$(RM) "my_dsp_projectcfg.pp" 
 	-$(RM) "config_AIC23.obj" "my_dsp_projectcfg.obj" "my_dsp_projectcfg_c.obj" "skeleton.obj" 
-=======
-	-$(RM) "config_AIC23.d" "main.d" "my_dsp_projectcfg_c.d" "skeleton.d" 
-	-$(RM) "my_dsp_projectcfg.d" 
-	-$(RM) "config_AIC23.obj" "main.obj" "my_dsp_projectcfg.obj" "my_dsp_projectcfg_c.obj" "skeleton.obj" 
->>>>>>> 3f42e8c19c4faaa53298f6f7917dfba923762007
 	-@echo 'Finished clean'
 	-@echo ' '
 

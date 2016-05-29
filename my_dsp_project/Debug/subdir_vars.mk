@@ -31,19 +31,12 @@ GEN_HDRS += \
 ./my_dsp_projectcfg.h?? 
 
 S??_DEPS += \
-./my_dsp_projectcfg.d 
+./my_dsp_projectcfg.pp 
 
 C_DEPS += \
-<<<<<<< HEAD
 ./config_AIC23.pp \
 ./my_dsp_projectcfg_c.pp \
 ./skeleton.pp 
-=======
-./config_AIC23.d \
-./main.d \
-./my_dsp_projectcfg_c.d \
-./skeleton.d 
->>>>>>> 3f42e8c19c4faaa53298f6f7917dfba923762007
 
 GEN_CMDS += \
 ./my_dsp_projectcfg.cmd 
@@ -66,19 +59,12 @@ GEN_FILES__QUOTED += \
 "my_dsp_projectcfg_c.c" 
 
 C_DEPS__QUOTED += \
-<<<<<<< HEAD
 "config_AIC23.pp" \
 "my_dsp_projectcfg_c.pp" \
 "skeleton.pp" 
-=======
-"config_AIC23.d" \
-"main.d" \
-"my_dsp_projectcfg_c.d" \
-"skeleton.d" 
->>>>>>> 3f42e8c19c4faaa53298f6f7917dfba923762007
 
 S??_DEPS__QUOTED += \
-"my_dsp_projectcfg.d" 
+"my_dsp_projectcfg.pp" 
 
 OBJS__QUOTED += \
 "config_AIC23.obj" \

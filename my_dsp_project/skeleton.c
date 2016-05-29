@@ -153,6 +153,10 @@ main()
 	/* configure EDMA */
     //config_EDMA();
 
+	DSK6713_LED_off(0);
+	DSK6713_LED_on(1);
+	DSK6713_LED_off(2);
+	DSK6713_LED_on(3);
     /* finally the interrupts */
     config_interrupts();
 
