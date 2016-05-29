@@ -23,6 +23,8 @@ extern far HST_Obj RTA_fromHost;
 extern far HST_Obj RTA_toHost;
 extern far SWI_Obj PRD_swi;
 extern far SWI_Obj KNL_swi;
+extern far SWI_Obj SWI_Ping;
+extern far SWI_Obj SWI_Pong;
 extern far TSK_Obj TSK_idle;
 extern far TSK_Obj TSK_LEDTOGGLE;
 extern far LOG_Obj LOG_system;

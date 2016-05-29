@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Sun May 29 12:51:24 2016" { 
+    global DATE :: "Sun May 29 15:34:32 2016" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -4856,7 +4856,7 @@ type SWI {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global gNumOf :: 2 { 
+    global gNumOf :: 4 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -7044,7 +7044,7 @@ type STS {
         prop Writable :: 1
         prop NoGen :: 1
     }
-    global gNumEmbed :: 4 { 
+    global gNumEmbed :: 6 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -8837,5 +8837,49 @@ object PRD_LEDToggle :: PRD {
     param sumformat :: "%g ticks"
     param avgformat :: "%.2f ticks"
     param unittype :: 2
+}
+
+object SWI_Ping :: SWI {
+    param iComment :: "<add comments here>"
+    param iIsUsed :: 1
+    param iId :: 0
+    param iDelUser :: "USER"
+    param iDelMsg :: "ok"
+    param function :: @_process_ping_SWI
+    param pri :: 1
+    param mailbox :: 0
+    param arg0 :: 0
+    param arg1 :: 0
+    param dorta :: 1
+    param Order :: 3
+    param filter :: 2
+    param maxformat :: "%g inst"
+    param sumformat :: "%g inst"
+    param avgformat :: "%.2f inst"
+    param filtmaxmult :: 1
+    param filtsummult :: 1
+    param unittype :: 0
+}
+
+object SWI_Pong :: SWI {
+    param iComment :: "<add comments here>"
+    param iIsUsed :: 1
+    param iId :: 0
+    param iDelUser :: "USER"
+    param iDelMsg :: "ok"
+    param function :: @_process_pong_SWI
+    param pri :: 1
+    param mailbox :: 0
+    param arg0 :: 0
+    param arg1 :: 0
+    param dorta :: 1
+    param Order :: 4
+    param filter :: 2
+    param maxformat :: "%g inst"
+    param sumformat :: "%g inst"
+    param avgformat :: "%.2f inst"
+    param filtmaxmult :: 1
+    param filtsummult :: 1
+    param unittype :: 0
 }
 

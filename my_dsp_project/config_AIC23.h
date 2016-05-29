@@ -5,4 +5,4 @@
 /*********************************/
 
 void Config_DSK6713_AIC23(void);
-void set_aic23_register(MCBSP_Handle hMcbsp,unsigned short regnum, unsigned short regval);
+static void set_aic23_register(MCBSP_Handle hMcbsp,unsigned short regnum, unsigned short regval);

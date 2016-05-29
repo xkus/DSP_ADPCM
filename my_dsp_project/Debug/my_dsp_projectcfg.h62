@@ -83,6 +83,8 @@
 	.global	HWI_unused
 	.global	_SWI_LEDToggle
 	.global	_tsk_led_toggle
+	.global	_process_ping_SWI
+	.global	_process_pong_SWI
 
 ;; MODULE PARAMETERS
 GBL$                .set 1

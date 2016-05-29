@@ -25,15 +25,15 @@ static unsigned short myAIC23_registers[10] = { \
 	            /* XX      00         reserved */                                \
 	            /* RIV     10111      right line input volume: 0 dB */           \
 	                                                                             \
-		0x01f9, /* Set-Up Reg 2       Left channel headphone volume control */   \
+		0x01ff, /* Set-Up Reg 2       Left channel headphone volume control */   \
 	            /* LRS     0          simultaneous left/right volume: disabled */ \
 	            /* LZC     1          left channel zero-cross detect: enabled */ \
 	            /* LHV     1111001    left headphone volume: 0 dB */             \
 	                                                                             \
-	    0x01f9, /* Set-Up Reg 3       Right channel headphone volume control */  \
+	    0x01ff, /* Set-Up Reg 3       Right channel headphone volume control */  \
 	            /* RLS     0          simultaneous right/left volume:disnabled */ \
 	            /* RZC     1          right channel zero-cross detect: enabled */\
-	            /* RHV     1111001    right headphone volume: 0 dB */            \
+	            /* RHV     1111001 (f9)   right headphone volume: 0 dB */            \
 	                                                                             \
 	    0x0011, /* Set-Up Reg 4       Analog audio path control */               \
 	            /* X       0          reserved */                                \
@@ -86,7 +86,7 @@ static MCBSP_Config mcbspforAIC23Cfg = {
         /* McBSP Control Register */
 		MCBSP_FMKS(SPCR, FREE, NO)              |	// Deaktivierter Freilauf
         MCBSP_FMKS(SPCR, SOFT, NO)              |	// Clock stoppt beim debuggen (sofort)
-        MCBSP_FMKS(SPCR, FRST, NO)              |	// Kein Frame-Sync Signal da SLAVE
+        MCBSP_FMKS(SPCR, FRST, YES)             |	// Frame-Sync Signal erzeugen da MASTER
         MCBSP_FMKS(SPCR, GRST, YES)             |	// Reset aus, damit läuft der Samplerate- Generator
         MCBSP_FMKS(SPCR, XINTM, XRDY)           |	// Sender Interrupt wird durch "XRDY-Bit" ausgelöst
         MCBSP_FMKS(SPCR, XSYNCERR, NO)          |	// keine Überwachung der Synchronisation

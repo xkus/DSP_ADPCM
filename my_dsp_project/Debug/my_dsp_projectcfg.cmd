@@ -92,6 +92,8 @@ _HWI_INT14 = HWI_INT14;
 _HWI_INT15 = HWI_INT15;
 _PRD_swi = PRD_swi;
 _KNL_swi = KNL_swi;
+_SWI_Ping = SWI_Ping;
+_SWI_Pong = SWI_Pong;
 _TSK_idle = TSK_idle;
 _TSK_LEDTOGGLE = TSK_LEDTOGGLE;
 _IDL_cpuLoad = IDL_cpuLoad;
@@ -175,7 +177,7 @@ SECTIONS {
    .swi: RUN_START(SWI_A_TABBEG), RUN_END(SWI_A_TABEND) {
    } > IRAM
 }
-SWI_A_TABLEN = 2;
+SWI_A_TABLEN = 4;
 
 /* MODULE TSK */
 SECTIONS {
