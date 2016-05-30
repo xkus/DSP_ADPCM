@@ -14,11 +14,13 @@ S??_SRCS += \
 
 C_SRCS += \
 ../config_AIC23.c \
+../config_BSPLink.c \
 ./my_dsp_projectcfg_c.c \
 ../skeleton.c 
 
 OBJS += \
 ./config_AIC23.obj \
+./config_BSPLink.obj \
 ./my_dsp_projectcfg.obj \
 ./my_dsp_projectcfg_c.obj \
 ./skeleton.obj 
@@ -35,6 +37,7 @@ S??_DEPS += \
 
 C_DEPS += \
 ./config_AIC23.pp \
+./config_BSPLink.pp \
 ./my_dsp_projectcfg_c.pp \
 ./skeleton.pp 
 
@@ -60,6 +63,7 @@ GEN_FILES__QUOTED += \
 
 C_DEPS__QUOTED += \
 "config_AIC23.pp" \
+"config_BSPLink.pp" \
 "my_dsp_projectcfg_c.pp" \
 "skeleton.pp" 
 
@@ -68,12 +72,14 @@ S??_DEPS__QUOTED += \
 
 OBJS__QUOTED += \
 "config_AIC23.obj" \
+"config_BSPLink.obj" \
 "my_dsp_projectcfg.obj" \
 "my_dsp_projectcfg_c.obj" \
 "skeleton.obj" 
 
 C_SRCS__QUOTED += \
 "../config_AIC23.c" \
+"../config_BSPLink.c" \
 "./my_dsp_projectcfg_c.c" \
 "../skeleton.c" 
 

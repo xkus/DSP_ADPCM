@@ -11,6 +11,7 @@ GEN_CMDS__FLAG := -l"./my_dsp_projectcfg.cmd"
 
 ORDERED_OBJS += \
 "./config_AIC23.obj" \
+"./config_BSPLink.obj" \
 "./my_dsp_projectcfg.obj" \
 "./my_dsp_projectcfg_c.obj" \
 "./skeleton.obj" \
@@ -154,9 +155,9 @@ my_dsp_project.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_HDRS__QUOTED)$(GEN_MISC_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_CMDS__QUOTED)
-	-$(RM) "config_AIC23.pp" "my_dsp_projectcfg_c.pp" "skeleton.pp" 
+	-$(RM) "config_AIC23.pp" "config_BSPLink.pp" "my_dsp_projectcfg_c.pp" "skeleton.pp" 
 	-$(RM) "my_dsp_projectcfg.pp" 
-	-$(RM) "config_AIC23.obj" "my_dsp_projectcfg.obj" "my_dsp_projectcfg_c.obj" "skeleton.obj" 
+	-$(RM) "config_AIC23.obj" "config_BSPLink.obj" "my_dsp_projectcfg.obj" "my_dsp_projectcfg_c.obj" "skeleton.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

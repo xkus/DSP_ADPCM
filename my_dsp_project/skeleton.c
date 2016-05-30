@@ -21,7 +21,9 @@
 #include <dsk6713_led.h>
 #include <dsk6713.h>
 #include "config_AIC23.h"
+#include "config_BSPLink.h"
 #include "skeleton.h"
+
 
 #define BUFFER_LEN 50000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
@@ -155,16 +157,9 @@ EDMA_Config configEDMAXmt = {
 };
 
 
-/* Transfer-Complete-Codes for EDMA-Jobs */
-int tccRcvPing;
-int tccRcvPong;
-int tccXmtPing;
-int tccXmtPong;
 
-/* EDMA-Handles; are these really all? */
-EDMA_Handle hEdmaRcv;  
-EDMA_Handle hEdmaReload; 
-						
+
+
 								
 int configComplete = 0;
 Uint8 t_reg = 0;
@@ -186,7 +181,7 @@ main()
 	DSK6713_LED_off(0);
 	DSK6713_LED_on(1);
 	DSK6713_LED_off(2);
-	DSK6713_LED_on(3);
+	DSK6713_LED_off(3);
     /* finally the interrupts */
     config_interrupts();
 
@@ -373,25 +368,20 @@ void tsk_led_toggle(void)
 		if(configComplete >= 2)
 		{
 			t_reg = DSK6713_rget(DSK6713_MISC);
-			t_reg &= ~MCBSP1SEL;				// Set MCBSP1SEL to 1 (extern)
+			t_reg &= ~MCBSP1SEL;				// Set MCBSP0 to 1 (extern)
 			DSK6713_rset(DSK6713_MISC,t_reg);
 
-				configComplete = 0;
-				//DSK6713_rset(DSK6713_MISC,MCBSP1SEL);
-			    //t_reg = DSK6713_rget(DSK6713_MISC);
-			    //t_reg &= ~MCBSP1SEL;				// Set MCBSP1SEL to 1 (extern)
-			    //DSK6713_rset(DSK6713_MISC,t_reg);
+			/* configure BSPLink-Interface */
+			config_BSPLink();
 
-				DSK6713_LED_on(0);
-				DSK6713_LED_on(1);
-				DSK6713_LED_on(2);
-				DSK6713_LED_on(3);
+			configComplete = 0;
+
+			DSK6713_LED_on(0);
+			DSK6713_LED_on(1);
 			}
 
 		DSK6713_LED_toggle(0);
 		DSK6713_LED_toggle(1);
-		DSK6713_LED_toggle(2);
-		DSK6713_LED_toggle(3);
 
 
 	}

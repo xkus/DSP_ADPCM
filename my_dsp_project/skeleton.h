@@ -26,4 +26,9 @@ EDMA_Handle hEdmaXmtRelPing;
 EDMA_Handle hEdmaXmtRelPong;
 
 	
+/* Transfer-Complete-Codes for EDMA-Jobs */
+int tccRcvPing;
+int tccRcvPong;
+int tccXmtPing;
+int tccXmtPong;
 #endif /*SKELETON_H*/
