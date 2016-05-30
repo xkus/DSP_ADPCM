@@ -8,6 +8,8 @@
 #include <csl_mcbsp.h>
 #include "config_AIC23.h"
 
+
+MCBSP_Handle hMcbsp_AIC23_Config;
 /***************************************************/
 /* Konfiguration des AIC23 aus Online-Help des CCS */
 /* Data Converter/Devices/TLV320AIC23              */
@@ -25,12 +27,12 @@ static unsigned short myAIC23_registers[10] = { \
 	            /* XX      00         reserved */                                \
 	            /* RIV     10111      right line input volume: 0 dB */           \
 	                                                                             \
-		0x01ff, /* Set-Up Reg 2       Left channel headphone volume control */   \
+		0x01f9, /* Set-Up Reg 2       Left channel headphone volume control */   \
 	            /* LRS     0          simultaneous left/right volume: disabled */ \
 	            /* LZC     1          left channel zero-cross detect: enabled */ \
 	            /* LHV     1111001    left headphone volume: 0 dB */             \
 	                                                                             \
-	    0x01ff, /* Set-Up Reg 3       Right channel headphone volume control */  \
+	    0x01f9, /* Set-Up Reg 3       Right channel headphone volume control */  \
 	            /* RLS     0          simultaneous right/left volume:disnabled */ \
 	            /* RZC     1          right channel zero-cross detect: enabled */\
 	            /* RHV     1111001 (f9)   right headphone volume: 0 dB */            \
@@ -157,32 +159,28 @@ static MCBSP_Config mcbspforAIC23Cfg = {
 void Config_DSK6713_AIC23(void)
 {
 	/* Handle für Steuerkanal */
-	MCBSP_Handle hMcbsp0;
 	unsigned short i;
 
-	hMcbsp0 = MCBSP_open(MCBSP_DEV0, MCBSP_OPEN_RESET);
-    MCBSP_config(hMcbsp0, &mcbspforAIC23Cfg);
-    MCBSP_start(hMcbsp0,  MCBSP_XMIT_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC , 220);
+	hMcbsp_AIC23_Config = MCBSP_open(MCBSP_DEV0, MCBSP_OPEN_RESET);
+    MCBSP_config(hMcbsp_AIC23_Config, &mcbspforAIC23Cfg);
+    MCBSP_start(hMcbsp_AIC23_Config,  MCBSP_XMIT_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC , 220);
   
 	/* jetzt alle Register konfigurieren */
 	/* ein Reset am Anfang ist immer gut, Register 15 --> 0 */
 	/* die 0 haben wir uns gespart, nach AIC23_registers aufzunehmen */
-    set_aic23_register(hMcbsp0,15,0);
+    set_aic23_register(hMcbsp_AIC23_Config,15,0);
 
     /* power-down Register zuerst */
-    set_aic23_register(hMcbsp0,6,myAIC23_registers[6]);
+    set_aic23_register(hMcbsp_AIC23_Config,6,myAIC23_registers[6]);
 
     /* jetzt die anderen */
     for (i = 0; i < 6; i++)
-      set_aic23_register(hMcbsp0,i,myAIC23_registers[i]);
+      set_aic23_register(hMcbsp_AIC23_Config,i,myAIC23_registers[i]);
     for (i = 7; i < 10; i++)
-      set_aic23_register(hMcbsp0,i,myAIC23_registers[i]);     
+      set_aic23_register(hMcbsp_AIC23_Config,i,myAIC23_registers[i]);
 
 	 /* fertig, aber MCBSP nicht schließen, sonst kein Takt an Codec!*/
 }
-
-
-
 
 
 static void set_aic23_register(MCBSP_Handle hMcbsp,unsigned short regnum, unsigned short regval)

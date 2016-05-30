@@ -31,4 +31,5 @@ int tccRcvPing;
 int tccRcvPong;
 int tccXmtPing;
 int tccXmtPong;
+
 #endif /*SKELETON_H*/

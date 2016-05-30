@@ -22,10 +22,11 @@
 #include <dsk6713.h>
 #include "config_AIC23.h"
 #include "config_BSPLink.h"
+#include "Sounds.h"
 #include "skeleton.h"
 
 
-#define BUFFER_LEN 50000
+#define BUFFER_LEN 5000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -36,6 +37,8 @@ short Buffer_in_pong[BUFFER_LEN];
 short Buffer_out_ping[BUFFER_LEN];
 #pragma DATA_SECTION(Buffer_out_pong, ".datenpuffer");
 short Buffer_out_pong[BUFFER_LEN];
+
+Uint32 soundBuffer_i = 0;
 
 //Configuration for McBSP1 (data-interface)
 MCBSP_Config datainterface_config = {
@@ -157,15 +160,13 @@ EDMA_Config configEDMAXmt = {
 };
 
 
-
-
-
 								
 int configComplete = 0;
-Uint8 t_reg = 0;
+Uint8 t_reg =
+0;
 main()
 {
-
+	DSK6713_init();
 	CSL_init();  
 	
 	/* Configure McBSP0 and AIC23 */
@@ -336,12 +337,20 @@ void process_pong_SWI(void)
 
 void process_buffer(short * buffersrc, short * bufferdes)
 {
-	//
+	// Buffer ablaufen, Daten verarbeiten
+
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
-			if(i < BUFFER_LEN / 2)
+			if(soundBuffer_i < SOUND_BUFF_LEN-1)
 			{
-				*(bufferdes+i) = (*(buffersrc+i) +*(buffersrc+i+(BUFFER_LEN / 2)))/2 ;
+
+				*(bufferdes+i) = MySound[soundBuffer_i];
+				i++;
+				*(bufferdes+i) = MySound[soundBuffer_i];
+				i++;
+				*(bufferdes+i) = MySound[soundBuffer_i];
+				i++;
+				*(bufferdes+i) = MySound[soundBuffer_i++];
 			}else
 			*(bufferdes+i) = *(buffersrc+i);
 }
@@ -367,6 +376,11 @@ void tsk_led_toggle(void)
 
 		if(configComplete >= 2)
 		{
+
+
+			MCBSP_close(hMcbsp_AIC23_Config);
+
+			/* Set McBSP0 MUX to EXTERN */
 			t_reg = DSK6713_rget(DSK6713_MISC);
 			t_reg &= ~MCBSP1SEL;				// Set MCBSP0 to 1 (extern)
 			DSK6713_rset(DSK6713_MISC,t_reg);
@@ -378,7 +392,7 @@ void tsk_led_toggle(void)
 
 			DSK6713_LED_on(0);
 			DSK6713_LED_on(1);
-			}
+		}
 
 		DSK6713_LED_toggle(0);
 		DSK6713_LED_toggle(1);
