@@ -1,0 +1,25 @@
+/*
+ * config_BSPLink.h
+ *
+ *  Created on: 30.05.2016
+ *      Author: Simon
+ */
+
+#ifndef CONFIG_BSPLINK_H_
+#define CONFIG_BSPLINK_H_
+
+/* Function Prototypes */
+void config_BSPLink_EDMA(void);
+void config_BSPLink();
+
+#define LINK_BUFFER_LEN 50000  // !!! Usually adapted with BUFFER_LEN in Skeleton.c
+
+#define EDMABSPLINK_CH_REVT				EDMA_CHA_REVT0
+#define EDMABSPLINK_CH_XEVT				EDMA_CHA_XEVT0
+
+/* McBSP-Handler for bi-direction DSP-Board Link */
+#define MCBSP_LINK_DEV					MCBSP_DEV0
+
+
+
+#endif /* CONFIG_BSPLINK_H_ */
