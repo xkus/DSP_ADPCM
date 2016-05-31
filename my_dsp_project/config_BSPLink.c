@@ -45,6 +45,7 @@ EDMA_Handle hEdmaBSPLinkXmtRelPing;
 EDMA_Handle hEdmaBSPLinkXmtRelPong;
 
 /* Transfer-Complete-Codes for EDMA-Jobs */
+
 int tccBSPLinkRcvPing;
 int tccBSPLinkRcvPong;
 int tccBSPLinkXmtPing;
@@ -94,9 +95,9 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(SRGR, CLKSP, DEFAULT)        |	// ""		Unrelevant
 		        MCBSP_FMKS(SRGR, CLKSM, INTERNAL)       |	// Samplerate-Clock wird vom CPU-Clock abgeleitet
 		        MCBSP_FMKS(SRGR, FSGM, DXR2XSR)         |	// Framesync- Signal bei jedem DXR zu XSR Kopiervorgang (setzt FPER und FWID ausser Kraft)
-		        MCBSP_FMKS(SRGR, FPER, DEFAULT)         |	// -- TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		        MCBSP_FMKS(SRGR, FWID, DEFAULT)         |	// -- TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				MCBSP_FMKS(SRGR, CLKGDV, OF(99)),		// CPU-Clock Teiler -> 225 MHz / 99 = 2,27MHz
+		        MCBSP_FMKS(SRGR, FPER, OF(15))          |	//
+		        MCBSP_FMKS(SRGR, FWID, OF(0))           |	//
+				MCBSP_FMKS(SRGR, CLKGDV, OF(99)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
 				/* Mehrkanal */
 		        MCBSP_MCR_DEFAULT,				// Mehrkanal wird nicht verwendet
 		        MCBSP_RCER_DEFAULT,				// dito
@@ -106,7 +107,7 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(PCR, RIOEN, SP)              |	// Pin wird für serielle Schnittstelle verwendet (alternativ GPIO)
 		        MCBSP_FMKS(PCR, FSXM, INTERNAL)         |	// Framesync- Signal für Sender generieren (MASTER)
 		        MCBSP_FMKS(PCR, FSRM, EXTERNAL)         |	// Framesync- Signal für Empfänger kommt von extern (Slave)
-		        MCBSP_FMKS(PCR, CLKXM, OUTPUT)           |	// Takt für Sender generieren (MASTER)
+		        MCBSP_FMKS(PCR, CLKXM, OUTPUT)          |	// Takt für Sender generieren (MASTER)
 		        MCBSP_FMKS(PCR, CLKRM, INPUT)           |	// Takt für Empfänger kommt von extern (Slave)
 		        MCBSP_FMKS(PCR, CLKSSTAT, DEFAULT)      |	// unrelevant da PINS keine GPIOs
 		        MCBSP_FMKS(PCR, DXSTAT, DEFAULT)        |	// unrelevant da PINS keine GPIOs

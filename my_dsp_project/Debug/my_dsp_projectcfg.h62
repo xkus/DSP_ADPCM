@@ -85,6 +85,7 @@
 	.global	_tsk_led_toggle
 	.global	_process_ping_SWI
 	.global	_process_pong_SWI
+	.global	_process_BSPLink_ping
 
 ;; MODULE PARAMETERS
 GBL$                .set 1

@@ -162,8 +162,7 @@ EDMA_Config configEDMAXmt = {
 
 								
 int configComplete = 0;
-Uint8 t_reg =
-0;
+Uint8 t_reg = 0;
 main()
 {
 	DSK6713_init();
@@ -289,6 +288,10 @@ void EDMA_ISR(void)
 	static int rcvPongDone=0;
 	static int xmtPingDone=0;
 	static int xmtPongDone=0;
+
+	// BSP Data Link Interface
+	static int xmtBSPLinkPingDone=0;
+	static int xmtBSPLinkPongDone=0;
 	
 	if(EDMA_intTest(tccRcvPing)) {
 		EDMA_intClear(tccRcvPing); // clear is mandatory
@@ -297,17 +300,27 @@ void EDMA_ISR(void)
 	else if(EDMA_intTest(tccRcvPong)) {
 			EDMA_intClear(tccRcvPong);
 			rcvPongDone=1;
-		}
+	}
 	
 	if(EDMA_intTest(tccXmtPing)) {
 			EDMA_intClear(tccXmtPing);
 			xmtPingDone=1;
-
-		}
-		else if(EDMA_intTest(tccXmtPong)) {
+	}
+	else if(EDMA_intTest(tccXmtPong)) {
 			EDMA_intClear(tccXmtPong);
 			xmtPongDone=1;
-		}
+	}
+
+	// BSP Data Link Interface
+	if(EDMA_intTest(tccBSPLinkXmtPing)) {
+		EDMA_intClear(tccBSPLinkXmtPing);
+		xmtBSPLinkPingDone=1;
+	}
+	else if(EDMA_intTest(tccBSPLinkXmtPong)) {
+		EDMA_intClear(tccBSPLinkXmtPong);
+		xmtBSPLinkPongDone=1;
+	}
+
 	
 	if(rcvPingDone && xmtPingDone) {
 		rcvPingDone=0;
@@ -322,6 +335,17 @@ void EDMA_ISR(void)
 		SWI_post(&SWI_Pong);
 	}
 
+	if(xmtBSPLinkPingDone) {
+		xmtBSPLinkPingDone=0;
+		// processing in SWI
+		SWI_post(&SWI_BSPLink_Ping);
+	}
+	else if(xmtBSPLinkPongDone) {
+		xmtBSPLinkPongDone=0;
+		// processing in SWI
+		SWI_post(&SWI_BSPLink_Pong);
+	}
+
 }
 
 void process_ping_SWI(void)
@@ -332,6 +356,21 @@ void process_ping_SWI(void)
 void process_pong_SWI(void)
 {
 	process_buffer(Buffer_in_pong,Buffer_out_pong);
+}
+
+
+/* McBSP - BSP-Link-Interface RECEIVE */
+
+void process_BSPLink_ping(void)
+{
+
+	// mach was tolles
+}
+
+void process_BSPLink_pong(void)
+{
+
+	// mach was tolles
 }
 
 

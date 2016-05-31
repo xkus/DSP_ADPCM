@@ -20,6 +20,10 @@ void config_BSPLink();
 /* McBSP-Handler for bi-direction DSP-Board Link */
 #define MCBSP_LINK_DEV					MCBSP_DEV0
 
-
+/* Transfer-Complete-Codes for EDMA-Jobs */
+extern int tccBSPLinkRcvPing;
+extern int tccBSPLinkRcvPong;
+extern int tccBSPLinkXmtPing;
+extern int tccBSPLinkXmtPong;
 
 #endif /* CONFIG_BSPLINK_H_ */

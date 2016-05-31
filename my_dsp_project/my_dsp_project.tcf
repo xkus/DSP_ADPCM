@@ -53,6 +53,13 @@ bios.SWI.instance("SWI_Ping").fxn = prog.extern("process_ping_SWI");
 bios.SWI.create("SWI_Pong");
 bios.SWI.instance("SWI_Pong").order = 4;
 bios.SWI.instance("SWI_Pong").fxn = prog.extern("process_pong_SWI");
+bios.SWI.create("SWI_BSPLink_Ping");
+bios.SWI.instance("SWI_BSPLink_Ping").order = 6;
+bios.SWI.instance("SWI_BSPLink_Ping").fxn = prog.extern("process_BSPLink_ping");
+bios.SWI.create("SWI_BSPLink_Pong");
+bios.SWI.instance("SWI_BSPLink_Pong").order = 7;
+bios.SWI.instance("SWI_BSPLink_Pong").fxn = prog.extern("process_BSPLink_ping");
+bios.MEM.instance("MYBUFFERS").destroy();
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();
