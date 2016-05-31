@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Tue May 31 12:31:15 2016" { 
+    global DATE :: "Tue May 31 14:28:42 2016" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -1418,7 +1418,7 @@ type MEM {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global gNumOf :: 3 { 
+    global gNumOf :: 2 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -4856,7 +4856,7 @@ type SWI {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global gNumOf :: 6 { 
+    global gNumOf :: 4 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -7044,7 +7044,7 @@ type STS {
         prop Writable :: 1
         prop NoGen :: 1
     }
-    global gNumEmbed :: 8 { 
+    global gNumEmbed :: 6 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -8760,24 +8760,6 @@ object IRAM :: MEM {
     param iIsModifiable :: 1
 }
 
-object MYBUFFERS :: MEM {
-    param iComment :: "<add comments here>"
-    param iIsUsed :: 1
-    param iId :: 0
-    param iDelUser :: "USER"
-    param iDelMsg :: "ok"
-    param base :: 253952
-    param len :: 8192
-    param iAllocHeap :: 0
-    param iHeapSize :: 32768
-    param iUserHeapId :: 0
-    param iHeapId :: @segment_name
-    param iReqHeapCount :: 0
-    param space :: "data"
-    param dynamicLoading :: 0
-    param iIsModifiable :: 1
-}
-
 object TSK_LEDTOGGLE :: TSK {
     param iComment :: "<add comments here>"
     param iIsUsed :: 1
@@ -8874,50 +8856,6 @@ object SWI_Pong :: SWI {
     param arg1 :: 0
     param dorta :: 1
     param Order :: 4
-    param filter :: 2
-    param maxformat :: "%g inst"
-    param sumformat :: "%g inst"
-    param avgformat :: "%.2f inst"
-    param filtmaxmult :: 1
-    param filtsummult :: 1
-    param unittype :: 0
-}
-
-object SWI_BSPLink_Ping :: SWI {
-    param iComment :: "<add comments here>"
-    param iIsUsed :: 1
-    param iId :: 0
-    param iDelUser :: "USER"
-    param iDelMsg :: "ok"
-    param function :: @_process_BSPLink_ping
-    param pri :: 1
-    param mailbox :: 0
-    param arg0 :: 0
-    param arg1 :: 0
-    param dorta :: 1
-    param Order :: 6
-    param filter :: 2
-    param maxformat :: "%g inst"
-    param sumformat :: "%g inst"
-    param avgformat :: "%.2f inst"
-    param filtmaxmult :: 1
-    param filtsummult :: 1
-    param unittype :: 0
-}
-
-object SWI_BSPLink_Pong :: SWI {
-    param iComment :: "<add comments here>"
-    param iIsUsed :: 1
-    param iId :: 0
-    param iDelUser :: "USER"
-    param iDelMsg :: "ok"
-    param function :: @_process_BSPLink_ping
-    param pri :: 1
-    param mailbox :: 0
-    param arg0 :: 0
-    param arg1 :: 0
-    param dorta :: 1
-    param Order :: 7
     param filter :: 2
     param maxformat :: "%g inst"
     param sumformat :: "%g inst"

@@ -157,7 +157,7 @@ EDMA_Config configEDMABSPLinkXmt = {
     EDMA_FMKS(OPT, DUM, NONE)          |  // Ziel-update mode -> FEST (McBSP)!!!
     EDMA_FMKS(OPT, TCINT,YES)          |  // EDMA interrupt erzeugen?
     EDMA_FMKS(OPT, TCC, OF(0))         |  // Transfer complete code (TCC)
-    EDMA_FMKS(OPT, LINK, YES)          |  // Link Parameter nutzen?
+    EDMA_FMKS(OPT, LINK, NO)          |  // Link Parameter nutzen?
     EDMA_FMKS(OPT, FS, NO),               // Frame Sync nutzen?
 
 	(Uint32)BSPLinkBuffer_out_ping,			// Quell-Adresse (initialisierung auf ping)
@@ -195,6 +195,17 @@ void config_BSPLink()
 	    DSK6713_LED_on(3);
 }
 
+
+void BSPLink_EDMA_Send_Pong()
+{
+	EDMA_enableChannel(hEdmaBSPLinkXmtRelPong);
+}
+
+
+void BSPLink_EDMA_Send_Ping()
+{
+	EDMA_enableChannel(hEdmaBSPLinkXmtRelPing);
+}
 
 void config_BSPLink_EDMA(void)
 {
@@ -247,9 +258,9 @@ void config_BSPLink_EDMA(void)
 	EDMA_config(hEdmaBSPLinkXmtRelPong, &configEDMABSPLinkXmt);
 
 	/* Transfers verlinken ping -> pong -> ping */
-	EDMA_link(hEdmaBSPLinkXmt, hEdmaBSPLinkXmtRelPong);  /* noch mehr verlinken? */
-	EDMA_link(hEdmaBSPLinkXmtRelPong, hEdmaBSPLinkXmtRelPing);
-	EDMA_link(hEdmaBSPLinkXmtRelPing, hEdmaBSPLinkXmtRelPong);
+	//EDMA_link(hEdmaBSPLinkXmt, hEdmaBSPLinkXmtRelPong);  /* noch mehr verlinken? */
+	//EDMA_link(hEdmaBSPLinkXmtRelPong, hEdmaBSPLinkXmtRelPing);
+	//EDMA_link(hEdmaBSPLinkXmtRelPing, hEdmaBSPLinkXmtRelPong);
 
 
 	/* EDMA TCC-Interrupts freigeben */
@@ -265,5 +276,5 @@ void config_BSPLink_EDMA(void)
 
 	/* EDMA starten, wen alles? */
 	EDMA_enableChannel(hEdmaBSPLinkRcv);
-	EDMA_enableChannel(hEdmaBSPLinkXmt);
+	//EDMA_enableChannel(hEdmaBSPLinkXmt);
 }

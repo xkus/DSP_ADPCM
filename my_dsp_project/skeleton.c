@@ -25,6 +25,8 @@
 #include "Sounds.h"
 #include "skeleton.h"
 
+#define DECODER
+//#define ENCODER
 
 #define BUFFER_LEN 5000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
@@ -292,7 +294,10 @@ void EDMA_ISR(void)
 	// BSP Data Link Interface
 	static int xmtBSPLinkPingDone=0;
 	static int xmtBSPLinkPongDone=0;
-	
+
+	static int rcvBSPLinkPingDone=0;
+	static int rcvBSPLinkPongDone=0;
+
 	if(EDMA_intTest(tccRcvPing)) {
 		EDMA_intClear(tccRcvPing); // clear is mandatory
 		rcvPingDone=1;
@@ -312,6 +317,7 @@ void EDMA_ISR(void)
 	}
 
 	// BSP Data Link Interface
+	// Transmit
 	if(EDMA_intTest(tccBSPLinkXmtPing)) {
 		EDMA_intClear(tccBSPLinkXmtPing);
 		xmtBSPLinkPingDone=1;
@@ -321,56 +327,76 @@ void EDMA_ISR(void)
 		xmtBSPLinkPongDone=1;
 	}
 
-	
-	if(rcvPingDone && xmtPingDone) {
+	// Receive
+	if(EDMA_intTest(tccBSPLinkRcvPing)) {
+		EDMA_intClear(tccBSPLinkRcvPing);
+		rcvBSPLinkPingDone=1;
+	}
+	else if(EDMA_intTest(tccBSPLinkRcvPong)) {
+		EDMA_intClear(tccBSPLinkRcvPong);
+		rcvBSPLinkPongDone=1;
+	}
+
+	// Buffer Verarbeitung
+#ifdef ENCODER
+	// Encoder
+	if(rcvPingDone && xmtBSPLinkPingDone) {
 		rcvPingDone=0;
+		xmtBSPLinkPingDone=0;
+		// processing in SWI
+		BSPLink_EDMA_Send_Pong();
+		SWI_post(&SWI_Ping);
+	}
+	else if(rcvPongDone && xmtBSPLinkPongDone) {
+		rcvPongDone=0;
+		xmtPongDone=0;
+		// processing in SWI
+		BSPLink_EDMA_Send_Ping();
+		SWI_post(&SWI_Pong);
+	}
+#endif
+
+#ifdef DECODER
+	// Decoder
+	if(xmtPingDone && rcvBSPLinkPingDone) {
+		rcvBSPLinkPingDone=0;
 		xmtPingDone=0;
 		// processing in SWI
 		SWI_post(&SWI_Ping);
 	}
-	else if(rcvPongDone && xmtPongDone) {
-		rcvPongDone=0;
+	else if(xmtPongDone && rcvBSPLinkPongDone) {
+		rcvBSPLinkPongDone=0;
 		xmtPongDone=0;
 		// processing in SWI
 		SWI_post(&SWI_Pong);
 	}
-
-	if(xmtBSPLinkPingDone) {
-		xmtBSPLinkPingDone=0;
-		// processing in SWI
-		SWI_post(&SWI_BSPLink_Ping);
-	}
-	else if(xmtBSPLinkPongDone) {
-		xmtBSPLinkPongDone=0;
-		// processing in SWI
-		SWI_post(&SWI_BSPLink_Pong);
-	}
-
+#endif
 }
 
 void process_ping_SWI(void)
 {
-	process_buffer(Buffer_in_ping,Buffer_out_ping);
+#ifdef ENCODER
+	// Encoder
+	process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
+#endif
+
+#ifdef DECODER
+	// Decoder
+	process_buffer(BSPLinkBuffer_in_ping,Buffer_out_ping);
+#endif
 }
 
 void process_pong_SWI(void)
 {
-	process_buffer(Buffer_in_pong,Buffer_out_pong);
-}
+#ifdef ENCODER
+	// Encoder
+	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
+#endif
 
-
-/* McBSP - BSP-Link-Interface RECEIVE */
-
-void process_BSPLink_ping(void)
-{
-
-	// mach was tolles
-}
-
-void process_BSPLink_pong(void)
-{
-
-	// mach was tolles
+#ifdef DECODER
+	// Decoder
+	process_buffer(BSPLinkBuffer_in_pong,Buffer_out_pong);
+#endif
 }
 
 
@@ -380,6 +406,7 @@ void process_buffer(short * buffersrc, short * bufferdes)
 
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
+#ifdef DECODER
 			if(soundBuffer_i < SOUND_BUFF_LEN-1)
 			{
 
@@ -391,6 +418,7 @@ void process_buffer(short * buffersrc, short * bufferdes)
 				i++;
 				*(bufferdes+i) = MySound[soundBuffer_i++];
 			}else
+#endif
 			*(bufferdes+i) = *(buffersrc+i);
 }
 

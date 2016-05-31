@@ -69,7 +69,6 @@ GIO_POSTFXN = _FXN_F_nop;
 /* OBJECT ALIASES */
 _SDRAM = SDRAM;
 _IRAM = IRAM;
-_MYBUFFERS = MYBUFFERS;
 _PRD_clock = PRD_clock;
 _PRD_LEDToggle = PRD_LEDToggle;
 _RTA_fromHost = RTA_fromHost;
@@ -94,8 +93,6 @@ _PRD_swi = PRD_swi;
 _KNL_swi = KNL_swi;
 _SWI_Ping = SWI_Ping;
 _SWI_Pong = SWI_Pong;
-_SWI_BSPLink_Ping = SWI_BSPLink_Ping;
-_SWI_BSPLink_Pong = SWI_BSPLink_Pong;
 _TSK_idle = TSK_idle;
 _TSK_LEDTOGGLE = TSK_LEDTOGGLE;
 _IDL_cpuLoad = IDL_cpuLoad;
@@ -130,7 +127,6 @@ _GBL_CACHE = GBL_CACHE;
 MEMORY {
    SDRAM       : origin = 0x80000000,  len = 0x800000
    IRAM        : origin = 0x0,         len = 0x3e000
-   MYBUFFERS   : origin = 0x3e000,     len = 0x2000
 }
 /* MODULE CLK */
 SECTIONS {
@@ -179,7 +175,7 @@ SECTIONS {
    .swi: RUN_START(SWI_A_TABBEG), RUN_END(SWI_A_TABEND) {
    } > IRAM
 }
-SWI_A_TABLEN = 6;
+SWI_A_TABLEN = 4;
 
 /* MODULE TSK */
 SECTIONS {
