@@ -1,0 +1,11 @@
+
+**** Build of configuration Debug for project my_dsp_project ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'Building target: my_dsp_project.out'
+'Invoking: C6000 Linker'
+"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number -z -m"my_dsp_project.map" --stack_size=0x800 --heap_size=0x800 -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib" -i"C:/ti/C6xCSL/include" -i"C:/ti/DSK6713/c6000/dsk6713/include" -i"C:/ti/DSK6713/c6000/dsk6713/lib" -i"C:/ti/C6xCSL/lib_3x" -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" -i"C:/ti/bios_5_42_01_09/packages/ti/rtdx/lib/c6000" -i"C:/ti/bios_5_42_01_09/packages/ti/bios/lib" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="my_dsp_project_linkInfo.xml" --rom_model -o "my_dsp_project.out" "./config_AIC23.obj" "./my_dsp_projectcfg.obj" "./my_dsp_projectcfg_c.obj" "./skeleton.obj" "../linker_cmd.cmd" -l"./my_dsp_projectcfg.cmd" -llibc.a -l"C:/ti/C6xCSL/lib_3x/csl6713.lib" -l"C:/ti/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib" 
+<Linking>
+warning #10366-D: automatic library build: using library
+   "C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib/rts6700.lib" for the first
+   time, so it must be built.  This may take a few minutes.

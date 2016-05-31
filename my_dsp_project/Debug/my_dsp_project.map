@@ -1,7 +1,7 @@
 ******************************************************************************
-               TMS320C6x Linker PC v7.4.14                     
+               TMS320C6x Linker PC v7.4.16                     
 ******************************************************************************
->> Linked Sun May 29 12:53:10 2016
+>> Linked Sun May 29 14:25:07 2016
 
 OUTPUT FILE NAME:   <my_dsp_project.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 0000da00

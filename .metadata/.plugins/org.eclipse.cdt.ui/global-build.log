@@ -1,0 +1,95 @@
+
+**** Clean-only build of configuration Debug for project my_dsp_project ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k clean 
+DEL /F  "my_dsp_projectcfg.h" "my_dsp_projectcfg.h??"  "my_dsp_project.cdb"  "my_dsp_project.out"  "my_dsp_projectcfg.cmd" "my_dsp_projectcfg.s??" "my_dsp_projectcfg_c.c"  "my_dsp_project.hex" 
+DEL /F "config_AIC23.d" "my_dsp_projectcfg_c.d" "skeleton.d" 
+DEL /F "my_dsp_projectcfg.d" 
+DEL /F "config_AIC23.obj" "my_dsp_projectcfg.obj" "my_dsp_projectcfg_c.obj" "skeleton.obj" 
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\config_AIC23.d konnte nicht gefunden werden
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\my_dsp_projectcfg.d konnte nicht gefunden werden
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\config_AIC23.obj konnte nicht gefunden werden
+'Finished clean'
+' '
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project my_dsp_project ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'Building file: ../my_dsp_project.tcf'
+'Invoking: TConf'
+"C:/ti/bios_5_42_01_09/xdctools/tconf" -b -Dconfig.importPath="C:/ti/bios_5_42_01_09/packages;" "../my_dsp_project.tcf"
+'Finished building: ../my_dsp_project.tcf'
+' '
+'Building file: ../config_AIC23.c'
+'Invoking: C6000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --include_path="C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" --include_path="C:/Users/LAPTOP/GIT/DSP_ADPCM/my_dsp_project/Debug" --include_path="C:/ti/bios_5_42_01_09/packages/ti/bios/include" --include_path="C:/ti/bios_5_42_01_09/packages/ti/rtdx/include/c6000" --include_path="C:/ti/C6xCSL/include" --include_path="C:/ti/DSPLIB/c6700/dsplib/include" --include_path="C:/ti/DSK6713/c6000/dsk6713/include" --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number --preproc_with_compile --preproc_dependency="config_AIC23.d"  "../config_AIC23.c"
+"..\config_AIC23.h", line 8: warning #1-D: last line of file ends without a newline
+"../config_AIC23.c", line 188: warning #174-D: external/internal linkage conflict with previous declaration
+'Finished building: ../config_AIC23.c'
+' '
+'Building file: my_dsp_projectcfg.s??'
+'Invoking: C6000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --include_path="C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" --include_path="C:/Users/LAPTOP/GIT/DSP_ADPCM/my_dsp_project/Debug" --include_path="C:/ti/bios_5_42_01_09/packages/ti/bios/include" --include_path="C:/ti/bios_5_42_01_09/packages/ti/rtdx/include/c6000" --include_path="C:/ti/C6xCSL/include" --include_path="C:/ti/DSPLIB/c6700/dsplib/include" --include_path="C:/ti/DSK6713/c6000/dsk6713/include" --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number --preproc_with_compile --preproc_dependency="my_dsp_projectcfg.d"  "my_dsp_projectcfg.s??"
+'Finished building: my_dsp_projectcfg.s??'
+' '
+'Building file: my_dsp_projectcfg_c.c'
+'Invoking: C6000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --include_path="C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" --include_path="C:/Users/LAPTOP/GIT/DSP_ADPCM/my_dsp_project/Debug" --include_path="C:/ti/bios_5_42_01_09/packages/ti/bios/include" --include_path="C:/ti/bios_5_42_01_09/packages/ti/rtdx/include/c6000" --include_path="C:/ti/C6xCSL/include" --include_path="C:/ti/DSPLIB/c6700/dsplib/include" --include_path="C:/ti/DSK6713/c6000/dsk6713/include" --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number --preproc_with_compile --preproc_dependency="my_dsp_projectcfg_c.d"  "my_dsp_projectcfg_c.c"
+'Finished building: my_dsp_projectcfg_c.c'
+' '
+'Building file: ../skeleton.c'
+'Invoking: C6000 Compiler'
+"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --include_path="C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" --include_path="C:/Users/LAPTOP/GIT/DSP_ADPCM/my_dsp_project/Debug" --include_path="C:/ti/bios_5_42_01_09/packages/ti/bios/include" --include_path="C:/ti/bios_5_42_01_09/packages/ti/rtdx/include/c6000" --include_path="C:/ti/C6xCSL/include" --include_path="C:/ti/DSPLIB/c6700/dsplib/include" --include_path="C:/ti/DSK6713/c6000/dsk6713/include" --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number --preproc_with_compile --preproc_dependency="skeleton.d"  "../skeleton.c"
+"..\config_AIC23.h", line 8: warning #1-D: last line of file ends without a newline
+"../skeleton.c", line 54: warning #9-D: nested comment is not allowed
+"../skeleton.c", line 64: warning #9-D: nested comment is not allowed
+"../skeleton.c", line 74: warning #9-D: nested comment is not allowed
+"../skeleton.c", line 82: warning #9-D: nested comment is not allowed
+"../skeleton.c", line 86: warning #9-D: nested comment is not allowed
+'Finished building: ../skeleton.c'
+' '
+'Building target: my_dsp_project.out'
+'Invoking: C6000 Linker'
+"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number -z -m"my_dsp_project.map" --stack_size=0x800 --heap_size=0x800 -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib" -i"C:/ti/C6xCSL/include" -i"C:/ti/DSK6713/c6000/dsk6713/include" -i"C:/ti/DSK6713/c6000/dsk6713/lib" -i"C:/ti/C6xCSL/lib_3x" -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" -i"C:/ti/bios_5_42_01_09/packages/ti/rtdx/lib/c6000" -i"C:/ti/bios_5_42_01_09/packages/ti/bios/lib" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="my_dsp_project_linkInfo.xml" --rom_model -o "my_dsp_project.out" "./config_AIC23.obj" "./my_dsp_projectcfg.obj" "./my_dsp_projectcfg_c.obj" "./skeleton.obj" "../linker_cmd.cmd" -l"./my_dsp_projectcfg.cmd" -llibc.a -l"C:/ti/C6xCSL/lib_3x/csl6713.lib" -l"C:/ti/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib" 
+<Linking>
+warning #10366-D: automatic library build: using library
+   "C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib/rts6700.lib" for the first
+   time, so it must be built.  This may take a few minutes.
+error: function _acos in file acos.c : invalid instruction schedule generated;
+   try reducing speed optimization levels
+
+**** Clean-only build of configuration Debug for project my_dsp_project ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k clean 
+DEL /F  "my_dsp_projectcfg.h" "my_dsp_projectcfg.h??"  "my_dsp_project.cdb"  "my_dsp_project.out"  "my_dsp_projectcfg.cmd" "my_dsp_projectcfg.s??" "my_dsp_projectcfg_c.c"  "my_dsp_project.hex" 
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\my_dsp_projectcfg.cmd
+DEL /F "config_AIC23.d" "my_dsp_projectcfg_c.d" "skeleton.d" 
+DEL /F "my_dsp_projectcfg.d" 
+DEL /F "config_AIC23.obj" "my_dsp_projectcfg.obj" "my_dsp_projectcfg_c.obj" "skeleton.obj" 
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\config_AIC23.obj
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\my_dsp_projectcfg.obj
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\my_dsp_projectcfg_c.obj
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\skeleton.obj
+Der Prozess kann nicht auf die Datei zugreifen, da sie von einem anderen Prozess verwendet wird.
+C:\Users\LAPTOP\GIT\DSP_ADPCM\my_dsp_project\Debug\my_dsp_projectcfg.d konnte nicht gefunden werden
+Der Prozess kann nicht auf die Datei zugreifen, da sie von einem anderen Prozess verwendet wird.
+Der Prozess kann nicht auf die Datei zugreifen, da sie von einem anderen Prozess verwendet wird.
+Der Prozess kann nicht auf die Datei zugreifen, da sie von einem anderen Prozess verwendet wird.
+Der Prozess kann nicht auf die Datei zugreifen, da sie von einem anderen Prozess verwendet wird.
+'Finished clean'
+' '
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project my_dsp_project ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'Building target: my_dsp_project.out'
+'Invoking: C6000 Linker'
+"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number -z -m"my_dsp_project.map" --stack_size=0x800 --heap_size=0x800 -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib" -i"C:/ti/C6xCSL/include" -i"C:/ti/DSK6713/c6000/dsk6713/include" -i"C:/ti/DSK6713/c6000/dsk6713/lib" -i"C:/ti/C6xCSL/lib_3x" -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" -i"C:/ti/bios_5_42_01_09/packages/ti/rtdx/lib/c6000" -i"C:/ti/bios_5_42_01_09/packages/ti/bios/lib" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="my_dsp_project_linkInfo.xml" --rom_model -o "my_dsp_project.out" "./config_AIC23.obj" "./my_dsp_projectcfg.obj" "./my_dsp_projectcfg_c.obj" "./skeleton.obj" "../linker_cmd.cmd" -l"./my_dsp_projectcfg.cmd" -llibc.a -l"C:/ti/C6xCSL/lib_3x/csl6713.lib" -l"C:/ti/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib" 
+<Linking>
+warning #10366-D: automatic library build: using library
+   "C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib/rts6700.lib" for the first
+   time, so it must be built.  This may take a few minutes.

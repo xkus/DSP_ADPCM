@@ -1,1 +1,1 @@
-"./config_AIC23.obj" "./my_dsp_projectcfg.obj" "./my_dsp_projectcfg_c.obj" "./skeleton.obj" "../linker_cmd.cmd" -l"./my_dsp_projectcfg.cmd" -l"libc.a" -l"C:\ti\C6xCSL\lib_3x\csl6713.lib" -l"C:\ti\DSK6713\c6000\dsk6713\lib\dsk6713bsl.lib" 
+"./config_AIC23.obj" "./my_dsp_projectcfg.obj" "./my_dsp_projectcfg_c.obj" "./skeleton.obj" "../linker_cmd.cmd" -l"./my_dsp_projectcfg.cmd" -llibc.a -l"C:/ti/C6xCSL/lib_3x/csl6713.lib" -l"C:/ti/DSK6713/c6000/dsk6713/lib/dsk6713bsl.lib" 
