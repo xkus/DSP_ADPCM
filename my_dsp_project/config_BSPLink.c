@@ -276,5 +276,5 @@ void config_BSPLink_EDMA(void)
 
 	/* EDMA starten, wen alles? */
 	EDMA_enableChannel(hEdmaBSPLinkRcv);
-	//EDMA_enableChannel(hEdmaBSPLinkXmt);
+	EDMA_enableChannel(hEdmaBSPLinkXmt);
 }

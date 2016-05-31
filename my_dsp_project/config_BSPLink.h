@@ -15,7 +15,7 @@ void config_BSPLink();
 void BSPLink_EDMA_Send_Ping();
 void BSPLink_EDMA_Send_Pong();
 
-#define LINK_BUFFER_LEN 50000  // !!! Usually adapted with BUFFER_LEN in Skeleton.c
+#define LINK_BUFFER_LEN 2000  // !!! Usually adapted with BUFFER_LEN in Skeleton.c
 
 #define EDMABSPLINK_CH_REVT				EDMA_CHA_REVT0
 #define EDMABSPLINK_CH_XEVT				EDMA_CHA_XEVT0

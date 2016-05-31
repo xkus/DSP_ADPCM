@@ -28,7 +28,7 @@
 #define DECODER
 //#define ENCODER
 
-#define BUFFER_LEN 5000
+#define BUFFER_LEN 2000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -288,15 +288,15 @@ void EDMA_ISR(void)
 
 	static int rcvPingDone=0;	//static
 	static int rcvPongDone=0;
-	static int xmtPingDone=0;
-	static int xmtPongDone=0;
+	volatile static int xmtPingDone=0;
+	volatile static int xmtPongDone=0;
 
 	// BSP Data Link Interface
 	static int xmtBSPLinkPingDone=0;
 	static int xmtBSPLinkPongDone=0;
 
-	static int rcvBSPLinkPingDone=0;
-	static int rcvBSPLinkPongDone=0;
+	volatile static int rcvBSPLinkPingDone=0;
+	volatile static int rcvBSPLinkPongDone=0;
 
 	if(EDMA_intTest(tccRcvPing)) {
 		EDMA_intClear(tccRcvPing); // clear is mandatory
@@ -340,14 +340,14 @@ void EDMA_ISR(void)
 	// Buffer Verarbeitung
 #ifdef ENCODER
 	// Encoder
-	if(rcvPingDone && xmtBSPLinkPingDone) {
+	if(rcvPingDone){ // && xmtBSPLinkPingDone) {
 		rcvPingDone=0;
 		xmtBSPLinkPingDone=0;
 		// processing in SWI
 		BSPLink_EDMA_Send_Pong();
 		SWI_post(&SWI_Ping);
 	}
-	else if(rcvPongDone && xmtBSPLinkPongDone) {
+	else if(rcvPongDone){ // && xmtBSPLinkPongDone) {
 		rcvPongDone=0;
 		xmtPongDone=0;
 		// processing in SWI
@@ -388,6 +388,7 @@ void process_ping_SWI(void)
 
 void process_pong_SWI(void)
 {
+
 #ifdef ENCODER
 	// Encoder
 	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
