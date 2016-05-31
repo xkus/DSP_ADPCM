@@ -1,3 +1,3 @@
 SECTIONS {
-   .datenpuffer: {} > IRAM
+   .datenpuffer: {} > SDRAM
    }

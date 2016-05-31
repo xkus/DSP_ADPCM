@@ -47,6 +47,12 @@ bios.PRD.instance("PRD_LEDToggle").fxn = prog.extern("SWI_LEDToggle");
 bios.PRD.instance("PRD_LEDToggle").period = 10000;
 bios.PRD.instance("PRD_LEDToggle").period = 1000;
 bios.TSK.instance("TSK_LEDTOGGLE").fxn = prog.extern("tsk_led_toggle");
+bios.SWI.create("SWI_Ping");
+bios.SWI.instance("SWI_Ping").order = 3;
+bios.SWI.instance("SWI_Ping").fxn = prog.extern("process_ping_SWI");
+bios.SWI.create("SWI_Pong");
+bios.SWI.instance("SWI_Pong").order = 4;
+bios.SWI.instance("SWI_Pong").fxn = prog.extern("process_pong_SWI");
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();
