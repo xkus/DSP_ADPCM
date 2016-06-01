@@ -202,16 +202,25 @@ void config_BSPLink()
 
 void BSPLink_EDMA_Send_Pong()
 {
-	EDMA_disableChannel(hEdmaBSPLinkXmtRelPing);
+	EDMA_reset(hEdmaBSPLinkXmt);
+	EDMA_reset(hEdmaBSPLinkXmtRelPing);
 	EDMA_enableChannel(hEdmaBSPLinkXmtRelPong);
+	//MCBSP_close(hMcbsp_Link);
+	//hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
+    //MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
+	//MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
 	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 
 
 void BSPLink_EDMA_Send_Ping()
 {
-	EDMA_disableChannel(hEdmaBSPLinkXmtRelPong);
+	EDMA_reset(hEdmaBSPLinkXmtRelPong);
 	EDMA_enableChannel(hEdmaBSPLinkXmtRelPing);
+	//MCBSP_close(hMcbsp_Link);
+	//hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
+	//MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
+	//MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
 	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 
@@ -266,9 +275,9 @@ void config_BSPLink_EDMA(void)
 	EDMA_config(hEdmaBSPLinkXmtRelPong, &configEDMABSPLinkXmt);
 
 	/* Transfers verlinken ping -> pong -> ping */
-	//EDMA_link(hEdmaBSPLinkXmt, hEdmaBSPLinkXmtRelPong);  /* noch mehr verlinken? */
-	//EDMA_link(hEdmaBSPLinkXmtRelPong, hEdmaBSPLinkXmtRelPing);
-	//EDMA_link(hEdmaBSPLinkXmtRelPing, hEdmaBSPLinkXmtRelPong);
+	EDMA_link(hEdmaBSPLinkXmt, hEdmaBSPLinkXmtRelPong);  /* noch mehr verlinken? */
+	EDMA_link(hEdmaBSPLinkXmtRelPong, hEdmaBSPLinkXmtRelPing);
+	EDMA_link(hEdmaBSPLinkXmtRelPing, hEdmaBSPLinkXmtRelPong);
 
 
 	/* EDMA TCC-Interrupts freigeben */
@@ -284,5 +293,5 @@ void config_BSPLink_EDMA(void)
 
 	/* EDMA starten, wen alles? */
 	EDMA_enableChannel(hEdmaBSPLinkRcv);
-	EDMA_enableChannel(hEdmaBSPLinkXmtRelPing);
+	EDMA_enableChannel(hEdmaBSPLinkXmt);
 }

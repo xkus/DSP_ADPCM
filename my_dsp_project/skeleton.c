@@ -25,8 +25,8 @@
 #include "Sounds.h"
 #include "skeleton.h"
 
-#define DECODER
-//#define ENCODER
+//#define DECODER
+#define ENCODER
 
 #define BUFFER_LEN 2000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
@@ -346,7 +346,7 @@ void EDMA_ISR(void)
 		BSPLink_EDMA_Send_Pong();
 		SWI_post(&SWI_Ping);
 	}
-	else if(rcvPongDone){ // && xmtBSPLinkPongDone) {
+	else if(rcvPongDone && xmtBSPLinkPongDone) {
 		rcvPongDone=0;
 		xmtPongDone=0;
 		// processing in SWI
