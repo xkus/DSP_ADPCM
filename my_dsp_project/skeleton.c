@@ -25,8 +25,8 @@
 #include "Sounds.h"
 #include "skeleton.h"
 
-#define DECODER
-//#define ENCODER
+//#define DECODER
+#define ENCODER
 
 #define BUFFER_LEN 2000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
@@ -170,6 +170,12 @@ main()
 	DSK6713_init();
 	CSL_init();  
 	
+	for(soundBuffer_i = 0; soundBuffer_i < SOUND_BUFF_LEN-1; soundBuffer_i++)
+				{
+					*(BSPLinkBuffer_out_ping+soundBuffer_i) = MySound[soundBuffer_i];
+					*(BSPLinkBuffer_out_pong+soundBuffer_i) = MySound[soundBuffer_i];
+				}
+
 	/* Configure McBSP0 and AIC23 */
 	Config_DSK6713_AIC23();
 	
@@ -343,14 +349,14 @@ void EDMA_ISR(void)
 		rcvPingDone=0;
 		xmtBSPLinkPingDone=0;
 		// processing in SWI
-		BSPLink_EDMA_Send_Pong();
+		//BSPLink_EDMA_Send_Pong();
 		SWI_post(&SWI_Ping);
 	}
-	else if(rcvPongDone){ // && xmtBSPLinkPongDone) {
+	else if(rcvPongDone && xmtBSPLinkPongDone) {
 		rcvPongDone=0;
 		xmtPongDone=0;
 		// processing in SWI
-		BSPLink_EDMA_Send_Ping();
+		//BSPLink_EDMA_Send_Ping();
 		SWI_post(&SWI_Pong);
 	}
 #endif
@@ -376,7 +382,7 @@ void process_ping_SWI(void)
 {
 #ifdef ENCODER
 	// Encoder
-	process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
+	//process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
 #endif
 
 #ifdef DECODER
@@ -390,7 +396,7 @@ void process_pong_SWI(void)
 
 #ifdef ENCODER
 	// Encoder
-	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
+	//process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
 #endif
 
 #ifdef DECODER
