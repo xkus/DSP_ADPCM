@@ -9,7 +9,9 @@
 #define CONFIG_BSPLINK_H_
 
 /* Function Prototypes */
-void config_BSPLink_EDMA(void);
+void config_BSPLink_EDMA_XMT(void);
+void config_BSPLink_EDMA_RCV(void);
+
 void config_BSPLink();
 
 void BSPLink_EDMA_Send_Ping();

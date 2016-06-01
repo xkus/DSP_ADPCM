@@ -28,7 +28,7 @@
 //#define DECODER
 #define ENCODER
 
-#define BUFFER_LEN 2000
+#define BUFFER_LEN 5000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -170,7 +170,7 @@ main()
 	DSK6713_init();
 	CSL_init();  
 	
-	for(soundBuffer_i = 0; soundBuffer_i < SOUND_BUFF_LEN-1; soundBuffer_i++)
+	for(soundBuffer_i = 0; soundBuffer_i < BUFFER_LEN-1; soundBuffer_i++)
 				{
 					*(BSPLinkBuffer_out_ping+soundBuffer_i) = MySound[soundBuffer_i];
 					*(BSPLinkBuffer_out_pong+soundBuffer_i) = MySound[soundBuffer_i];
@@ -356,8 +356,8 @@ void EDMA_ISR(void)
 		rcvPongDone=0;
 		xmtPongDone=0;
 		// processing in SWI
-		//BSPLink_EDMA_Send_Ping();
-		SWI_post(&SWI_Pong);
+
+		SWI_post(&SWI_Ping);
 	}
 #endif
 
@@ -382,7 +382,8 @@ void process_ping_SWI(void)
 {
 #ifdef ENCODER
 	// Encoder
-	//process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
+	process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
+	BSPLink_EDMA_Send_Pong();
 #endif
 
 #ifdef DECODER
@@ -396,7 +397,8 @@ void process_pong_SWI(void)
 
 #ifdef ENCODER
 	// Encoder
-	//process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
+	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_ping);
+	BSPLink_EDMA_Send_Pong();
 #endif
 
 #ifdef DECODER
