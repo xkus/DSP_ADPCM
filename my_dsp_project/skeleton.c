@@ -285,18 +285,17 @@ void config_interrupts(void)
 
 void EDMA_ISR(void)
 {
-
-	static int rcvPingDone=0;	//static
-	static int rcvPongDone=0;
-	volatile static int xmtPingDone=0;
-	volatile static int xmtPongDone=0;
+	static volatile int rcvPingDone=0;	//static
+	static volatile int rcvPongDone=0;
+	static volatile int xmtPingDone=0;
+	static volatile int xmtPongDone=0;
 
 	// BSP Data Link Interface
-	static int xmtBSPLinkPingDone=0;
-	static int xmtBSPLinkPongDone=0;
+	static volatile int xmtBSPLinkPingDone=0;
+	static volatile int xmtBSPLinkPongDone=0;
 
-	volatile static int rcvBSPLinkPingDone=0;
-	volatile static int rcvBSPLinkPongDone=0;
+	static volatile int rcvBSPLinkPingDone=0;
+	static volatile int rcvBSPLinkPongDone=0;
 
 	if(EDMA_intTest(tccRcvPing)) {
 		EDMA_intClear(tccRcvPing); // clear is mandatory
@@ -340,7 +339,7 @@ void EDMA_ISR(void)
 	// Buffer Verarbeitung
 #ifdef ENCODER
 	// Encoder
-	if(rcvPingDone){ // && xmtBSPLinkPingDone) {
+	if(rcvPingDone && xmtBSPLinkPingDone) {
 		rcvPingDone=0;
 		xmtBSPLinkPingDone=0;
 		// processing in SWI
@@ -455,7 +454,7 @@ void tsk_led_toggle(void)
 
 			/* configure BSPLink-Interface */
 			config_BSPLink();
-
+		    config_interrupts();
 			configComplete = 0;
 
 			DSK6713_LED_on(0);

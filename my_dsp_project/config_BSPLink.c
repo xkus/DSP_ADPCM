@@ -189,7 +189,7 @@ void config_BSPLink()
 		/* configure EDMA */
 	    config_BSPLink_EDMA();
 
-	    MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START, 0xffffffff);		// Start Data Link IN & OUT transmision
+	    MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 0xffffffff);		// Start Data Link IN & OUT transmision
 	    MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 
 	    DSK6713_LED_on(3);
@@ -198,13 +198,17 @@ void config_BSPLink()
 
 void BSPLink_EDMA_Send_Pong()
 {
+	EDMA_disableChannel(hEdmaBSPLinkXmtRelPing);
 	EDMA_enableChannel(hEdmaBSPLinkXmtRelPong);
+	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 
 
 void BSPLink_EDMA_Send_Ping()
 {
+	EDMA_disableChannel(hEdmaBSPLinkXmtRelPong);
 	EDMA_enableChannel(hEdmaBSPLinkXmtRelPing);
+	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 
 void config_BSPLink_EDMA(void)
@@ -276,5 +280,5 @@ void config_BSPLink_EDMA(void)
 
 	/* EDMA starten, wen alles? */
 	EDMA_enableChannel(hEdmaBSPLinkRcv);
-	EDMA_enableChannel(hEdmaBSPLinkXmt);
+	EDMA_enableChannel(hEdmaBSPLinkXmtRelPing);
 }
