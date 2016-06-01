@@ -52,11 +52,11 @@ int tccBSPLinkXmtPing;
 int tccBSPLinkXmtPong;
 
 
-//Configuration for McBSP1 (data-interface)
+//Configuration for McBSP (data-interface)
 MCBSP_Config BSPLink_interface_config = {
 		/* McBSP Control Register */
         MCBSP_FMKS(SPCR, FREE, NO)              |	//  Freilauf
-        MCBSP_FMKS(SPCR, SOFT, YES)		        |	// YES:  Soft mode is enabled. During emulation halt, serial port clock stops after completion of current transmission.
+        MCBSP_FMKS(SPCR, SOFT, NO)		        |	// YES:  Soft mode is enabled. During emulation halt, serial port clock stops after completion of current transmission.
         MCBSP_FMKS(SPCR, FRST, YES)             |	// Framesync ist ein
         MCBSP_FMKS(SPCR, GRST, YES)             |	// Reset aus, damit läuft der Samplerate- Generator
         MCBSP_FMKS(SPCR, XINTM, XRDY)           |	// XINT is driven by XRDY (end-of-word) and end-of-frame in A-bis mode.
@@ -184,12 +184,16 @@ void config_BSPLink()
 
 
 		hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
+		if(hMcbsp_Link == INV)
+		{
+			DSK6713_LED_on(2);
+		}
 	    MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
 
 		/* configure EDMA */
 	    config_BSPLink_EDMA();
 
-	    MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 0xffffffff);		// Start Data Link IN & OUT transmision
+	    MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);		// Start Data Link IN & OUT transmision
 	    MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 
 	    DSK6713_LED_on(3);

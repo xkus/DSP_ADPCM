@@ -441,20 +441,18 @@ void tsk_led_toggle(void)
 		if(configComplete)
 				configComplete ++;
 
-		if(configComplete >= 2)
+		if(configComplete >= 3)
 		{
-
-
 			MCBSP_close(hMcbsp_AIC23_Config);
 
 			/* Set McBSP0 MUX to EXTERN */
 			t_reg = DSK6713_rget(DSK6713_MISC);
-			t_reg &= ~MCBSP1SEL;				// Set MCBSP0 to 1 (extern)
+			t_reg |= MCBSP1SEL;				// Set MCBSP0 to 1 (extern)
 			DSK6713_rset(DSK6713_MISC,t_reg);
 
 			/* configure BSPLink-Interface */
 			config_BSPLink();
-		    config_interrupts();
+		    //config_interrupts();
 			configComplete = 0;
 
 			DSK6713_LED_on(0);

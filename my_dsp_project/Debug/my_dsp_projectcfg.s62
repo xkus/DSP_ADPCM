@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Tue May 31 15:15:17 2016", VERS$DATE
+	.asg "Wed Jun 01 08:43:23 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
