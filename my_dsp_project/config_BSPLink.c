@@ -41,6 +41,7 @@ EDMA_Handle hEdmaBSPLinkRcvRelPing; 	/* Empfang handle auf einen reload-Paramete
 EDMA_Handle hEdmaBSPLinkRcvRelPong;
 								/* braucht man noch mehr? ja -> pong */
 EDMA_Handle hEdmaBSPLinkXmt;			/* handle auf EDMA XEVT1-Channel */
+EDMA_Handle hEdmaBSPLinkEMPTY;
 EDMA_Handle hEdmaBSPLinkXmtRelPing;
 EDMA_Handle hEdmaBSPLinkXmtRelPong;
 
@@ -235,7 +236,7 @@ void config_BSPLink_EDMA_XMT(void)
 
 
 		/* Transfers verlinken ping -> pong -> ping */
-		//EDMA_link(hEdmaBSPLinkXmt, hEdmaBSPLinkXmtRelPong);  /* noch mehr verlinken? */
+		EDMA_link(hEdmaBSPLinkXmt, hEdmaBSPLinkEMPTY);  /* noch mehr verlinken? */
 		//EDMA_link(hEdmaBSPLinkXmtRelPong, hEdmaBSPLinkXmtRelPing);
 		//EDMA_link(hEdmaBSPLinkXmtRelPing, hEdmaBSPLinkXmtRelPong);
 
