@@ -12,8 +12,9 @@
 void config_BSPLink_EDMA(void);
 void config_BSPLink();
 
-void BSPLink_EDMA_Send_Ping();
-void BSPLink_EDMA_Send_Pong();
+void BSPLink_EDMA_Start_Ping();
+void BSPLink_EDMA_Start_Pong();
+void BSPLink_EDMA_Stop();
 
 #define LINK_BUFFER_LEN 2000  // !!! Usually adapted with BUFFER_LEN in Skeleton.c
 

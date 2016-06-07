@@ -337,39 +337,31 @@ void EDMA_ISR(void)
 	}
 
 	// Buffer Verarbeitung
-#ifdef ENCODER
+if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
+{
+	BSPLink_EDMA_Stop();
+}
+
+
+
+
 	// Encoder
 	if(rcvPingDone && xmtBSPLinkPingDone) {
 		rcvPingDone=0;
 		xmtBSPLinkPingDone=0;
 		// processing in SWI
-		BSPLink_EDMA_Send_Pong();
+		BSPLink_EDMA_Start_Pong();
 		SWI_post(&SWI_Ping);
 	}
 	else if(rcvPongDone && xmtBSPLinkPongDone) {
 		rcvPongDone=0;
 		xmtPongDone=0;
 		// processing in SWI
-		BSPLink_EDMA_Send_Ping();
+		BSPLink_EDMA_Start_Ping();
 		SWI_post(&SWI_Pong);
 	}
-#endif
 
-#ifdef DECODER
-	// Decoder
-	if(xmtPingDone && rcvBSPLinkPingDone) {
-		rcvBSPLinkPingDone=0;
-		xmtPingDone=0;
-		// processing in SWI
-		SWI_post(&SWI_Ping);
-	}
-	else if(xmtPongDone && rcvBSPLinkPongDone) {
-		rcvBSPLinkPongDone=0;
-		xmtPongDone=0;
-		// processing in SWI
-		SWI_post(&SWI_Pong);
-	}
-#endif
+
 }
 
 void process_ping_SWI(void)
