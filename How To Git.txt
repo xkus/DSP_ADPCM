@@ -4,13 +4,11 @@
 - git add -A					// Änderungen hinzufügen
 - git commit -m"Kommentar"		// Aktueller Stand Committen
 - git push						// Auf server hochladen
-
+- gitk --all					// öffnet GUI
+- gitk --all&					// öffnet GUI, Konsole bleibt aber benutzbar
+- git checkout "Branch"			// wechselt zu einem neuen Branch (ohne "")
 
 *********************************************************************
-
-gitk				Benutzeroberfläche zeigt Änderungen und 
-
-
 
 Proxy:
 git config --global http.proxy http://NAME:PASSWORT@proxy.hs-karlsruhe.de:8888
