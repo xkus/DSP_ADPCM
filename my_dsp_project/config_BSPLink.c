@@ -41,8 +41,8 @@ EDMA_Handle hEdmaBSPLinkRcvRelPing; 	/* Empfang handle auf einen reload-Paramete
 EDMA_Handle hEdmaBSPLinkRcvRelPong;
 								/* braucht man noch mehr? ja -> pong */
 EDMA_Handle hEdmaBSPLinkXmt;			/* handle auf EDMA XEVT1-Channel */
-EDMA_Handle hEdmaBSPLinkXmtRelPing;
-EDMA_Handle hEdmaBSPLinkXmtRelPong;
+//EDMA_Handle hEdmaBSPLinkXmtRelPing;
+//EDMA_Handle hEdmaBSPLinkXmtRelPong;
 
 /* Transfer-Complete-Codes for EDMA-Jobs */
 
@@ -97,7 +97,7 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(SRGR, FSGM, DXR2XSR)         |	// Framesync- Signal bei jedem DXR zu XSR Kopiervorgang (setzt FPER und FWID ausser Kraft)
 		        MCBSP_FMKS(SRGR, FPER, OF(15))          |	//
 		        MCBSP_FMKS(SRGR, FWID, OF(0))           |	//
-				MCBSP_FMKS(SRGR, CLKGDV, OF(99)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
+				MCBSP_FMKS(SRGR, CLKGDV, OF(50)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
 				/* Mehrkanal */
 		        MCBSP_MCR_DEFAULT,				// Mehrkanal wird nicht verwendet
 		        MCBSP_RCER_DEFAULT,				// dito
@@ -229,7 +229,7 @@ void BSPLink_EDMA_Start_Pong()
 	hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
 
-    hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
+   // hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
 	EDMA_config(hEdmaBSPLinkXmt, &configEDMABSPLinkXmt_Pong);
 
 	EDMA_intClear(tccBSPLinkXmtPong);
@@ -253,7 +253,7 @@ void BSPLink_EDMA_Start_Ping()
 	hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
 
-    hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
+//    hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
 	EDMA_config(hEdmaBSPLinkXmt, &configEDMABSPLinkXmt_Ping);
 
 	/* sind das alle? nein -> pong und alle für Sendeseite */
@@ -285,6 +285,7 @@ void config_BSPLink_EDMA(void)
 	EDMA_config(hEdmaBSPLinkRcvRelPing, &configEDMABSPLinkRcv);
 
 	/* braucht man auch noch andere EDMA-Konfigurationen fuer das Lesen? ja -> pong */
+	configEDMABSPLinkRcv.opt &= EDMA_FMK(OPT,TCC,0);
 	configEDMABSPLinkRcv.opt |= EDMA_FMK(OPT,TCC,tccBSPLinkRcvPong);
 	configEDMABSPLinkRcv.dst = (Uint32)BSPLinkBuffer_in_pong ;
 	EDMA_config(hEdmaBSPLinkRcvRelPong, &configEDMABSPLinkRcv);
@@ -299,8 +300,8 @@ void config_BSPLink_EDMA(void)
 	/* muss man mittels EDMA auch schreiben? */
 	/* Konfiguration der EDMA zum Schreiben */
 	hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event REVT1
-	hEdmaBSPLinkXmtRelPing = EDMA_allocTable(-1);               // einen Reload-Parametersatz für Ping
-	hEdmaBSPLinkXmtRelPong = EDMA_allocTable(-1);               // einen Reload-Parametersatz für Pong
+	//hEdmaBSPLinkXmtRelPing = EDMA_allocTable(-1);               // einen Reload-Parametersatz für Ping
+	//hEdmaBSPLinkXmtRelPong = EDMA_allocTable(-1);               // einen Reload-Parametersatz für Pong
 
 	configEDMABSPLinkXmt_Ping.dst = MCBSP_getXmtAddr(hMcbsp_Link);	//  Ziel-Adresse zum Schreiben
 	configEDMABSPLinkXmt_Pong.dst = MCBSP_getXmtAddr(hMcbsp_Link);	//  Ziel-Adresse zum Schreiben

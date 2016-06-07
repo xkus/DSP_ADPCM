@@ -63,6 +63,25 @@ bios.MEM.instance("MYBUFFERS").destroy();
 bios.SWI.instance("SWI_BSPLink_Ping").order = 5;
 bios.SWI.instance("SWI_BSPLink_Pong").destroy();
 bios.SWI.instance("SWI_BSPLink_Ping").destroy();
+bios.SWI.instance("SWI_Pong").order = 3;
+bios.SWI.instance("SWI_Ping").destroy();
+bios.SWI.create("SWI_Ping_Enc");
+bios.SWI.instance("SWI_Ping_Enc").order = 5;
+bios.SWI.instance("SWI_Ping_Enc").fxn = prog.extern("process_ping_SWI");
+bios.SWI.instance("SWI_Ping_Enc").order = 3;
+bios.SWI.instance("SWI_Pong").destroy();
+bios.SWI.create("SWI_Pong_Enc");
+bios.SWI.instance("SWI_Pong_Enc").order = 5;
+bios.SWI.instance("SWI_Pong_Enc").fxn = prog.extern("process_pong_SWI");
+bios.SWI.instance("SWI_Ping_Enc").fxn = prog.extern("process_ping_enc_SWI");
+bios.SWI.instance("SWI_Pong_Enc").fxn = prog.extern("process_pong_enc_SWI");
+bios.SWI.create("SWI_Ping_Dec");
+bios.SWI.instance("SWI_Ping_Dec").order = 6;
+bios.SWI.instance("SWI_Ping_Dec").fxn = prog.extern("process_pong_dec_SWI");
+bios.SWI.instance("SWI_Ping_Dec").fxn = prog.extern("process_ping_dec_SWI");
+bios.SWI.create("SWI_Pong_Dec");
+bios.SWI.instance("SWI_Pong_Dec").order = 7;
+bios.SWI.instance("SWI_Pong_Dec").fxn = prog.extern("process_pong_dec_SWI");
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

@@ -25,10 +25,8 @@
 #include "Sounds.h"
 #include "skeleton.h"
 
-//#define DECODER
-#define ENCODER
 
-#define BUFFER_LEN 2000
+#define BUFFER_LEN 500
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -343,6 +341,22 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 }
 
 
+// Decoder
+	if( xmtPingDone && rcvBSPLinkPingDone) {
+		xmtPingDone=0;
+		rcvBSPLinkPingDone=0;
+		// processing in SWI
+		//BSPLink_EDMA_Start_Pong();
+		SWI_post(&SWI_Ping_Dec);
+	}
+	else if(xmtPongDone && rcvBSPLinkPongDone) {
+		xmtPongDone=0;
+		rcvBSPLinkPongDone=0;
+		// processing in SWI
+		//BSPLink_EDMA_Start_Ping();
+		SWI_post(&SWI_Pong_Dec);
+	}
+
 
 
 	// Encoder
@@ -351,46 +365,43 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 		xmtBSPLinkPingDone=0;
 		// processing in SWI
 		BSPLink_EDMA_Start_Pong();
-		SWI_post(&SWI_Ping);
+		SWI_post(&SWI_Ping_Enc);
 	}
 	else if(rcvPongDone && xmtBSPLinkPongDone) {
 		rcvPongDone=0;
 		xmtBSPLinkPongDone=0;
 		// processing in SWI
 		BSPLink_EDMA_Start_Ping();
-		SWI_post(&SWI_Pong);
+		SWI_post(&SWI_Pong_Enc);
 	}
 
 
 }
 
-void process_ping_SWI(void)
+void process_ping_dec_SWI(void)
 {
-#ifdef ENCODER
-	// Encoder
-	process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
-#endif
-
-#ifdef DECODER
 	// Decoder
 	process_buffer(BSPLinkBuffer_in_ping,Buffer_out_ping);
-#endif
 }
 
-void process_pong_SWI(void)
+void process_pong_dec_SWI(void)
 {
-
-#ifdef ENCODER
-	// Encoder
-	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
-#endif
-
-#ifdef DECODER
 	// Decoder
 	process_buffer(BSPLinkBuffer_in_pong,Buffer_out_pong);
-#endif
 }
 
+
+void process_ping_enc_SWI(void)
+{
+	// Encoder
+	process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
+}
+
+void process_pong_enc_SWI(void)
+{
+	// Encoder
+	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
+}
 
 void process_buffer(short * buffersrc, short * bufferdes)
 {
@@ -398,19 +409,6 @@ void process_buffer(short * buffersrc, short * bufferdes)
 
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
-#ifdef DECODER
-			if(soundBuffer_i < SOUND_BUFF_LEN-1)
-			{
-
-				*(bufferdes+i) = MySound[soundBuffer_i];
-				i++;
-				*(bufferdes+i) = MySound[soundBuffer_i];
-				i++;
-				*(bufferdes+i) = MySound[soundBuffer_i];
-				i++;
-				*(bufferdes+i) = MySound[soundBuffer_i++];
-			}else
-#endif
 			*(bufferdes+i) = *(buffersrc+i);
 }
 
