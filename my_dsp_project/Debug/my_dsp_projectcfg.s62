@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Tue Jun 07 16:19:57 2016", VERS$DATE
+	.asg "Tue Jun 07 17:09:35 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -406,9 +406,9 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _ZEROTAB
 	.asg 00H, _GENERATE_RESET_VEC
 	.asg 00H, _POLARITYMASK
-	.asg 0310718a4H, _INTRMULTLOW
+	.asg 0250718a4H, _INTRMULTLOW
 	.asg 082039a3H, _INTRMULTHIGH
-	.asg 05108H, _CFGDISPATCHED
+	.asg 05308H, _CFGDISPATCHED
 	HWI_config  _ZEROTAB, _GENERATE_RESET_VEC, _POLARITYMASK, _INTRMULTLOW, _INTRMULTHIGH, _CFGDISPATCHED
 
 ;; ======== SWI_config ========
@@ -760,13 +760,13 @@ HOOK$SETOF          .set 00H
 ;;
 ;; HWI_Obj HWI_INT9 (function, monitor, addr, dataType, operation, client, iUseDispatcher, iArg, IntrMask, iCCBitMask, iLoadTrack)
 	.global HWI_INT9
-	.asg HWI_unused, _function
+	.asg _HWI_McBSP0_Rx, _function
 	.asg "Nothing", _monitor
 	.asg 00H, _addr
 	.asg "signed", _dataType
 	.asg "STS_add(*addr)", _operation
 	.asg "USER", _client
-	.asg 00H, _iUseDispatcher
+	.asg 01H, _iUseDispatcher
 	.asg 00H, _iArg
 	.asg 0200H, _IntrMask
 	.asg 01H, _iCCBitMask

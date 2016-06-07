@@ -101,6 +101,7 @@
 	.global	_p_ring_link_out_read_pin
 	.global	_p_ring_link_out_read_pong
 	.global	_process_ring_link_in_write_ping
+	.global	_HWI_McBSP0_Rx
 
 ;; MODULE PARAMETERS
 GBL$                .set 1
@@ -176,9 +177,9 @@ HWI$                .set 1
 HWI_ZEROTAB         .set 01H
 HWI_GENERATE_RESET_VEC .set 00H
 HWI_POLARITYMASK    .set 00H
-HWI_INTRMULTLOW     .set 0310718a4H
+HWI_INTRMULTLOW     .set 0250718a4H
 HWI_INTRMULTHIGH    .set 082039a3H
-HWI_CFGDISPATCHED   .set 05108H
+HWI_CFGDISPATCHED   .set 05308H
 SWI$                .set 1
 TSK$                .set 1
 TSK_STACKSIZE       .set 0400H

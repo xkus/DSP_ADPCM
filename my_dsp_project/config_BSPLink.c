@@ -25,24 +25,15 @@ short BSPLinkBuffer_out_ping[LINK_BUFFER_LEN];
 short BSPLinkBuffer_out_pong[LINK_BUFFER_LEN];
 
 
-/* Receive Buffer - Data starting with magic number */
-#pragma DATA_SECTION(BSPLinkBuffer_data, ".datenpuffer");
-short BSPLinkBuffer_data[LINK_BUFFER_LEN];
-
-
 MCBSP_Handle hMcbsp_Link=0;
 
-
 /* EDMA-Handles */
-
-
 EDMA_Handle hEdmaBSPLinkRcv;  			/* Empfang handle auf EDMA REVT1-Channel */
 EDMA_Handle hEdmaBSPLinkRcvRelPing; 	/* Empfang handle auf einen reload-Parametersatz */
 EDMA_Handle hEdmaBSPLinkRcvRelPong;
 								/* braucht man noch mehr? ja -> pong */
 EDMA_Handle hEdmaBSPLinkXmt;			/* handle auf EDMA XEVT1-Channel */
-//EDMA_Handle hEdmaBSPLinkXmtRelPing;
-//EDMA_Handle hEdmaBSPLinkXmtRelPong;
+
 
 /* Transfer-Complete-Codes for EDMA-Jobs */
 

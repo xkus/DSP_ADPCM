@@ -287,12 +287,19 @@ void config_interrupts(void)
 	IRQ_clear(IRQ_EVT_EDMAINT);
 	IRQ_enable(IRQ_EVT_EDMAINT);
 
+	IRQ_map(IRQ_EVT_RINT0, 9);		// CHECK same settings in BIOS!!!
+	IRQ_clear(IRQ_EVT_RINT0);
+	IRQ_enable(IRQ_EVT_RINT0);
+
 	SWI_enable();
 
 	IRQ_globalEnable();
 }
 
-
+void HWI_McBSP0_Rx(void)
+{
+	DSK6713_LED_toggle(2);
+}
 void EDMA_ISR(void)
 {
 	static volatile int rcvPingDone=0;	//static

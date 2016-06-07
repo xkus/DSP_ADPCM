@@ -156,6 +156,10 @@ bios.SWI.instance("SWI_BSPLink_Out_Pong").fxn = prog.extern("p_ring_link_out_rea
 bios.SWI.instance("SWI_BSPLink_Out_Pong").fxn = prog.extern("p_ring_link_out_read_ping");
 bios.SWI.instance("SWI_BSPLink_Out_Pong").fxn = prog.extern("p_ring_link_out_read_pong");
 bios.SWI.instance("SWI_BSPLink_In_Ping").fxn = prog.extern("process_ring_link_in_write_ping");
+bios.HWI.instance("HWI_INT9").interruptSource = prog.get("MCSP_0_Receive");
+bios.HWI.instance("HWI_INT9").fxn = prog.extern("HWI_McBSP0_Rx");
+bios.HWI.instance("HWI_INT9").interruptSelectNumber = 9;
+bios.HWI.instance("HWI_INT9").useDispatcher = 1;
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();
