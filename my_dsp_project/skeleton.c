@@ -355,7 +355,7 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 	}
 	else if(rcvPongDone && xmtBSPLinkPongDone) {
 		rcvPongDone=0;
-		xmtPongDone=0;
+		xmtBSPLinkPongDone=0;
 		// processing in SWI
 		BSPLink_EDMA_Start_Ping();
 		SWI_post(&SWI_Pong);

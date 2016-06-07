@@ -226,14 +226,18 @@ void config_BSPLink()
 
 void BSPLink_EDMA_Start_Pong()
 {
-	hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_REVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
-	EDMA_config(hEdmaBSPLinkXmt, &configEDMABSPLinkXmt_Pong);
-
 	hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
-	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
+
+    hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
+	EDMA_config(hEdmaBSPLinkXmt, &configEDMABSPLinkXmt_Pong);
+
+	EDMA_intClear(tccBSPLinkXmtPong);
+	EDMA_intEnable(tccBSPLinkXmtPong);
 
 	EDMA_enableChannel(hEdmaBSPLinkXmt);
+
+	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
 	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 
@@ -246,14 +250,19 @@ void BSPLink_EDMA_Stop()
 }
 void BSPLink_EDMA_Start_Ping()
 {
-	hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_REVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
-	EDMA_config(hEdmaBSPLinkXmt, &configEDMABSPLinkXmt_Ping);
-
 	hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
-	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
+
+    hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
+	EDMA_config(hEdmaBSPLinkXmt, &configEDMABSPLinkXmt_Ping);
+
+	/* sind das alle? nein -> pong und alle für Sendeseite */
+	EDMA_intClear(tccBSPLinkXmtPing);
+	EDMA_intEnable(tccBSPLinkXmtPing);
 
 	EDMA_enableChannel(hEdmaBSPLinkXmt);
+
+	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
 	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 
