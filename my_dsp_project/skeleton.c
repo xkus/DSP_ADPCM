@@ -42,6 +42,11 @@ short Buffer_out_pong[BUFFER_LEN];
 
 Uint32 soundBuffer_i = 0;
 
+Uint32 BSPSend_Buffer_i = 0;
+Uint8 BSPSend_pending = 0;
+
+Uint8 BSPLink_Config_Done = 0;
+
 //Configuration for McBSP1 (data-interface)
 MCBSP_Config datainterface_config = {
 		/* McBSP Control Register */
@@ -170,36 +175,41 @@ main()
 	DSK6713_init();
 	CSL_init();  
 	
+	/*
 	for(soundBuffer_i = 0; soundBuffer_i < BUFFER_LEN-1; soundBuffer_i++)
 				{
 					*(BSPLinkBuffer_out_ping+soundBuffer_i) = MySound[soundBuffer_i];
 					*(BSPLinkBuffer_out_pong+soundBuffer_i) = MySound[soundBuffer_i];
 				}
-
+	*/
+	DSK6713_LED_on(0);
 	/* Configure McBSP0 and AIC23 */
 	Config_DSK6713_AIC23();
 	
 	/* Configure McBSP1*/
 	hMcbsp = MCBSP_open(MCBSP_DEV1, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp, &datainterface_config);
-    
+	DSK6713_LED_on(1);
 	/* configure EDMA */
     config_EDMA();
 
-	DSK6713_LED_off(0);
-	DSK6713_LED_on(1);
-	DSK6713_LED_off(2);
-	DSK6713_LED_off(3);
+
+	DSK6713_LED_on(2);
+
     /* finally the interrupts */
     config_interrupts();
 
     MCBSP_start(hMcbsp, MCBSP_XMIT_START | MCBSP_RCV_START, 0xffffffff);		// Start Audio IN & OUT transmision
     MCBSP_write(hMcbsp, 0x0); 	/* one shot */
-
+    DSK6713_LED_on(3);
     configComplete = 1;
     //t_reg = DSK6713_rget(DSK6713_MISC);
     //t_reg |= MCBSP1SEL;				// Set MCBSP1SEL to 1 (extern)
     //DSK6713_rset(DSK6713_MISC,t_reg);
+	DSK6713_LED_off(0);
+	DSK6713_LED_on(1);
+	DSK6713_LED_off(2);
+	DSK6713_LED_off(3);
 
 } /* finished*/
 
@@ -283,6 +293,10 @@ void config_interrupts(void)
 	IRQ_clear(IRQ_EVT_EDMAINT);
 	IRQ_enable(IRQ_EVT_EDMAINT);
 
+	IRQ_map(IRQ_EVT_XINT0, 12);		// CHECK same settings in BIOS!!!
+	IRQ_clear(IRQ_EVT_XINT0);
+
+
 	SWI_enable();
 
 	IRQ_globalEnable();
@@ -345,19 +359,19 @@ void EDMA_ISR(void)
 	// Buffer Verarbeitung
 #ifdef ENCODER
 	// Encoder
-	if(rcvPingDone && xmtBSPLinkPingDone) {
+	if(rcvPingDone) {
 		rcvPingDone=0;
 		xmtBSPLinkPingDone=0;
 		// processing in SWI
 		//BSPLink_EDMA_Send_Pong();
 		SWI_post(&SWI_Ping);
 	}
-	else if(rcvPongDone && xmtBSPLinkPongDone) {
+	else if(rcvPongDone) {
 		rcvPongDone=0;
 		xmtPongDone=0;
 		// processing in SWI
 
-		SWI_post(&SWI_Ping);
+		SWI_post(&SWI_Pong);
 	}
 #endif
 
@@ -378,17 +392,40 @@ void EDMA_ISR(void)
 #endif
 }
 
+void HWI_MCBSP0_Tx_Complete()
+{
+	//IRQ_clear(IRQ_EVT_XINT0);
+	if(BSPSend_pending && BSPLink_Config_Done)
+	SWI_post(&SWI_BSPLink_SEND);
+}
+
+
+void SWI_BSPLink_SendBuff()
+{
+	// Sende nächstes Word aus Sendebuffer
+	if(BSPSend_Buffer_i < LINK_BUFFER_LEN)
+	{
+		MCBSP_write(hMcbsp_Link, BSPLinkBuffer_Send[BSPSend_Buffer_i]); 	/* one shot */
+	}else
+		BSPSend_pending = 0;
+
+
+}
+
 void process_ping_SWI(void)
 {
 #ifdef ENCODER
 	// Encoder
-	process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
-	BSPLink_EDMA_Send_Pong();
+	process_buffer(Buffer_in_ping,BSPLinkBuffer_Send);
+	BSPSend_Buffer_i = 0;
+	BSPSend_pending = 1;
+	//BSPLink_EDMA_Send_Pong();
 #endif
 
 #ifdef DECODER
 	// Decoder
 	process_buffer(BSPLinkBuffer_in_ping,Buffer_out_ping);
+
 #endif
 }
 
@@ -397,8 +434,10 @@ void process_pong_SWI(void)
 
 #ifdef ENCODER
 	// Encoder
-	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_ping);
-	BSPLink_EDMA_Send_Pong();
+	process_buffer(Buffer_in_pong,BSPLinkBuffer_Send);
+	BSPSend_Buffer_i=0;
+	BSPSend_pending = 1;
+	//BSPLink_EDMA_Send_Pong();
 #endif
 
 #ifdef DECODER
@@ -449,7 +488,7 @@ void tsk_led_toggle(void)
 		if(configComplete)
 				configComplete ++;
 
-		if(configComplete >= 3)
+		if(configComplete >= 5)
 		{
 			MCBSP_close(hMcbsp_AIC23_Config);
 
@@ -460,6 +499,10 @@ void tsk_led_toggle(void)
 
 			/* configure BSPLink-Interface */
 			config_BSPLink();
+			IRQ_enable(IRQ_EVT_XINT0);
+			BSPLink_Config_Done = 1;
+
+			MCBSP_write(hMcbsp_Link, 0x1234);
 		    //config_interrupts();
 			configComplete = 0;
 

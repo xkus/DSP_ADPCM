@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Wed Jun 01 08:43:23 2016", VERS$DATE
+	.asg "Wed Jun 01 12:37:40 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -62,7 +62,7 @@ HST$NUMOF           .set 2
 HST$SETOF           .set 03H
 HWI$NUMOF           .set 16
 HWI$SETOF           .set 0ffffH
-SWI$NUMOF           .set 4
+SWI$NUMOF           .set 5
 SWI$SETOF           .set 00H
 TSK$NUMOF           .set 2
 TSK$SETOF           .set 00H
@@ -407,7 +407,7 @@ HOOK$SETOF          .set 00H
 	.asg 00H, _GENERATE_RESET_VEC
 	.asg 00H, _POLARITYMASK
 	.asg 0310718a4H, _INTRMULTLOW
-	.asg 082039a3H, _INTRMULTHIGH
+	.asg 082031a3H, _INTRMULTHIGH
 	.asg 05108H, _CFGDISPATCHED
 	HWI_config  _ZEROTAB, _GENERATE_RESET_VEC, _POLARITYMASK, _INTRMULTLOW, _INTRMULTHIGH, _CFGDISPATCHED
 
@@ -814,7 +814,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; HWI_Obj HWI_INT12 (function, monitor, addr, dataType, operation, client, iUseDispatcher, iArg, IntrMask, iCCBitMask, iLoadTrack)
 	.global HWI_INT12
-	.asg HWI_unused, _function
+	.asg _HWI_MCBSP0_Tx_Complete, _function
 	.asg "Nothing", _monitor
 	.asg 00H, _addr
 	.asg "signed", _dataType
@@ -964,6 +964,27 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _filtsummult
 	.asg 00H, _unittype
 	SWI_Obj 1, SWI_Pong, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+
+;; ======== SWI_Obj SWI_BSPLink_SEND ========
+;; <add comments here>
+;;
+;; SWI_Obj SWI_BSPLink_SEND (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_BSPLink_SEND
+	.asg _SWI_BSPLink_SendBuff, _function
+	.asg 02H, _pri
+	.asg 00H, _mailbox
+	.asg 00H, _arg0
+	.asg 00H, _arg1
+	.asg 01H, _dorta
+	.asg 05H, _Order
+	.asg 02H, _filter
+	.asg "%g inst", _maxformat
+	.asg "%g inst", _sumformat
+	.asg "%.2f inst", _avgformat
+	.asg 01H, _filtmaxmult
+	.asg 01H, _filtsummult
+	.asg 00H, _unittype
+	SWI_Obj 1, SWI_BSPLink_SEND, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
 
 ;; ======== TSK_Obj TSK_idle ========
 ;; This is the idle task; it only runs when no other task is ready

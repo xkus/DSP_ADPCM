@@ -24,6 +24,8 @@ short BSPLinkBuffer_out_ping[LINK_BUFFER_LEN];
 #pragma DATA_SECTION(BSPLinkBuffer_out_pong, ".datenpuffer");
 short BSPLinkBuffer_out_pong[LINK_BUFFER_LEN];
 
+#pragma DATA_SECTION(BSPLinkBuffer_out_pong, ".datenpuffer");
+short BSPLinkBuffer_Send[LINK_BUFFER_LEN];
 
 /* Receive Buffer - Data starting with magic number */
 #pragma DATA_SECTION(BSPLinkBuffer_data, ".datenpuffer");
@@ -98,7 +100,7 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(SRGR, FSGM, DXR2XSR)         |	// Framesync- Signal bei jedem DXR zu XSR Kopiervorgang (setzt FPER und FWID ausser Kraft)
 		        MCBSP_FMKS(SRGR, FPER, OF(15))          |	//
 		        MCBSP_FMKS(SRGR, FWID, OF(0))           |	//
-				MCBSP_FMKS(SRGR, CLKGDV, OF(99)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
+				MCBSP_FMKS(SRGR, CLKGDV, OF(20)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
 				/* Mehrkanal */
 		        MCBSP_MCR_DEFAULT,				// Mehrkanal wird nicht verwendet
 		        MCBSP_RCER_DEFAULT,				// dito
@@ -192,13 +194,13 @@ void config_BSPLink()
 	    MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
 
 		/* configure EDMA */
-	    tccBSPLinkXmtPing = EDMA_intAlloc(-1);                        // nächsten freien Transfer-Complete-Code Ping
+	   // tccBSPLinkXmtPing = EDMA_intAlloc(-1);                        // nächsten freien Transfer-Complete-Code Ping
 
-	    config_BSPLink_EDMA_XMT();
-	    config_BSPLink_EDMA_RCV();
+	    //config_BSPLink_EDMA_XMT();
+	    //config_BSPLink_EDMA_RCV();
 
 	    MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);		// Start Data Link IN & OUT transmision
-	    MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
+	    //MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 
 	    DSK6713_LED_on(3);
 }

@@ -63,6 +63,23 @@ bios.MEM.instance("MYBUFFERS").destroy();
 bios.SWI.instance("SWI_BSPLink_Ping").order = 5;
 bios.SWI.instance("SWI_BSPLink_Pong").destroy();
 bios.SWI.instance("SWI_BSPLink_Ping").destroy();
+bios.SWI.create("SWI_BSPLink_SEND");
+bios.SWI.instance("SWI_BSPLink_SEND").order = 5;
+bios.SWI.instance("SWI_BSPLink_SEND").fxn = prog.extern("SWI_BSPLink_SendBuff");
+bios.HWI.instance("HWI_INT4").interruptSource = prog.get("MCSP_0_Transmit");
+bios.HWI.instance("HWI_INT4").fxn = prog.extern("HWI_MCBSP0_Tx_Complete");
+bios.HWI.instance("HWI_INT4").interruptSelectNumber = 1;
+bios.HWI.instance("HWI_INT4").interruptSelectNumber = 4;
+bios.HWI.instance("HWI_INT4").fxn = prog.extern("HWI_unused");
+bios.HWI.instance("HWI_INT4").fxn = prog.extern("HWI_unused", "asm");
+bios.HWI.instance("HWI_INT4").interruptSource = prog.get("External_Pin_4");
+bios.HWI.instance("HWI_INT4").fxn = prog.extern("HWI_MCBSP0_Tx_Complete");
+bios.HWI.instance("HWI_INT4").interruptSource = prog.get("MCSP_0_Transmit");
+bios.HWI.instance("HWI_INT4").interruptSelectNumber = 4;
+bios.SWI.instance("SWI_BSPLink_SEND").priority = 2;
+bios.HWI.instance("HWI_INT4").fxn = prog.extern("HWI_unused", "asm");
+bios.HWI.instance("HWI_INT12").interruptSource = prog.get("MCSP_0_Transmit");
+bios.HWI.instance("HWI_INT12").fxn = prog.extern("HWI_MCBSP0_Tx_Complete");
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

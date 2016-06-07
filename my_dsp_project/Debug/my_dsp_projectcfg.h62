@@ -86,6 +86,9 @@
 	.global	_process_ping_SWI
 	.global	_process_pong_SWI
 	.global	_process_BSPLink_ping
+	.global	_SWI_BSPLink_SendBuff
+	.global	_HWI_MCBSP0_Tx_Complete
+	.global	_HWI_unused
 
 ;; MODULE PARAMETERS
 GBL$                .set 1
@@ -162,7 +165,7 @@ HWI_ZEROTAB         .set 01H
 HWI_GENERATE_RESET_VEC .set 00H
 HWI_POLARITYMASK    .set 00H
 HWI_INTRMULTLOW     .set 0310718a4H
-HWI_INTRMULTHIGH    .set 082039a3H
+HWI_INTRMULTHIGH    .set 082031a3H
 HWI_CFGDISPATCHED   .set 05108H
 SWI$                .set 1
 TSK$                .set 1
