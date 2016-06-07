@@ -90,6 +90,17 @@
 	.global	_process_pong_enc_SWI
 	.global	_process_pong_dec_SWI
 	.global	_process_ping_dec_SWI
+	.global	_process_ringbuffer_in_SWI
+	.global	_process_ring_in_SWI
+	.global	_process_ring_link_in_write_pong
+	.global	_process_ring_link_in_read_ping
+	.global	_process_ring_link_in_read_pong
+	.global	_p_ring_link_out_write_ping
+	.global	_p_ring_link_out_write_pong
+	.global	_p_ring_link_out_read_ping
+	.global	_p_ring_link_out_read_pin
+	.global	_p_ring_link_out_read_pong
+	.global	_process_ring_link_in_write_ping
 
 ;; MODULE PARAMETERS
 GBL$                .set 1

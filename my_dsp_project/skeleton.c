@@ -27,6 +27,7 @@
 
 
 #define BUFFER_LEN 500
+#define RINGBUFFER_LEN	3000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -38,7 +39,18 @@ short Buffer_out_ping[BUFFER_LEN];
 #pragma DATA_SECTION(Buffer_out_pong, ".datenpuffer");
 short Buffer_out_pong[BUFFER_LEN];
 
-Uint32 soundBuffer_i = 0;
+#pragma DATA_SECTION(Ringbuffer_out, ".datenpuffer");
+short Ringbuffer_out[RINGBUFFER_LEN];
+#pragma DATA_SECTION(Ringbuffer_in, ".datenpuffer");
+short Ringbuffer_in[RINGBUFFER_LEN];
+
+Uint32 ringbuff_in_read_i = RINGBUFFER_LEN/2;
+Uint32 ringbuff_in_write_i = 0;
+
+Uint32 ringbuff_out_read_i = RINGBUFFER_LEN/2;
+Uint32 ringbuff_out_write_i = 0;
+
+//Uint32 soundBuffer_i = 0;
 
 //Configuration for McBSP1 (data-interface)
 MCBSP_Config datainterface_config = {
@@ -342,75 +354,161 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 
 
 // Decoder
-	if( xmtPingDone && rcvBSPLinkPingDone) {
-		xmtPingDone=0;
+//BSPLink IN -> ADC Out
+
+// BSPLink In lesen -> Ringbuffer Schreiben
+	if( rcvBSPLinkPingDone) {
 		rcvBSPLinkPingDone=0;
-		// processing in SWI
-		//BSPLink_EDMA_Start_Pong();
-		SWI_post(&SWI_Ping_Dec);
+		SWI_post(&SWI_BSPLink_In_Ping);
 	}
-	else if(xmtPongDone && rcvBSPLinkPongDone) {
-		xmtPongDone=0;
+	else if(rcvBSPLinkPongDone) {
 		rcvBSPLinkPongDone=0;
-		// processing in SWI
-		//BSPLink_EDMA_Start_Ping();
-		SWI_post(&SWI_Pong_Dec);
+		SWI_post(&SWI_BSPLink_In_Pong);
+	}
+
+// Ringbuffer lesen -> ADC schreiben
+
+	if( xmtPingDone) {
+		xmtPingDone=0;
+		SWI_post(&SWI_ADC_Out_Ping);
+	}
+	else if(xmtPongDone) {
+		xmtPongDone=0;
+		SWI_post(&SWI_ADC_Out_Pong);
 	}
 
 
 
 	// Encoder
-	if(rcvPingDone && xmtBSPLinkPingDone) {
-		rcvPingDone=0;
+	// Ringbuffer lesen -> BSP Link schreiben
+	if(xmtBSPLinkPingDone) {
 		xmtBSPLinkPingDone=0;
-		// processing in SWI
+
 		BSPLink_EDMA_Start_Pong();
-		SWI_post(&SWI_Ping_Enc);
+		SWI_post(&SWI_BSPLink_Out_Ping);
 	}
-	else if(rcvPongDone && xmtBSPLinkPongDone) {
-		rcvPongDone=0;
+	else if(xmtBSPLinkPongDone) {
 		xmtBSPLinkPongDone=0;
-		// processing in SWI
+
 		BSPLink_EDMA_Start_Ping();
-		SWI_post(&SWI_Pong_Enc);
+		SWI_post(&SWI_BSPLink_Out_Pong);
 	}
 
 
+	// ADC lesen -> Ringbuffer schreiben
+	if(rcvPingDone) {
+		rcvPingDone=0;
+
+		SWI_post(&SWI_ADC_In_Pong);
+	}
+	else if(rcvPongDone) {
+		rcvPongDone=0;
+
+		SWI_post(&SWI_ADC_In_Pong);
+	}
 }
 
-void process_ping_dec_SWI(void)
+/************************ SWI Section ****************************************/
+
+// BSP Input RingBuffer schreiben
+void process_ring_link_in_write_ping(void)
 {
-	// Decoder
-	process_buffer(BSPLinkBuffer_in_ping,Buffer_out_ping);
+	write_ring_buffer_in(BSPLinkBuffer_in_ping);
 }
 
-void process_pong_dec_SWI(void)
+void process_ring_link_in_write_pong(void)
 {
-	// Decoder
-	process_buffer(BSPLinkBuffer_in_pong,Buffer_out_pong);
+	write_ring_buffer_in(BSPLinkBuffer_in_pong);
 }
 
-
-void process_ping_enc_SWI(void)
+// BSP Input RingBuffer lesen
+void process_ring_link_in_read_ping(void)
 {
-	// Encoder
-	process_buffer(Buffer_in_ping,BSPLinkBuffer_out_ping);
+	read_ring_buffer_in(Buffer_out_ping);
 }
 
-void process_pong_enc_SWI(void)
+void process_ring_link_in_read_pong(void)
 {
-	// Encoder
-	process_buffer(Buffer_in_pong,BSPLinkBuffer_out_pong);
+	read_ring_buffer_in(Buffer_out_pong);
 }
 
-void process_buffer(short * buffersrc, short * bufferdes)
+// BSP Output RingBuffer schreiben
+void p_ring_link_out_write_ping(void)
+{
+	write_ring_buffer_out(Buffer_in_ping);
+}
+
+void p_ring_link_out_write_pong(void)
+{
+	write_ring_buffer_out(Buffer_in_pong);
+}
+
+// BSP Output RingBuffer lesen
+void p_ring_link_out_read_ping(void)
+{
+	read_ring_buffer_out(BSPLinkBuffer_out_ping);
+}
+
+void p_ring_link_out_read_pong(void)
+{
+	read_ring_buffer_out(BSPLinkBuffer_out_pong);
+}
+/****************************************************************************/
+
+void write_ring_buffer_in(short * buffersrc)
 {
 	// Buffer ablaufen, Daten verarbeiten
+	Uint32 i;
+		for(i=0; i<BUFFER_LEN; i++)
+		{
+			if(ringbuff_in_write_i >= RINGBUFFER_LEN-1)
+				ringbuff_in_write_i = 0;
 
+			*(Ringbuffer_in+ringbuff_in_write_i++) = *(buffersrc+i);
+		}
+}
+
+void read_ring_buffer_in(short * bufferdes)
+{
+	// Buffer ablaufen, Daten verarbeiten
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
-			*(bufferdes+i) = *(buffersrc+i);
+		{
+			if(ringbuff_in_read_i >= RINGBUFFER_LEN-1)
+				ringbuff_in_read_i = 0;
+
+			*(bufferdes+i) = *(Ringbuffer_in+ringbuff_in_read_i++);
+		}
 }
+
+void write_ring_buffer_out(short * buffersrc)
+{
+	// Buffer ablaufen, Daten verarbeiten
+	int i;
+		for(i=0; i<BUFFER_LEN; i++)
+		{
+			if(ringbuff_out_write_i >= RINGBUFFER_LEN-1)
+				ringbuff_out_write_i = 0;
+
+			*(Ringbuffer_out+ringbuff_out_write_i++) = *(buffersrc+i);
+		}
+}
+
+void read_ring_buffer_out(short * bufferdes)
+{
+	// Buffer ablaufen, Daten verarbeiten
+	int i;
+		for(i=0; i<BUFFER_LEN; i++)
+		{
+			if(ringbuff_out_read_i >= RINGBUFFER_LEN-1)
+				ringbuff_out_read_i = 0;
+
+			*(bufferdes+i) = *(Ringbuffer_out+ringbuff_out_read_i++);
+		}
+}
+
+
+
 
 /* Periodic Function */
 void SWI_LEDToggle(void)

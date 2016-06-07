@@ -8,7 +8,10 @@ extern void EDMA_interrupt_service(void);
 extern void config_EDMA(void);
 void config_interrupts(void);
 // Datenverarbeitung
-void process_buffer(short * buffersrc, short * bufferdes);
+void write_ring_buffer_in(short * buffersrc);
+void read_ring_buffer_in(short * bufferdes);
+void write_ring_buffer_out(short * buffersrc);
+void read_ring_buffer_out(short * bufferdes);
 //extern void SWI_LEDToggle(void);
 extern void tsk_led_toggle(void);
 

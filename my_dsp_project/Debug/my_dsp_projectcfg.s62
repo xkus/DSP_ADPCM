@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Tue Jun 07 13:48:23 2016", VERS$DATE
+	.asg "Tue Jun 07 16:19:57 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -62,7 +62,7 @@ HST$NUMOF           .set 2
 HST$SETOF           .set 03H
 HWI$NUMOF           .set 16
 HWI$SETOF           .set 0ffffH
-SWI$NUMOF           .set 6
+SWI$NUMOF           .set 10
 SWI$SETOF           .set 00H
 TSK$NUMOF           .set 2
 TSK$SETOF           .set 00H
@@ -923,12 +923,12 @@ HOOK$SETOF          .set 00H
 	.asg 00H, _unittype
 	SWI_Obj 1, KNL_swi, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
 
-;; ======== SWI_Obj SWI_Ping_Enc ========
+;; ======== SWI_Obj SWI_BSPLink_In_Ping ========
 ;; <add comments here>
 ;;
-;; SWI_Obj SWI_Ping_Enc (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
-	.global SWI_Ping_Enc
-	.asg _process_ping_enc_SWI, _function
+;; SWI_Obj SWI_BSPLink_In_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_BSPLink_In_Ping
+	.asg _process_ring_link_in_write_ping, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -942,14 +942,35 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _filtmaxmult
 	.asg 01H, _filtsummult
 	.asg 00H, _unittype
-	SWI_Obj 1, SWI_Ping_Enc, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+	SWI_Obj 1, SWI_BSPLink_In_Ping, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
 
-;; ======== SWI_Obj SWI_Pong_Enc ========
+;; ======== SWI_Obj SWI_BSPLink_In_Pong ========
 ;; <add comments here>
 ;;
-;; SWI_Obj SWI_Pong_Enc (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
-	.global SWI_Pong_Enc
-	.asg _process_pong_enc_SWI, _function
+;; SWI_Obj SWI_BSPLink_In_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_BSPLink_In_Pong
+	.asg _process_ring_link_in_write_pong, _function
+	.asg 01H, _pri
+	.asg 00H, _mailbox
+	.asg 00H, _arg0
+	.asg 00H, _arg1
+	.asg 01H, _dorta
+	.asg 04H, _Order
+	.asg 02H, _filter
+	.asg "%g inst", _maxformat
+	.asg "%g inst", _sumformat
+	.asg "%.2f inst", _avgformat
+	.asg 01H, _filtmaxmult
+	.asg 01H, _filtsummult
+	.asg 00H, _unittype
+	SWI_Obj 1, SWI_BSPLink_In_Pong, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+
+;; ======== SWI_Obj SWI_ADC_Out_Ping ========
+;; <add comments here>
+;;
+;; SWI_Obj SWI_ADC_Out_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_ADC_Out_Ping
+	.asg _process_ring_link_in_read_ping, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -963,14 +984,14 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _filtmaxmult
 	.asg 01H, _filtsummult
 	.asg 00H, _unittype
-	SWI_Obj 1, SWI_Pong_Enc, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+	SWI_Obj 1, SWI_ADC_Out_Ping, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
 
-;; ======== SWI_Obj SWI_Ping_Dec ========
+;; ======== SWI_Obj SWI_ADC_Out_Pong ========
 ;; <add comments here>
 ;;
-;; SWI_Obj SWI_Ping_Dec (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
-	.global SWI_Ping_Dec
-	.asg _process_ping_dec_SWI, _function
+;; SWI_Obj SWI_ADC_Out_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_ADC_Out_Pong
+	.asg _process_ring_link_in_read_pong, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -984,14 +1005,14 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _filtmaxmult
 	.asg 01H, _filtsummult
 	.asg 00H, _unittype
-	SWI_Obj 1, SWI_Ping_Dec, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+	SWI_Obj 1, SWI_ADC_Out_Pong, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
 
-;; ======== SWI_Obj SWI_Pong_Dec ========
+;; ======== SWI_Obj SWI_ADC_In_Ping ========
 ;; <add comments here>
 ;;
-;; SWI_Obj SWI_Pong_Dec (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
-	.global SWI_Pong_Dec
-	.asg _process_pong_dec_SWI, _function
+;; SWI_Obj SWI_ADC_In_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_ADC_In_Ping
+	.asg _p_ring_link_out_write_ping, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -1005,7 +1026,70 @@ HOOK$SETOF          .set 00H
 	.asg 01H, _filtmaxmult
 	.asg 01H, _filtsummult
 	.asg 00H, _unittype
-	SWI_Obj 1, SWI_Pong_Dec, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+	SWI_Obj 1, SWI_ADC_In_Ping, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+
+;; ======== SWI_Obj SWI_ADC_In_Pong ========
+;; <add comments here>
+;;
+;; SWI_Obj SWI_ADC_In_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_ADC_In_Pong
+	.asg _p_ring_link_out_write_pong, _function
+	.asg 01H, _pri
+	.asg 00H, _mailbox
+	.asg 00H, _arg0
+	.asg 00H, _arg1
+	.asg 01H, _dorta
+	.asg 08H, _Order
+	.asg 02H, _filter
+	.asg "%g inst", _maxformat
+	.asg "%g inst", _sumformat
+	.asg "%.2f inst", _avgformat
+	.asg 01H, _filtmaxmult
+	.asg 01H, _filtsummult
+	.asg 00H, _unittype
+	SWI_Obj 1, SWI_ADC_In_Pong, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+
+;; ======== SWI_Obj SWI_BSPLink_Out_Ping ========
+;; <add comments here>
+;;
+;; SWI_Obj SWI_BSPLink_Out_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_BSPLink_Out_Ping
+	.asg _p_ring_link_out_read_ping, _function
+	.asg 01H, _pri
+	.asg 00H, _mailbox
+	.asg 00H, _arg0
+	.asg 00H, _arg1
+	.asg 01H, _dorta
+	.asg 09H, _Order
+	.asg 02H, _filter
+	.asg "%g inst", _maxformat
+	.asg "%g inst", _sumformat
+	.asg "%.2f inst", _avgformat
+	.asg 01H, _filtmaxmult
+	.asg 01H, _filtsummult
+	.asg 00H, _unittype
+	SWI_Obj 1, SWI_BSPLink_Out_Ping, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
+
+;; ======== SWI_Obj SWI_BSPLink_Out_Pong ========
+;; <add comments here>
+;;
+;; SWI_Obj SWI_BSPLink_Out_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
+	.global SWI_BSPLink_Out_Pong
+	.asg _p_ring_link_out_read_pong, _function
+	.asg 01H, _pri
+	.asg 00H, _mailbox
+	.asg 00H, _arg0
+	.asg 00H, _arg1
+	.asg 01H, _dorta
+	.asg 0bH, _Order
+	.asg 02H, _filter
+	.asg "%g inst", _maxformat
+	.asg "%g inst", _sumformat
+	.asg "%.2f inst", _avgformat
+	.asg 01H, _filtmaxmult
+	.asg 01H, _filtsummult
+	.asg 00H, _unittype
+	SWI_Obj 1, SWI_BSPLink_Out_Pong, 0, _function, _pri, _mailbox, _arg0, _arg1, _dorta, _Order, _filter, _maxformat, _sumformat, _avgformat, _filtmaxmult, _filtsummult, _unittype
 
 ;; ======== TSK_Obj TSK_idle ========
 ;; This is the idle task; it only runs when no other task is ready

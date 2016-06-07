@@ -224,9 +224,21 @@ void config_BSPLink()
 	    DSK6713_LED_on(3);
 }
 
+void BSPLink_EDMA_Stop()
+{
+	EDMA_disableChannel(hEdmaBSPLinkXmt);
+	EDMA_reset(hEdmaBSPLinkXmt);
+
+	//MCBSP_close(hMcbsp_Link);
+
+	Uint32 reg_t = MCBSP_RGET(SPCR0);
+	reg_t &= ~0xC00000;
+	MCBSP_RSET(SPCR0, reg_t);
+}
+
 void BSPLink_EDMA_Start_Pong()
 {
-	hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
+	//hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
 
    // hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
@@ -241,16 +253,9 @@ void BSPLink_EDMA_Start_Pong()
 	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 
-void BSPLink_EDMA_Stop()
-{
-	EDMA_disableChannel(hEdmaBSPLinkXmt);
-	EDMA_reset(hEdmaBSPLinkXmt);
-
-	MCBSP_close(hMcbsp_Link);
-}
 void BSPLink_EDMA_Start_Ping()
 {
-	hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
+	//hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp_Link, &BSPLink_interface_config);
 
 //    hEdmaBSPLinkXmt = EDMA_open(EDMABSPLINK_CH_XEVT, EDMA_OPEN_RESET);  // EDMA Kanal für das Event McBSP
