@@ -161,6 +161,13 @@ bios.HWI.instance("HWI_INT9").fxn = prog.extern("HWI_McBSP0_Rx");
 bios.HWI.instance("HWI_INT9").interruptSelectNumber = 9;
 bios.HWI.instance("HWI_INT9").useDispatcher = 1;
 bios.HWI.instance("HWI_INT9").fxn = prog.extern("HWI_unused", "asm");
+bios.PRD.instance("PRD_LEDToggle").destroy();
+bios.HWI.instance("HWI_INT8").fxn = prog.extern("HWI_unused", "asm");
+bios.PRD.create("PRD_Sek");
+bios.PRD.instance("PRD_Sek").order = 1;
+bios.PRD.instance("PRD_Sek").period = 1000;
+bios.PRD.instance("PRD_Sek").fxn = prog.extern("SWI_LEDToggle");
+bios.HWI.instance("HWI_INT8").fxn = prog.extern("EDMA_ISR");
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

@@ -26,8 +26,8 @@
 #include "skeleton.h"
 
 
-#define BUFFER_LEN 500
-#define RINGBUFFER_LEN	5014
+#define BUFFER_LEN 2000
+#define RINGBUFFER_LEN	10000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -56,7 +56,7 @@ Uint32 soundBuffer_i = 0;
 MCBSP_Config datainterface_config = {
 		/* McBSP Control Register */
         MCBSP_FMKS(SPCR, FREE, NO)              |	//  Freilauf
-        MCBSP_FMKS(SPCR, SOFT, YES)		        |	// YES:  Soft mode is enabled. During emulation halt, serial port clock stops after completion of current transmission.
+        MCBSP_FMKS(SPCR, SOFT, NO)		        |	// YES:  Soft mode is enabled. During emulation halt, serial port clock stops after completion of current transmission.
         MCBSP_FMKS(SPCR, FRST, YES)             |	// Framesync ist ein
         MCBSP_FMKS(SPCR, GRST, YES)             |	// Reset aus, damit läuft der Samplerate- Generator
         MCBSP_FMKS(SPCR, XINTM, XRDY)           |	// XINT is driven by XRDY (end-of-word) and end-of-frame in A-bis mode.
@@ -180,7 +180,8 @@ main()
 	DSK6713_init();
 	CSL_init();
 
-	ringbuff_in_write_i =0;
+/*
+ * 	ringbuff_in_write_i =0;
 	Uint32 i = 0;
 		for(ringbuff_in_write_i = 0; ringbuff_in_write_i < RINGBUFFER_LEN; ringbuff_in_write_i++)
 					{
@@ -204,6 +205,14 @@ main()
 						else
 							soundBuffer_i++;
 				}
+*/
+
+	ringbuff_out_write_i =0;
+		for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; )
+					{
+						*(Ringbuffer_out+ringbuff_out_write_i++) = ringbuff_out_write_i;
+					}
+
 
 	/* Configure McBSP0 and AIC23 */
 	Config_DSK6713_AIC23();
@@ -251,6 +260,7 @@ void config_EDMA(void)
 	EDMA_config(hEdmaRcvRelPing, &configEDMARcv);
 
 	/* braucht man auch noch andere EDMA-Konfigurationen fuer das Lesen? ja -> pong */
+	configEDMARcv.opt &= 0xFFF0FFFF;
 	configEDMARcv.opt |= EDMA_FMK(OPT,TCC,tccRcvPong);
 	configEDMARcv.dst = (Uint32)Buffer_in_pong ;
 	EDMA_config(hEdmaRcvRelPong, &configEDMARcv);
@@ -279,6 +289,7 @@ void config_EDMA(void)
 	EDMA_config(hEdmaXmtRelPing, &configEDMAXmt);
 
 	/* braucht man auch noch andere EDMA-Konfigurationen fuer das Schreiben? ja -> pong */
+	configEDMAXmt.opt &= 0xFFF0FFFF;
 	configEDMAXmt.opt |= EDMA_FMK(OPT,TCC,tccXmtPong);
 	configEDMAXmt.src = (Uint32)Buffer_out_pong ;
 	EDMA_config(hEdmaXmtRelPong, &configEDMAXmt);
@@ -371,11 +382,6 @@ void EDMA_ISR(void)
 		rcvBSPLinkPongDone=1;
 	}
 
-}
-
-#ifdef DEINMUDDER
-void nothing(void)
-{
 	// Buffer Verarbeitung
 if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 {
@@ -437,7 +443,7 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 		//SWI_post(&SWI_ADC_In_Pong);
 	}
 }
-#endif
+
 /************************ SWI Section ****************************************/
 
 // BSP Input RingBuffer schreiben
@@ -573,6 +579,7 @@ void tsk_led_toggle(void)
 			MCBSP_close(hMcbsp_AIC23_Config);
 
 			/* Set McBSP0 MUX to EXTERN */
+
 			t_reg = DSK6713_rget(DSK6713_MISC);
 			t_reg |= MCBSP1SEL;				// Set MCBSP0 to 1 (extern)
 			DSK6713_rset(DSK6713_MISC,t_reg);

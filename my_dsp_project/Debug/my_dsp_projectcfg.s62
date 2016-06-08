@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Wed Jun 08 14:04:49 2016", VERS$DATE
+	.asg "Wed Jun 08 16:39:42 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -541,23 +541,23 @@ HOOK$SETOF          .set 00H
 	.asg PRD_F_tick, _function
 	CLK_Obj 1, PRD_clock, 0, _function
 
-;; ======== PRD_Obj PRD_LEDToggle ========
+;; ======== PRD_Obj PRD_Sek ========
 ;; <add comments here>
 ;;
-;; PRD_Obj PRD_LEDToggle (period, mode, function, arg0, arg1, Order, filter, maxformat, sumformat, avgformat, unittype)
-	.global PRD_LEDToggle
+;; PRD_Obj PRD_Sek (period, mode, function, arg0, arg1, Order, filter, maxformat, sumformat, avgformat, unittype)
+	.global PRD_Sek
 	.asg 03e8H, _period
 	.asg "continuous", _mode
 	.asg _SWI_LEDToggle, _function
 	.asg 00H, _arg0
 	.asg 00H, _arg1
-	.asg 02H, _Order
+	.asg 01H, _Order
 	.asg 00H, _filter
 	.asg "%g ticks", _maxformat
 	.asg "%g ticks", _sumformat
 	.asg "%.2f ticks", _avgformat
 	.asg 02H, _unittype
-	PRD_Obj 1, PRD_LEDToggle, 0, _period, _mode, _function, _arg0, _arg1, _Order, _filter, _maxformat, _sumformat, _avgformat, _unittype
+	PRD_Obj 1, PRD_Sek, 0, _period, _mode, _function, _arg0, _arg1, _Order, _filter, _maxformat, _sumformat, _avgformat, _unittype
 
 ;; ======== HST_Obj RTA_fromHost ========
 ;; Used to access LOG and STS data

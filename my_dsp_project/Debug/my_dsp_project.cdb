@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Wed Jun 08 14:04:49 2016" { 
+    global DATE :: "Wed Jun 08 16:39:42 2016" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -8802,26 +8802,6 @@ object SEM_LEDToggle :: SEM {
     param iCount :: 0
 }
 
-object PRD_LEDToggle :: PRD {
-    param iComment :: "<add comments here>"
-    param iIsUsed :: 1
-    param iId :: 0
-    param iDelUser :: "USER"
-    param iDelMsg :: "ok"
-    param period :: 1000
-    param mode :: "continuous"
-    param function :: @_SWI_LEDToggle
-    param arg0 :: 0
-    param arg1 :: 0
-    param Order :: 2
-    param iPri :: 0
-    param filter :: 0
-    param maxformat :: "%g ticks"
-    param sumformat :: "%g ticks"
-    param avgformat :: "%.2f ticks"
-    param unittype :: 2
-}
-
 object SWI_BSPLink_In_Ping :: SWI {
     param iComment :: "<add comments here>"
     param iIsUsed :: 1
@@ -8996,5 +8976,25 @@ object SWI_BSPLink_Out_Pong :: SWI {
     param filtmaxmult :: 1
     param filtsummult :: 1
     param unittype :: 0
+}
+
+object PRD_Sek :: PRD {
+    param iComment :: "<add comments here>"
+    param iIsUsed :: 1
+    param iId :: 0
+    param iDelUser :: "USER"
+    param iDelMsg :: "ok"
+    param period :: 1000
+    param mode :: "continuous"
+    param function :: @_SWI_LEDToggle
+    param arg0 :: 0
+    param arg1 :: 0
+    param Order :: 1
+    param iPri :: 0
+    param filter :: 0
+    param maxformat :: "%g ticks"
+    param sumformat :: "%g ticks"
+    param avgformat :: "%.2f ticks"
+    param unittype :: 2
 }
 

@@ -16,8 +16,6 @@ void BSPLink_EDMA_Start_Ping();
 void BSPLink_EDMA_Start_Pong();
 void BSPLink_EDMA_Stop();
 
-#define LINK_BUFFER_LEN 500  // !!! Usually adapted with BUFFER_LEN in Skeleton.c
-
 #define EDMABSPLINK_CH_REVT				EDMA_CHA_REVT0
 #define EDMABSPLINK_CH_XEVT				EDMA_CHA_XEVT0
 
@@ -30,14 +28,15 @@ extern int tccBSPLinkRcvPong;
 extern int tccBSPLinkXmtPing;
 extern int tccBSPLinkXmtPong;
 
+#define BUFFER_LEN 2000
 
 //#pragma DATA_SECTION(BSPLinkBuffer_in_ping, ".datenpuffer");
-extern short BSPLinkBuffer_in_ping[LINK_BUFFER_LEN];
+extern short BSPLinkBuffer_in_ping[BUFFER_LEN];
 //#pragma DATA_SECTION(BSPLinkBuffer_in_pong, ".datenpuffer");
-extern short BSPLinkBuffer_in_pong[LINK_BUFFER_LEN];
+extern short BSPLinkBuffer_in_pong[BUFFER_LEN];
 //#pragma DATA_SECTION(BSPLinkBuffer_out_ping, ".datenpuffer");
-extern short BSPLinkBuffer_out_ping[LINK_BUFFER_LEN];
+extern short BSPLinkBuffer_out_ping[BUFFER_LEN];
 //#pragma DATA_SECTION(BSPLinkBuffer_out_pong, ".datenpuffer");
-extern short BSPLinkBuffer_out_pong[LINK_BUFFER_LEN];
+extern short BSPLinkBuffer_out_pong[BUFFER_LEN];
 
 #endif /* CONFIG_BSPLINK_H_ */

@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-extern far PRD_Obj PRD_LEDToggle;
+extern far PRD_Obj PRD_Sek;
 extern far HST_Obj RTA_fromHost;
 extern far HST_Obj RTA_toHost;
 extern far SWI_Obj PRD_swi;

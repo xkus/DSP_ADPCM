@@ -16,13 +16,13 @@
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(BSPLinkBuffer_in_ping, ".datenpuffer");
-short BSPLinkBuffer_in_ping[LINK_BUFFER_LEN];
+short BSPLinkBuffer_in_ping[BUFFER_LEN];
 #pragma DATA_SECTION(BSPLinkBuffer_in_pong, ".datenpuffer");
-short BSPLinkBuffer_in_pong[LINK_BUFFER_LEN];
+short BSPLinkBuffer_in_pong[BUFFER_LEN];
 #pragma DATA_SECTION(BSPLinkBuffer_out_ping, ".datenpuffer");
-short BSPLinkBuffer_out_ping[LINK_BUFFER_LEN];
+short BSPLinkBuffer_out_ping[BUFFER_LEN];
 #pragma DATA_SECTION(BSPLinkBuffer_out_pong, ".datenpuffer");
-short BSPLinkBuffer_out_pong[LINK_BUFFER_LEN];
+short BSPLinkBuffer_out_pong[BUFFER_LEN];
 
 
 MCBSP_Handle hMcbsp_Link=0;
@@ -88,7 +88,7 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(SRGR, FSGM, DXR2XSR)         |	// Framesync- Signal bei jedem DXR zu XSR Kopiervorgang (setzt FPER und FWID ausser Kraft)
 		        MCBSP_FMKS(SRGR, FPER, OF(15))          |	//
 		        MCBSP_FMKS(SRGR, FWID, OF(0))           |	//
-				MCBSP_FMKS(SRGR, CLKGDV, OF(50)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
+				MCBSP_FMKS(SRGR, CLKGDV, OF(124)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
 				/* Mehrkanal */
 		        MCBSP_MCR_DEFAULT,				// Mehrkanal wird nicht verwendet
 		        MCBSP_RCER_DEFAULT,				// dito
@@ -127,7 +127,7 @@ EDMA_Config configEDMABSPLinkRcv = {
     EDMA_FMKS(SRC, SRC, OF(0)),           // Quell-Adresse
 
     EDMA_FMK(CNT, FRMCNT, NULL)        |  // Anzahl Frames
-    EDMA_FMK(CNT, ELECNT, LINK_BUFFER_LEN),   // Anzahl Elemente
+    EDMA_FMK(CNT, ELECNT, BUFFER_LEN),   // Anzahl Elemente
 
     (Uint32)BSPLinkBuffer_in_ping,       		  // Ziel-Adresse ( initialsierung auf ping )
 
@@ -154,7 +154,7 @@ EDMA_Config configEDMABSPLinkXmt_Ping = {
 	(Uint32)BSPLinkBuffer_out_ping,			// Quell-Adresse (initialisierung auf ping)
 
     EDMA_FMK(CNT, FRMCNT, NULL)       |  // Anzahl Frames
-    EDMA_FMK(CNT, ELECNT, LINK_BUFFER_LEN),   // Anzahl Elemente
+    EDMA_FMK(CNT, ELECNT, BUFFER_LEN),   // Anzahl Elemente
 
     EDMA_FMKS(DST, DST, OF(0)),       	  // Ziel-Adresse
 
@@ -180,7 +180,7 @@ EDMA_Config configEDMABSPLinkXmt_Pong = {
 	(Uint32)BSPLinkBuffer_out_pong,			// Quell-Adresse (initialisierung auf ping)
 
     EDMA_FMK(CNT, FRMCNT, NULL)       |  // Anzahl Frames
-    EDMA_FMK(CNT, ELECNT, LINK_BUFFER_LEN),   // Anzahl Elemente
+    EDMA_FMK(CNT, ELECNT, BUFFER_LEN),   // Anzahl Elemente
 
     EDMA_FMKS(DST, DST, OF(0)),       	  // Ziel-Adresse
 
