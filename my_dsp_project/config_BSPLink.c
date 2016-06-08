@@ -88,7 +88,7 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(SRGR, FSGM, DXR2XSR)         |	// Framesync- Signal bei jedem DXR zu XSR Kopiervorgang (setzt FPER und FWID ausser Kraft)
 		        MCBSP_FMKS(SRGR, FPER, OF(15))          |	//
 		        MCBSP_FMKS(SRGR, FWID, OF(0))           |	//
-				MCBSP_FMKS(SRGR, CLKGDV, OF(50)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
+				MCBSP_FMKS(SRGR, CLKGDV, OF(110)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
 				/* Mehrkanal */
 		        MCBSP_MCR_DEFAULT,				// Mehrkanal wird nicht verwendet
 		        MCBSP_RCER_DEFAULT,				// dito
@@ -104,8 +104,8 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(PCR, DXSTAT, DEFAULT)        |	// unrelevant da PINS keine GPIOs
 		        MCBSP_FMKS(PCR, FSXP, ACTIVEHIGH)       |	// Framesync senderseitig ist "activehigh"
 		        MCBSP_FMKS(PCR, FSRP, ACTIVEHIGH)       |	// Framesync empfängerseitig ist "activehigh"
-		        MCBSP_FMKS(PCR, CLKXP, FALLING)         |	// Datum wird bei fallender Flanke gesendet
-		        MCBSP_FMKS(PCR, CLKRP, RISING)			// Datum wird bei steigender Flanke übernommen
+		        MCBSP_FMKS(PCR, CLKXP, RISING)         |	// Datum wird bei fallender Flanke gesendet
+		        MCBSP_FMKS(PCR, CLKRP, FALLING)			// Datum wird bei steigender Flanke übernommen
 
 
 };
@@ -217,14 +217,16 @@ void config_BSPLink()
 
 void BSPLink_EDMA_Stop()
 {
+	Uint32 reg_t = MCBSP_RGET(SPCR0);
+	reg_t &= ~0xC00000;
+	MCBSP_RSET(SPCR0, reg_t);
+
 	EDMA_disableChannel(hEdmaBSPLinkXmt);
 	EDMA_reset(hEdmaBSPLinkXmt);
 
 	//MCBSP_close(hMcbsp_Link);
 
-	Uint32 reg_t = MCBSP_RGET(SPCR0);
-	reg_t &= ~0xC00000;
-	MCBSP_RSET(SPCR0, reg_t);
+
 }
 
 void BSPLink_EDMA_Start_Pong()

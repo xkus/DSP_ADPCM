@@ -181,11 +181,17 @@ main()
 	CSL_init();
 
 	ringbuff_in_write_i =0;
+	Uint32 i = 0;
 		for(ringbuff_in_write_i = 0; ringbuff_in_write_i < RINGBUFFER_LEN; ringbuff_in_write_i++)
 					{
-						*(Ringbuffer_in+ringbuff_in_write_i) = 0;
+						*(Ringbuffer_in+ringbuff_in_write_i) = (short) 888;
 					}
 
+		for(i = 0; i < BUFFER_LEN; i++)
+					{
+						*(Buffer_in_ping+i) = (short) 999;
+						*(Buffer_in_pong+i) = (short) 777;
+					}
 
 	
 	ringbuff_out_write_i =0;
@@ -488,9 +494,17 @@ void write_ring_buffer_in(short * buffersrc)
 		for(i=0; i<BUFFER_LEN; i++)
 		{
 
-			if(ringbuff_in_write_i >= RINGBUFFER_LEN-1)
+			if(ringbuff_in_write_i >= RINGBUFFER_LEN)
 				ringbuff_in_write_i = 0;
 
+			if(*(buffersrc+i) == 666)
+			{
+				if(ringbuff_in_write_i)
+					ringbuff_in_write_i--;
+				else
+					ringbuff_in_write_i = RINGBUFFER_LEN-1;
+
+			}else
 			*(Ringbuffer_in+ringbuff_in_write_i++) = *(buffersrc+i);
 		}
 }
@@ -501,7 +515,7 @@ void read_ring_buffer_in(short * bufferdes)
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			if(ringbuff_in_read_i >= RINGBUFFER_LEN-1)
+			if(ringbuff_in_read_i >= RINGBUFFER_LEN)
 				ringbuff_in_read_i = 0;
 
 			*(bufferdes+i) = *(Ringbuffer_in+ringbuff_in_read_i++);
@@ -514,7 +528,7 @@ void write_ring_buffer_out(short * buffersrc)
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			if(ringbuff_out_write_i >= RINGBUFFER_LEN-1)
+			if(ringbuff_out_write_i >= RINGBUFFER_LEN)
 				ringbuff_out_write_i = 0;
 
 			*(Ringbuffer_out+ringbuff_out_write_i++) = *(buffersrc+i);
@@ -527,7 +541,7 @@ void read_ring_buffer_out(short * bufferdes)
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			if(ringbuff_out_read_i >= RINGBUFFER_LEN-1)
+			if(ringbuff_out_read_i >= RINGBUFFER_LEN)
 				ringbuff_out_read_i = 0;
 
 			*(bufferdes+i) = *(Ringbuffer_out+ringbuff_out_read_i++);
