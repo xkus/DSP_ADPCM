@@ -27,7 +27,7 @@
 
 
 #define BUFFER_LEN 500
-#define RINGBUFFER_LEN	5000
+#define RINGBUFFER_LEN	5014
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -189,12 +189,14 @@ main()
 
 	
 	ringbuff_out_write_i =0;
-	for(soundBuffer_i = 0; soundBuffer_i < SOUND_BUFF_LEN; soundBuffer_i++)
+	for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; )
 				{
-					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i++);
 					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
 					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
-					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
+						if(soundBuffer_i >= SOUND_BUFF_LEN-1)
+							soundBuffer_i = 0;
+						else
+							soundBuffer_i++;
 				}
 
 	/* Configure McBSP0 and AIC23 */
@@ -423,7 +425,7 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 	if(rcvPingDone) {
 		rcvPingDone=0;
 
-		//SWI_post(&SWI_ADC_In_Pong);
+		//SWI_post(&SWI_ADC_In_Ping);
 	}
 	else if(rcvPongDone) {
 		rcvPongDone=0;
