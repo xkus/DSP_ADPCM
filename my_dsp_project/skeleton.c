@@ -312,19 +312,12 @@ void config_interrupts(void)
 	IRQ_clear(IRQ_EVT_EDMAINT);
 	IRQ_enable(IRQ_EVT_EDMAINT);
 
-	IRQ_map(IRQ_EVT_RINT0, 9);		// CHECK same settings in BIOS!!!
-	IRQ_clear(IRQ_EVT_RINT0);
-	IRQ_enable(IRQ_EVT_RINT0);
-
 	SWI_enable();
 
 	IRQ_globalEnable();
 }
 
-void HWI_McBSP0_Rx(void)
-{
-	DSK6713_LED_toggle(2);
-}
+
 void EDMA_ISR(void)
 {
 	static volatile int rcvPingDone=0;	//static
@@ -378,6 +371,11 @@ void EDMA_ISR(void)
 		rcvBSPLinkPongDone=1;
 	}
 
+}
+
+#ifdef DEINMUDDER
+void nothing(void)
+{
 	// Buffer Verarbeitung
 if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 {
@@ -439,7 +437,7 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 		//SWI_post(&SWI_ADC_In_Pong);
 	}
 }
-
+#endif
 /************************ SWI Section ****************************************/
 
 // BSP Input RingBuffer schreiben
@@ -570,7 +568,7 @@ void tsk_led_toggle(void)
 		if(configComplete)
 				configComplete ++;
 
-		if(configComplete >= 3)
+		if(configComplete >= 4)
 		{
 			MCBSP_close(hMcbsp_AIC23_Config);
 

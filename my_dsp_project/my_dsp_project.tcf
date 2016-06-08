@@ -160,6 +160,7 @@ bios.HWI.instance("HWI_INT9").interruptSource = prog.get("MCSP_0_Receive");
 bios.HWI.instance("HWI_INT9").fxn = prog.extern("HWI_McBSP0_Rx");
 bios.HWI.instance("HWI_INT9").interruptSelectNumber = 9;
 bios.HWI.instance("HWI_INT9").useDispatcher = 1;
+bios.HWI.instance("HWI_INT9").fxn = prog.extern("HWI_unused", "asm");
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

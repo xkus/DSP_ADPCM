@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Tue Jun 07 17:09:35 2016", VERS$DATE
+	.asg "Wed Jun 08 14:04:49 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -760,7 +760,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; HWI_Obj HWI_INT9 (function, monitor, addr, dataType, operation, client, iUseDispatcher, iArg, IntrMask, iCCBitMask, iLoadTrack)
 	.global HWI_INT9
-	.asg _HWI_McBSP0_Rx, _function
+	.asg HWI_unused, _function
 	.asg "Nothing", _monitor
 	.asg 00H, _addr
 	.asg "signed", _dataType

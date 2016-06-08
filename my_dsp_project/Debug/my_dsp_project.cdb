@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Tue Jun 07 17:09:35 2016" { 
+    global DATE :: "Wed Jun 08 14:04:49 2016" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -4441,7 +4441,7 @@ object HWI_INT9 :: HWI {
     param iEventId :: 9
     param iReMappable :: 1
     param iIntrEnableMask :: 512
-    param function :: @_HWI_McBSP0_Rx
+    param function :: @HWI_unused
     param iSTSObj :: HWI_INT9_STS
     param monitor :: "Nothing"
     param saveAddr :: 0
