@@ -27,7 +27,7 @@
 
 
 #define BUFFER_LEN 500
-#define RINGBUFFER_LEN	3000
+#define RINGBUFFER_LEN	5000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -50,7 +50,7 @@ Uint32 ringbuff_in_write_i = 0;
 Uint32 ringbuff_out_read_i = RINGBUFFER_LEN/2;
 Uint32 ringbuff_out_write_i = 0;
 
-//Uint32 soundBuffer_i = 0;
+Uint32 soundBuffer_i = 0;
 
 //Configuration for McBSP1 (data-interface)
 MCBSP_Config datainterface_config = {
@@ -178,11 +178,28 @@ Uint8 t_reg = 0;
 main()
 {
 	DSK6713_init();
-	CSL_init();  
+	CSL_init();
+
+	ringbuff_in_write_i =0;
+		for(ringbuff_in_write_i = 0; ringbuff_in_write_i < RINGBUFFER_LEN; ringbuff_in_write_i++)
+					{
+						*(Ringbuffer_in+ringbuff_in_write_i) = 0;
+					}
+
+
 	
+	ringbuff_out_write_i =0;
+	for(soundBuffer_i = 0; soundBuffer_i < SOUND_BUFF_LEN; soundBuffer_i++)
+				{
+					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i++);
+					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
+					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
+					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
+				}
+
 	/* Configure McBSP0 and AIC23 */
 	Config_DSK6713_AIC23();
-	
+
 	/* Configure McBSP1*/
 	hMcbsp = MCBSP_open(MCBSP_DEV1, MCBSP_OPEN_RESET);
     MCBSP_config(hMcbsp, &datainterface_config);
@@ -406,12 +423,12 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 	if(rcvPingDone) {
 		rcvPingDone=0;
 
-		SWI_post(&SWI_ADC_In_Pong);
+		//SWI_post(&SWI_ADC_In_Pong);
 	}
 	else if(rcvPongDone) {
 		rcvPongDone=0;
 
-		SWI_post(&SWI_ADC_In_Pong);
+		//SWI_post(&SWI_ADC_In_Pong);
 	}
 }
 
@@ -468,6 +485,7 @@ void write_ring_buffer_in(short * buffersrc)
 	Uint32 i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
+
 			if(ringbuff_in_write_i >= RINGBUFFER_LEN-1)
 				ringbuff_in_write_i = 0;
 

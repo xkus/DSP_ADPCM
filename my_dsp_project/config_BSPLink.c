@@ -281,7 +281,7 @@ void config_BSPLink_EDMA(void)
 	EDMA_config(hEdmaBSPLinkRcvRelPing, &configEDMABSPLinkRcv);
 
 	/* braucht man auch noch andere EDMA-Konfigurationen fuer das Lesen? ja -> pong */
-	configEDMABSPLinkRcv.opt &= EDMA_FMK(OPT,TCC,0);
+	configEDMABSPLinkRcv.opt &= 0xFFF0FFFF;
 	configEDMABSPLinkRcv.opt |= EDMA_FMK(OPT,TCC,tccBSPLinkRcvPong);
 	configEDMABSPLinkRcv.dst = (Uint32)BSPLinkBuffer_in_pong ;
 	EDMA_config(hEdmaBSPLinkRcvRelPong, &configEDMABSPLinkRcv);
