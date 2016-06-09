@@ -21,3 +21,4 @@ fprintf(file, 'short MySound[%i] = {\n', length(samp2));
 fprintf(file, '};\n');
 %soundsc(double(samp2),fs)
 length(samp2)
+
