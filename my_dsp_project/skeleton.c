@@ -175,6 +175,7 @@ EDMA_Config configEDMAXmt = {
 								
 int configComplete = 0;
 Uint8 t_reg = 0;
+short dat = -6000;
 main()
 {
 	DSK6713_init();
@@ -194,7 +195,7 @@ main()
 						*(Buffer_in_pong+i) = (short) 777;
 					}
 
-	
+*/
 	ringbuff_out_write_i =0;
 	for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; )
 				{
@@ -205,13 +206,13 @@ main()
 						else
 							soundBuffer_i++;
 				}
-*/
 
-	ringbuff_out_write_i =0;
-		for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; )
-					{
-						*(Ringbuffer_out+ringbuff_out_write_i++) = ringbuff_out_write_i;
-					}
+
+//	ringbuff_out_write_i =0;
+//		for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; ringbuff_out_write_i++)
+//					{
+//						*(Ringbuffer_out+ringbuff_out_write_i) = dat ++;
+//					}
 
 
 	/* Configure McBSP0 and AIC23 */
@@ -435,12 +436,12 @@ if(xmtBSPLinkPingDone || xmtBSPLinkPongDone)
 	if(rcvPingDone) {
 		rcvPingDone=0;
 
-		//SWI_post(&SWI_ADC_In_Ping);
+		SWI_post(&SWI_ADC_In_Ping);
 	}
 	else if(rcvPongDone) {
 		rcvPongDone=0;
 
-		//SWI_post(&SWI_ADC_In_Pong);
+		SWI_post(&SWI_ADC_In_Pong);
 	}
 }
 
@@ -497,19 +498,24 @@ void write_ring_buffer_in(short * buffersrc)
 	Uint32 i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-
-			if(ringbuff_in_write_i >= RINGBUFFER_LEN)
-				ringbuff_in_write_i = 0;
-
-			if(*(buffersrc+i) == 666)
+			/*
+			 *
+			if(*(buffersrc+i) == MAGIC_NR)
 			{
+				// Element vor Magic-Nr löschen
 				if(ringbuff_in_write_i)
 					ringbuff_in_write_i--;
 				else
 					ringbuff_in_write_i = RINGBUFFER_LEN-1;
 
 			}else
-			*(Ringbuffer_in+ringbuff_in_write_i++) = *(buffersrc+i);
+			*/
+			*(Ringbuffer_in+ringbuff_in_write_i) = *(buffersrc+i);
+
+			if(ringbuff_in_write_i < RINGBUFFER_LEN-1)
+				ringbuff_in_write_i++;
+				else
+				ringbuff_in_write_i = 0;
 		}
 }
 
@@ -519,10 +525,12 @@ void read_ring_buffer_in(short * bufferdes)
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			if(ringbuff_in_read_i >= RINGBUFFER_LEN)
-				ringbuff_in_read_i = 0;
+			*(bufferdes+i) = *(Ringbuffer_in+ringbuff_in_read_i);
 
-			*(bufferdes+i) = *(Ringbuffer_in+ringbuff_in_read_i++);
+			if(ringbuff_in_read_i < RINGBUFFER_LEN-1)
+				ringbuff_in_read_i++;
+				else
+				ringbuff_in_read_i = 0;
 		}
 }
 
@@ -532,23 +540,32 @@ void write_ring_buffer_out(short * buffersrc)
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			if(ringbuff_out_write_i >= RINGBUFFER_LEN)
-				ringbuff_out_write_i = 0;
+			*(Ringbuffer_out+ringbuff_out_write_i) = *(buffersrc+i);
 
-			*(Ringbuffer_out+ringbuff_out_write_i++) = *(buffersrc+i);
+			if(ringbuff_out_write_i < RINGBUFFER_LEN-1)
+				ringbuff_out_write_i++;
+				else
+					ringbuff_out_write_i = 0;
 		}
 }
 
 void read_ring_buffer_out(short * bufferdes)
 {
 	// Buffer ablaufen, Daten verarbeiten
+	/*
+	 * Buffer Index steht nach der Verarbeitung auf dem nächsten,
+	 * noch nicht verarbeiteten Wert
+	 */
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			if(ringbuff_out_read_i >= RINGBUFFER_LEN)
+			*(bufferdes+i) = *(Ringbuffer_out+ringbuff_out_read_i);
+
+			if(ringbuff_out_read_i < RINGBUFFER_LEN-1)
+				ringbuff_out_read_i++;
+				else
 				ringbuff_out_read_i = 0;
 
-			*(bufferdes+i) = *(Ringbuffer_out+ringbuff_out_read_i++);
 		}
 }
 
@@ -574,7 +591,7 @@ void tsk_led_toggle(void)
 		if(configComplete)
 				configComplete ++;
 
-		if(configComplete >= 4)
+		if(configComplete >= 2)
 		{
 			MCBSP_close(hMcbsp_AIC23_Config);
 

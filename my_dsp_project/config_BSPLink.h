@@ -30,6 +30,8 @@ extern int tccBSPLinkXmtPong;
 
 #define BUFFER_LEN 2000
 
+#define MAGIC_NR		(short) 30003
+
 //#pragma DATA_SECTION(BSPLinkBuffer_in_ping, ".datenpuffer");
 extern short BSPLinkBuffer_in_ping[BUFFER_LEN];
 //#pragma DATA_SECTION(BSPLinkBuffer_in_pong, ".datenpuffer");
