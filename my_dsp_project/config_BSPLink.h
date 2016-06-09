@@ -28,7 +28,7 @@ extern int tccBSPLinkRcvPong;
 extern int tccBSPLinkXmtPing;
 extern int tccBSPLinkXmtPong;
 
-#define BUFFER_LEN 2000
+#define BUFFER_LEN 8000
 
 #define MAGIC_NR		(short) 30003
 

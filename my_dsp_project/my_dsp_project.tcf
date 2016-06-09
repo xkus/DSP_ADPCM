@@ -168,6 +168,18 @@ bios.PRD.instance("PRD_Sek").order = 1;
 bios.PRD.instance("PRD_Sek").period = 1000;
 bios.PRD.instance("PRD_Sek").fxn = prog.extern("SWI_LEDToggle");
 bios.HWI.instance("HWI_INT8").fxn = prog.extern("EDMA_ISR");
+bios.SWI.instance("SWI_ADC_In_Ping").fxn = prog.extern("ADC_In_Ping");
+bios.SWI.instance("SWI_ADC_In_Pong").fxn = prog.extern("ADC_In_Pong");
+bios.SWI.instance("SWI_ADC_Out_Ping").fxn = prog.extern("ADC_Out_Ping");
+bios.SWI.instance("SWI_ADC_Out_Pong").fxn = prog.extern("ADC_Out_Pong");
+bios.SWI.instance("SWI_BSPLink_In_Ping").fxn = prog.extern("BSPLink_In_Ping");
+bios.SWI.instance("SWI_BSPLink_In_Pong").fxn = prog.extern("BSPLink_In_Pong");
+bios.SWI.instance("SWI_BSPLink_Out_Ping").fxn = prog.extern("BSPLink_Out_Ping");
+bios.SWI.instance("SWI_BSPLink_Out_Pong").fxn = prog.extern("BSPLink_Out_Pong");
+bios.SWI.instance("SWI_ADC_In_Pong").priority = 2;
+bios.SWI.instance("SWI_ADC_Out_Ping").priority = 3;
+bios.SWI.instance("SWI_ADC_Out_Pong").priority = 5;
+bios.SWI.instance("SWI_ADC_Out_Pong").priority = 4;
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

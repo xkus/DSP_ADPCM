@@ -88,7 +88,7 @@ MCBSP_Config BSPLink_interface_config = {
 		        MCBSP_FMKS(SRGR, FSGM, DXR2XSR)         |	// Framesync- Signal bei jedem DXR zu XSR Kopiervorgang (setzt FPER und FWID ausser Kraft)
 		        MCBSP_FMKS(SRGR, FPER, OF(15))          |	//
 		        MCBSP_FMKS(SRGR, FWID, OF(0))           |	//
-				MCBSP_FMKS(SRGR, CLKGDV, OF(124)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
+				MCBSP_FMKS(SRGR, CLKGDV, OF(50)),		// CPU-Clock Teiler -> 225 MHz / 2*100= 1,125MHz
 				/* Mehrkanal */
 		        MCBSP_MCR_DEFAULT,				// Mehrkanal wird nicht verwendet
 		        MCBSP_RCER_DEFAULT,				// dito

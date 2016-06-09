@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Wed Jun 08 16:39:42 2016", VERS$DATE
+	.asg "Thu Jun 09 19:13:43 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -928,7 +928,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_BSPLink_In_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_BSPLink_In_Ping
-	.asg _process_ring_link_in_write_ping, _function
+	.asg _BSPLink_In_Ping, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -949,7 +949,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_BSPLink_In_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_BSPLink_In_Pong
-	.asg _process_ring_link_in_write_pong, _function
+	.asg _BSPLink_In_Pong, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -970,8 +970,8 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_ADC_Out_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_ADC_Out_Ping
-	.asg _process_ring_link_in_read_ping, _function
-	.asg 01H, _pri
+	.asg _ADC_Out_Ping, _function
+	.asg 03H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
 	.asg 00H, _arg1
@@ -991,8 +991,8 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_ADC_Out_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_ADC_Out_Pong
-	.asg _process_ring_link_in_read_pong, _function
-	.asg 01H, _pri
+	.asg _ADC_Out_Pong, _function
+	.asg 04H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
 	.asg 00H, _arg1
@@ -1012,7 +1012,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_ADC_In_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_ADC_In_Ping
-	.asg _p_ring_link_out_write_ping, _function
+	.asg _ADC_In_Ping, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -1033,8 +1033,8 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_ADC_In_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_ADC_In_Pong
-	.asg _p_ring_link_out_write_pong, _function
-	.asg 01H, _pri
+	.asg _ADC_In_Pong, _function
+	.asg 02H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
 	.asg 00H, _arg1
@@ -1054,7 +1054,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_BSPLink_Out_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_BSPLink_Out_Ping
-	.asg _p_ring_link_out_read_ping, _function
+	.asg _BSPLink_Out_Ping, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
@@ -1075,7 +1075,7 @@ HOOK$SETOF          .set 00H
 ;;
 ;; SWI_Obj SWI_BSPLink_Out_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_BSPLink_Out_Pong
-	.asg _p_ring_link_out_read_pong, _function
+	.asg _BSPLink_Out_Pong, _function
 	.asg 01H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0

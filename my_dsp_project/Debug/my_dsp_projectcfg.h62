@@ -102,6 +102,14 @@
 	.global	_p_ring_link_out_read_pong
 	.global	_process_ring_link_in_write_ping
 	.global	_HWI_McBSP0_Rx
+	.global	_ADC_In_Ping
+	.global	_ADC_In_Pong
+	.global	_ADC_Out_Ping
+	.global	_ADC_Out_Pong
+	.global	_BSPLink_In_Ping
+	.global	_BSPLink_In_Pong
+	.global	_BSPLink_Out_Ping
+	.global	_BSPLink_Out_Pong
 
 ;; MODULE PARAMETERS
 GBL$                .set 1
