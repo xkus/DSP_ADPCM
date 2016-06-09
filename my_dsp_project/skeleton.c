@@ -26,8 +26,8 @@
 #include "skeleton.h"
 
 
-#define BUFFER_LEN 8000
-#define RINGBUFFER_LEN	25000
+//#define BUFFER_LEN 1000
+#define RINGBUFFER_LEN	12001
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -60,6 +60,7 @@ Uint32 ringbuff_out_write_i = 0;
 
 Uint32 soundBuffer_i = 0;
 
+Uint16 time_cnt = 0;
 //Configuration for McBSP1 (data-interface)
 MCBSP_Config datainterface_config = {
 		/* McBSP Control Register */
@@ -219,17 +220,27 @@ main()
 
 */
 //	ringbuff_out_write_i =0;
-//	for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; )
-//				{
-//					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
-//					*(Ringbuffer_out+ringbuff_out_write_i++) = *(MySound+soundBuffer_i);
-//						if(soundBuffer_i >= SOUND_BUFF_LEN-1)
+//	for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN -1 ; ringbuff_out_write_i++ )
+//	{
+//		if(ringbuff_out_write_i < 30000)
+//		{
+//
+//
+//					*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/10000);
+//					ringbuff_out_write_i++;
+//					*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/10000);;
+//
+//					if(soundBuffer_i >= SOUND_BUFF_LEN-1)
 //							soundBuffer_i = 0;
 //						else
 //							soundBuffer_i++;
-//				}
-
-
+//		}
+//		else
+//			*(Ringbuffer_out+ringbuff_out_write_i) = 0;
+//
+//	}
+//
+//	ringbuff_out_write_i =0;
 //	ringbuff_out_write_i =0;
 //		for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; ringbuff_out_write_i++)
 //					{
@@ -247,10 +258,10 @@ main()
 	/* configure EDMA */
     config_EDMA();
 
-	DSK6713_LED_off(0);
+	DSK6713_LED_on(0);
 	DSK6713_LED_on(1);
-	DSK6713_LED_off(2);
-	DSK6713_LED_off(3);
+	DSK6713_LED_on(2);
+	DSK6713_LED_on(3);
     /* finally the interrupts */
     config_interrupts();
 
@@ -443,6 +454,7 @@ if(xmtBSPLinkPingDone == 1 || xmtBSPLinkPongDone == 1)
 	if(xmtBSPLinkPingDone ==1) {
 		xmtBSPLinkPingDone = 2;
 
+		DSK6713_LED_off(3);
 		//BSPLink_EDMA_Start_Pong();
 		SWI_post(&SWI_BSPLink_Out_Ping);
 	}
@@ -461,6 +473,8 @@ if(xmtBSPLinkPingDone == 1 || xmtBSPLinkPongDone == 1)
 	else if(xmtBSPLinkPongDone && rcvPongDone)
 	{
 		xmtBSPLinkPongDone=0;
+
+		DSK6713_LED_on(3);
 		BSPLink_EDMA_Start_Ping();
 	}
 
@@ -493,23 +507,27 @@ void BSPLink_In_Pong(void)
 // BSP Input RingBuffer lesen
 void ADC_Out_Ping(void)
 {
-	read_ring_buffer_in(Buffer_out_ping);
+	read_ring_buffer_in(Buffer_out_pong);
 }
 
 void ADC_Out_Pong(void)
 {
-	read_ring_buffer_in(Buffer_out_pong);
+	read_ring_buffer_in(Buffer_out_ping);
 }
 
 // BSP Output RingBuffer schreiben
 void ADC_In_Ping(void)
 {
-	write_ring_buffer_out(Buffer_in_ping);
+	DSK6713_LED_on(1);
+	write_ring_buffer_out(Buffer_in_pong);
+	DSK6713_LED_off(1);
 }
 
 void ADC_In_Pong(void)
 {
-	write_ring_buffer_out(Buffer_in_pong);
+	DSK6713_LED_on(2);
+	write_ring_buffer_out(Buffer_in_ping);
+	DSK6713_LED_off(2);
 }
 
 // BSP Output RingBuffer lesen
@@ -548,6 +566,9 @@ void write_ring_buffer_in(short * buffersrc)
 				ringbuff_in_write_i++;
 				else
 				ringbuff_in_write_i = 0;
+
+			if(ringbuff_in_read_i == ringbuff_in_write_i)
+			DSK6713_LED_off(0);
 		}
 }
 
@@ -563,6 +584,9 @@ void read_ring_buffer_in(short * bufferdes)
 				ringbuff_in_read_i++;
 				else
 				ringbuff_in_read_i = 0;
+
+			if(ringbuff_in_read_i == ringbuff_in_write_i)
+			DSK6713_LED_off(0);
 		}
 }
 
@@ -572,18 +596,24 @@ void write_ring_buffer_out(short * buffersrc)
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			*(Ringbuffer_out+ringbuff_out_write_i) = *(buffersrc+i);
+			//*(Ringbuffer_out+ringbuff_out_write_i) = *(buffersrc+i);
+
+			Ringbuffer_out[ringbuff_out_write_i] = buffersrc[i];
 
 			if(ringbuff_out_write_i < RINGBUFFER_LEN-1)
 				ringbuff_out_write_i++;
 				else
 					ringbuff_out_write_i = 0;
+
+			if(ringbuff_out_read_i == ringbuff_out_write_i)
+			DSK6713_LED_off(0);
 		}
 
-		if(mul >= 5)
-			mul = 0;
-		else
-			mul ++;
+
+//		if(mul >= 5)
+//			mul = 0;
+//		else
+//			mul ++;
 }
 
 void read_ring_buffer_out(short * bufferdes)
@@ -596,12 +626,17 @@ void read_ring_buffer_out(short * bufferdes)
 	int i;
 		for(i=0; i<BUFFER_LEN; i++)
 		{
-			*(bufferdes+i) = *(Ringbuffer_out+ringbuff_out_read_i);
+			//*(bufferdes+i) = *(Ringbuffer_out+ringbuff_out_read_i);
+
+			bufferdes[i] = Ringbuffer_out[ringbuff_out_read_i];
 
 			if(ringbuff_out_read_i < RINGBUFFER_LEN-1)
 				ringbuff_out_read_i++;
 				else
 				ringbuff_out_read_i = 0;
+
+			if(ringbuff_out_read_i == ringbuff_out_write_i)
+				DSK6713_LED_off(0);
 
 		}
 }
@@ -643,12 +678,20 @@ void tsk_led_toggle(void)
 		    //config_interrupts();
 			configComplete = 0;
 
-			DSK6713_LED_on(0);
-			DSK6713_LED_on(1);
+		DSK6713_LED_on(0);
+			//DSK6713_LED_on(1);
 		}
 
-//		DSK6713_LED_toggle(0);
-//		DSK6713_LED_toggle(1);
+//		if(time_cnt > 2)
+//		{
+//			time_cnt = 0;
+//			DSK6713_LED_on(0);
+//		}
+//		else
+//		{
+//			time_cnt ++;
+//			DSK6713_LED_off(0);
+//		}
 
 
 	}
