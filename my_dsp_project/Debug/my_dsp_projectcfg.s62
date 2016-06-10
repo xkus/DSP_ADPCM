@@ -5,7 +5,7 @@
 ;; INPUT my_dsp_project.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Fri Jun 10 01:52:59 2016", VERS$DATE
+	.asg "Fri Jun 10 16:43:44 2016", VERS$DATE
 
 ;; PROLOGUE
 	.include my_dsp_projectcfg.h62
@@ -1013,7 +1013,7 @@ HOOK$SETOF          .set 00H
 ;; SWI_Obj SWI_ADC_In_Ping (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_ADC_In_Ping
 	.asg _ADC_In_Ping, _function
-	.asg 01H, _pri
+	.asg 02H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
 	.asg 00H, _arg1
@@ -1034,7 +1034,7 @@ HOOK$SETOF          .set 00H
 ;; SWI_Obj SWI_ADC_In_Pong (function, pri, mailbox, arg0, arg1, dorta, Order, filter, maxformat, sumformat, avgformat, filtmaxmult, filtsummult, unittype)
 	.global SWI_ADC_In_Pong
 	.asg _ADC_In_Pong, _function
-	.asg 01H, _pri
+	.asg 02H, _pri
 	.asg 00H, _mailbox
 	.asg 00H, _arg0
 	.asg 00H, _arg1

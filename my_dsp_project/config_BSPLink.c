@@ -209,7 +209,7 @@ void config_BSPLink()
 		/* configure EDMA */
 	    config_BSPLink_EDMA();
 
-	    MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);		// Start Data Link IN & OUT transmision
+	    MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 0x00003000);		// Start Data Link IN & OUT transmision
 	   // MCBSP_write(hMcbsp_Link, MAGIC_NR); 	/* one shot */
 
 	    DSK6713_LED_on(3);
@@ -243,7 +243,7 @@ void BSPLink_EDMA_Start_Pong()
 
 	EDMA_enableChannel(hEdmaBSPLinkXmt);
 
-	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
+	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 0x00003000);
 	//MCBSP_write(hMcbsp_Link, MAGIC_NR); 	/* one shot */
 }
 
@@ -261,7 +261,7 @@ void BSPLink_EDMA_Start_Ping()
 
 	EDMA_enableChannel(hEdmaBSPLinkXmt);
 
-	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);
+	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 0x00003000);
 	//MCBSP_write(hMcbsp_Link, MAGIC_NR); 	/* one shot */
 }
 

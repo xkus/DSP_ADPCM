@@ -12,6 +12,8 @@ void write_ring_buffer_in(short * buffersrc);
 void read_ring_buffer_in(short * bufferdes);
 void write_ring_buffer_out(short * buffersrc);
 void read_ring_buffer_out(short * bufferdes);
+
+inline void inc_ringbuff_i(Uint32 * index);
 //extern void SWI_LEDToggle(void);
 extern void tsk_led_toggle(void);
 

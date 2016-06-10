@@ -7,7 +7,7 @@
 *
 *   F. Quint, HsKA
 *
-*   Von mir gegittet!
+*
 ************************************************************/
 
 #include <my_dsp_projectcfg.h>
@@ -27,7 +27,7 @@
 
 
 //#define BUFFER_LEN 1000
-#define RINGBUFFER_LEN	12001
+#define RINGBUFFER_LEN	20000
 /* Ping-Pong buffers. Place them in the compiler section .datenpuffer */
 /* How do you place the compiler section in the memory?     */
 #pragma DATA_SECTION(Buffer_in_ping, ".datenpuffer");
@@ -205,42 +205,56 @@ main()
 						}
 
 /*
- * 	ringbuff_in_write_i =0;
-	Uint32 i = 0;
+ * Ringbuffer_in mit 0 initialisieren
+ */
+	ringbuff_in_write_i =0;
+	i = 0;
 		for(ringbuff_in_write_i = 0; ringbuff_in_write_i < RINGBUFFER_LEN; ringbuff_in_write_i++)
 					{
-						*(Ringbuffer_in+ringbuff_in_write_i) = (short) 888;
+						*(Ringbuffer_in+ringbuff_in_write_i) = (short) ringbuff_in_write_i;
 					}
 
-		for(i = 0; i < BUFFER_LEN; i++)
-					{
-						*(Buffer_in_ping+i) = (short) 999;
-						*(Buffer_in_pong+i) = (short) 777;
-					}
 
-*/
 //	ringbuff_out_write_i =0;
-//	for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN -1 ; ringbuff_out_write_i++ )
+//	for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN ; ringbuff_out_write_i++ )
 //	{
-//		if(ringbuff_out_write_i < 30000)
+//		if(ringbuff_out_write_i < 1)
 //		{
 //
+///*
+// * Hübscher Sinus Sweep
 //
-//					*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/10000);
+// 	 	 	 	// Links
+//					*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/1000);
 //					ringbuff_out_write_i++;
-//					*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/10000);;
+//				// Rechts
+//					*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/1000);
+//*/
+//
+//			/*
+//			 * Positiver Sweep immer > 0
+//			 */
+//						// Links
+//							*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/2000) +2570;
+//							ringbuff_out_write_i++;
+//						// Rechts
+//							*(Ringbuffer_out+ringbuff_out_write_i) = (short) *(MySinus+soundBuffer_i)*((float) ringbuff_out_write_i/2000) + 2570;
+//
 //
 //					if(soundBuffer_i >= SOUND_BUFF_LEN-1)
 //							soundBuffer_i = 0;
 //						else
 //							soundBuffer_i++;
+//
+//
+//
 //		}
 //		else
-//			*(Ringbuffer_out+ringbuff_out_write_i) = 0;
+//			*(Ringbuffer_out+ringbuff_out_write_i) = 2570;
 //
 //	}
 //
-//	ringbuff_out_write_i =0;
+	ringbuff_out_write_i =0;
 //	ringbuff_out_write_i =0;
 //		for(soundBuffer_i = 0; ringbuff_out_write_i < RINGBUFFER_LEN; ringbuff_out_write_i++)
 //					{
@@ -455,13 +469,11 @@ if(xmtBSPLinkPingDone == 1 || xmtBSPLinkPongDone == 1)
 		xmtBSPLinkPingDone = 2;
 
 		DSK6713_LED_off(3);
-		//BSPLink_EDMA_Start_Pong();
 		SWI_post(&SWI_BSPLink_Out_Ping);
 	}
 	else if(xmtBSPLinkPongDone == 1) {
-		xmtBSPLinkPongDone=2;
 
-		//BSPLink_EDMA_Start_Ping();
+		xmtBSPLinkPongDone=2;
 		SWI_post(&SWI_BSPLink_Out_Pong);
 	}
 
@@ -482,12 +494,12 @@ if(xmtBSPLinkPingDone == 1 || xmtBSPLinkPongDone == 1)
 	if(rcvPingDone) {
 		rcvPingDone=0;
 
-		SWI_post(&SWI_ADC_In_Pong);
+		SWI_post(&SWI_ADC_In_Ping);
 	}
 	else if(rcvPongDone) {
 		rcvPongDone=0;
 
-		SWI_post(&SWI_ADC_In_Ping);
+		SWI_post(&SWI_ADC_In_Pong);
 	}
 }
 
@@ -496,57 +508,61 @@ if(xmtBSPLinkPingDone == 1 || xmtBSPLinkPongDone == 1)
 // BSP Input RingBuffer schreiben
 void BSPLink_In_Ping(void)
 {
+	DSK6713_LED_on(1);
 	write_ring_buffer_in(BSPLinkBuffer_in_ping);
+	DSK6713_LED_off(1);
 }
 
 void BSPLink_In_Pong(void)
 {
+	DSK6713_LED_on(2);
 	write_ring_buffer_in(BSPLinkBuffer_in_pong);
+	DSK6713_LED_off(2);
 }
 
 // BSP Input RingBuffer lesen
 void ADC_Out_Ping(void)
 {
-	read_ring_buffer_in(Buffer_out_pong);
+	read_ring_buffer_out(Buffer_out_ping);
 }
 
 void ADC_Out_Pong(void)
 {
-	read_ring_buffer_in(Buffer_out_ping);
+	read_ring_buffer_out(Buffer_out_pong);
 }
 
 // BSP Output RingBuffer schreiben
 void ADC_In_Ping(void)
 {
-	DSK6713_LED_on(1);
-	write_ring_buffer_out(Buffer_in_pong);
-	DSK6713_LED_off(1);
+	//DSK6713_LED_on(1);
+	write_ring_buffer_out(Buffer_in_ping);
+	//DSK6713_LED_off(1);
 }
 
 void ADC_In_Pong(void)
 {
-	DSK6713_LED_on(2);
-	write_ring_buffer_out(Buffer_in_ping);
-	DSK6713_LED_off(2);
+	//DSK6713_LED_on(2);
+	write_ring_buffer_out(Buffer_in_pong);
+	//DSK6713_LED_off(2);
 }
 
 // BSP Output RingBuffer lesen
 void BSPLink_Out_Ping(void)
 {
-	read_ring_buffer_out(BSPLinkBuffer_out_ping);
+	read_ring_buffer_in(BSPLinkBuffer_out_pong);
 }
 
 void BSPLink_Out_Pong(void)
 {
-	read_ring_buffer_out(BSPLinkBuffer_out_pong);
+	read_ring_buffer_in(BSPLinkBuffer_out_ping);
 }
 /****************************************************************************/
 
 void write_ring_buffer_in(short * buffersrc)
 {
 	// Buffer ablaufen, Daten verarbeiten
-	Uint32 i;
-		for(i=0; i<BUFFER_LEN; i++)
+	Uint32 i_read;
+		for(i_read=0; i_read<BUFFER_LEN; i_read++)
 		{
 			/*
 			 *
@@ -560,12 +576,16 @@ void write_ring_buffer_in(short * buffersrc)
 
 			}else
 			*/
-			*(Ringbuffer_in+ringbuff_in_write_i) = *(buffersrc+i);
+			*(Ringbuffer_in+ringbuff_in_write_i) = *(buffersrc+i_read);
+
+			if(*(buffersrc+i_read) == 0)
+			DSK6713_LED_off(0);
 
 			if(ringbuff_in_write_i < RINGBUFFER_LEN-1)
 				ringbuff_in_write_i++;
 				else
 				ringbuff_in_write_i = 0;
+			//inc_ringbuff_i(&ringbuff_in_write_i);
 
 			if(ringbuff_in_read_i == ringbuff_in_write_i)
 			DSK6713_LED_off(0);
@@ -580,10 +600,7 @@ void read_ring_buffer_in(short * bufferdes)
 		{
 			*(bufferdes+i) = *(Ringbuffer_in+ringbuff_in_read_i);
 
-			if(ringbuff_in_read_i < RINGBUFFER_LEN-1)
-				ringbuff_in_read_i++;
-				else
-				ringbuff_in_read_i = 0;
+			inc_ringbuff_i(&ringbuff_in_read_i);
 
 			if(ringbuff_in_read_i == ringbuff_in_write_i)
 			DSK6713_LED_off(0);
@@ -600,10 +617,11 @@ void write_ring_buffer_out(short * buffersrc)
 
 			Ringbuffer_out[ringbuff_out_write_i] = buffersrc[i];
 
-			if(ringbuff_out_write_i < RINGBUFFER_LEN-1)
-				ringbuff_out_write_i++;
-				else
-					ringbuff_out_write_i = 0;
+			inc_ringbuff_i(&ringbuff_out_write_i);
+//			if(ringbuff_out_write_i < RINGBUFFER_LEN-1)
+//				ringbuff_out_write_i++;
+//				else
+//					ringbuff_out_write_i = 0;
 
 			if(ringbuff_out_read_i == ringbuff_out_write_i)
 			DSK6713_LED_off(0);
@@ -630,10 +648,7 @@ void read_ring_buffer_out(short * bufferdes)
 
 			bufferdes[i] = Ringbuffer_out[ringbuff_out_read_i];
 
-			if(ringbuff_out_read_i < RINGBUFFER_LEN-1)
-				ringbuff_out_read_i++;
-				else
-				ringbuff_out_read_i = 0;
+			inc_ringbuff_i(&ringbuff_out_read_i);
 
 			if(ringbuff_out_read_i == ringbuff_out_write_i)
 				DSK6713_LED_off(0);
@@ -641,7 +656,13 @@ void read_ring_buffer_out(short * bufferdes)
 		}
 }
 
-
+inline void inc_ringbuff_i(Uint32 * index)
+{
+	if(*index < RINGBUFFER_LEN-1)
+		*index = *index + 1;
+	else
+		*index = 0;
+}
 
 
 /* Periodic Function */

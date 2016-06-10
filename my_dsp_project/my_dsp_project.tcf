@@ -183,6 +183,8 @@ bios.SWI.instance("SWI_ADC_Out_Pong").priority = 4;
 bios.SWI.instance("SWI_ADC_In_Pong").priority = 1;
 bios.SWI.instance("SWI_ADC_Out_Ping").priority = 1;
 bios.SWI.instance("SWI_ADC_Out_Pong").priority = 1;
+bios.SWI.instance("SWI_ADC_In_Ping").priority = 2;
+bios.SWI.instance("SWI_ADC_In_Pong").priority = 2;
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();
