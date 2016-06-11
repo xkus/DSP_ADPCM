@@ -28,17 +28,15 @@ extern int tccBSPLinkRcvPong;
 extern int tccBSPLinkXmtPing;
 extern int tccBSPLinkXmtPong;
 
-#define BUFFER_LEN 1000
-
-#define MAGIC_NR		(short) 30003
+#define LINK_BUFFER_LEN 1050
 
 //#pragma DATA_SECTION(BSPLinkBuffer_in_ping, ".datenpuffer");
-extern short BSPLinkBuffer_in_ping[BUFFER_LEN];
+extern short BSPLinkBuffer_in_ping[LINK_BUFFER_LEN];
 //#pragma DATA_SECTION(BSPLinkBuffer_in_pong, ".datenpuffer");
-extern short BSPLinkBuffer_in_pong[BUFFER_LEN];
+extern short BSPLinkBuffer_in_pong[LINK_BUFFER_LEN];
 //#pragma DATA_SECTION(BSPLinkBuffer_out_ping, ".datenpuffer");
-extern short BSPLinkBuffer_out_ping[BUFFER_LEN];
+extern short BSPLinkBuffer_out_ping[LINK_BUFFER_LEN];
 //#pragma DATA_SECTION(BSPLinkBuffer_out_pong, ".datenpuffer");
-extern short BSPLinkBuffer_out_pong[BUFFER_LEN];
+extern short BSPLinkBuffer_out_pong[LINK_BUFFER_LEN];
 
 #endif /* CONFIG_BSPLINK_H_ */

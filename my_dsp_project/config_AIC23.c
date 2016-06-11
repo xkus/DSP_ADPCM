@@ -8,6 +8,7 @@
 #include <csl_mcbsp.h>
 #include "config_AIC23.h"
 
+#define SAMPLING_RATE 32000 // 48000
 
 MCBSP_Handle hMcbsp_AIC23_Config;
 /***************************************************/
@@ -70,15 +71,16 @@ static unsigned short myAIC23_registers[10] = { \
 	            /* LRSWAP  0          DAC left/right swap: disabled */           \
 	            /* LRP     0          DAC lrp: MSB on 1st BCLK */                \
 	            /* IWL     00         input bit length: 16 bit */                \
-	            /* FOR     11         USB-Mode */                 \
-	                                                                           \
-	    0x0001, /* Set-Up Reg 8       Sample rate control */                     \
+	            /* FOR     11         USB-Mode */                 				 \
+																				 \
+		0x0019, /* Set-Up Reg 8       Sample rate control - SR = 32 kHz  */                     \
+	    /*0x0001, /* Set-Up Reg 8       Sample rate control  - SR = 48 kHz */                     \
 	            /* X       0          reserved */                                \
 	            /* CLKOUT  0          clock output divider: 2 (MCLK/2) */        \
 	            /* CLKIN   0          clock input divider: 2 (MCLK/2) */         \
 	            /* SR,BOSR 00000      sampling rate: ADC 48 kHz, DAC 48 kHz in USB mode*/  \
 	            /* USB/N   1          clock mode select (USB/normal): USB */     \
-	                                                                             \
+				\
 	    0x0001  /* Set-Up Reg 9       Digital interface activation */            \
 	            /* XX..X   00000000   reserved */                                \
 	            /* ACT     1          not reseted */                                  \

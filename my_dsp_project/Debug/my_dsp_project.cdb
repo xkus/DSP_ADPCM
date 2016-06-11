@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Fri Jun 10 16:43:44 2016" { 
+    global DATE :: "Sat Jun 11 22:57:12 2016" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -4857,7 +4857,7 @@ type SWI {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global gNumOf :: 10 { 
+    global gNumOf :: 8 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -7045,7 +7045,7 @@ type STS {
         prop Writable :: 1
         prop NoGen :: 1
     }
-    global gNumEmbed :: 12 { 
+    global gNumEmbed :: 10 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -8809,7 +8809,7 @@ object SWI_BSPLink_In_Ping :: SWI {
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
     param function :: @_BSPLink_In_Ping
-    param pri :: 1
+    param pri :: 3
     param mailbox :: 0
     param arg0 :: 0
     param arg1 :: 0
@@ -8831,7 +8831,7 @@ object SWI_BSPLink_In_Pong :: SWI {
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
     param function :: @_BSPLink_In_Pong
-    param pri :: 1
+    param pri :: 3
     param mailbox :: 0
     param arg0 :: 0
     param arg1 :: 0
@@ -8853,7 +8853,7 @@ object SWI_ADC_Out_Ping :: SWI {
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
     param function :: @_ADC_Out_Ping
-    param pri :: 1
+    param pri :: 2
     param mailbox :: 0
     param arg0 :: 0
     param arg1 :: 0
@@ -8875,7 +8875,7 @@ object SWI_ADC_Out_Pong :: SWI {
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
     param function :: @_ADC_Out_Pong
-    param pri :: 1
+    param pri :: 2
     param mailbox :: 0
     param arg0 :: 0
     param arg1 :: 0
@@ -8925,50 +8925,6 @@ object SWI_ADC_In_Pong :: SWI {
     param arg1 :: 0
     param dorta :: 1
     param Order :: 8
-    param filter :: 2
-    param maxformat :: "%g inst"
-    param sumformat :: "%g inst"
-    param avgformat :: "%.2f inst"
-    param filtmaxmult :: 1
-    param filtsummult :: 1
-    param unittype :: 0
-}
-
-object SWI_BSPLink_Out_Ping :: SWI {
-    param iComment :: "<add comments here>"
-    param iIsUsed :: 1
-    param iId :: 0
-    param iDelUser :: "USER"
-    param iDelMsg :: "ok"
-    param function :: @_BSPLink_Out_Ping
-    param pri :: 1
-    param mailbox :: 0
-    param arg0 :: 0
-    param arg1 :: 0
-    param dorta :: 1
-    param Order :: 9
-    param filter :: 2
-    param maxformat :: "%g inst"
-    param sumformat :: "%g inst"
-    param avgformat :: "%.2f inst"
-    param filtmaxmult :: 1
-    param filtsummult :: 1
-    param unittype :: 0
-}
-
-object SWI_BSPLink_Out_Pong :: SWI {
-    param iComment :: "<add comments here>"
-    param iIsUsed :: 1
-    param iId :: 0
-    param iDelUser :: "USER"
-    param iDelMsg :: "ok"
-    param function :: @_BSPLink_Out_Pong
-    param pri :: 1
-    param mailbox :: 0
-    param arg0 :: 0
-    param arg1 :: 0
-    param dorta :: 1
-    param Order :: 11
     param filter :: 2
     param maxformat :: "%g inst"
     param sumformat :: "%g inst"
