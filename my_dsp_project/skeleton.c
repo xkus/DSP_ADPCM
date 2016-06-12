@@ -36,7 +36,7 @@ int configComplete = 0;
 Uint8 t_reg = 0;
 
 main() {
-Uint16 i =0;
+	Uint16 i = 0;
 
 	DSK6713_init();
 	CSL_init();
@@ -49,7 +49,7 @@ Uint16 i =0;
 
 	for (i = 0; i < AIC_BUFFER_LEN; i++) {
 		Debug_Buff_ping[i] = (short) i;
-		Debug_Buff_pong[AIC_BUFFER_LEN-i-1] = (short) i+1;
+		Debug_Buff_pong[AIC_BUFFER_LEN - i - 1] = (short) i + 1;
 	}
 
 	ringbuff_in_write_i = 0;
@@ -72,8 +72,8 @@ Uint16 i =0;
 	/* finally the interrupts */
 	config_interrupts();
 
-	MCBSP_start(hMcbsp_AIC23, MCBSP_XMIT_START | MCBSP_RCV_START, 0xffffffff); // Start Audio IN & OUT transmision
-	MCBSP_write(hMcbsp_AIC23, 0x0); /* one shot */
+//	MCBSP_start(hMcbsp_AIC23, MCBSP_XMIT_START | MCBSP_RCV_START, 0xffffffff); // Start Audio IN & OUT transmision
+//	MCBSP_write(hMcbsp_AIC23, 0x0); /* one shot */
 
 	configComplete = 1;
 
@@ -160,6 +160,7 @@ void config_interrupts(void) {
 }
 
 void EDMA_ISR(void) {
+	DSK6713_LED_on(2);
 	static volatile int rcvPingDone = 0;	//static
 	static volatile int rcvPongDone = 0;
 	static volatile int xmtPingDone = 0;
@@ -195,11 +196,9 @@ void EDMA_ISR(void) {
 	if (EDMA_intTest(tccBSPLinkXmtPing)) {
 		EDMA_intClear(tccBSPLinkXmtPing);
 		xmtBSPLinkPingDone = 1;
-		DSK6713_LED_on(2);
 	} else if (EDMA_intTest(tccBSPLinkXmtPong)) {
 		EDMA_intClear(tccBSPLinkXmtPong);
 		xmtBSPLinkPongDone = 1;
-		DSK6713_LED_off(2);
 	}
 
 	// BSPLink Anhalten, bis neuer Buffer verarbeitet
@@ -217,7 +216,6 @@ void EDMA_ISR(void) {
 		rcvBSPLinkPongDone = 1;
 		DSK6713_LED_on(3);
 	}
-
 
 	/*
 	 * *********** DECODER **********************
@@ -260,6 +258,8 @@ void EDMA_ISR(void) {
 		BSPLink_EDMA_Start_Ping();
 		SWI_post(&SWI_ADC_In_Pong);
 	}
+
+	DSK6713_LED_off(2);
 }
 
 /************************ SWI Section ****************************************/
@@ -382,7 +382,7 @@ void read_ring_buffer_in(short * bufferdes) {
 			i_write++;
 		}
 
-		if(i_write >= AIC_BUFFER_LEN)
+		if (i_write >= AIC_BUFFER_LEN)
 			break;
 	}
 }
@@ -417,10 +417,14 @@ void tsk_led_toggle(void) {
 			/* configure BSPLink-Interface */
 			config_BSPLink();
 
+			/* Start AIC McBSP */
+			MCBSP_start(hMcbsp_AIC23, MCBSP_XMIT_START | MCBSP_RCV_START,0xffffffff); // Start Audio IN & OUT transmision
+			MCBSP_write(hMcbsp_AIC23, 0x0); /* one shot */
+
 			configComplete = 2;
 
-		} else if (configComplete == 2)
-		{}
+		} else if (configComplete == 2) {
+		}
 
 	}
 }

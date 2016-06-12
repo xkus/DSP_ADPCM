@@ -209,8 +209,8 @@ void BSPLink_EDMA_Stop() {
 	reg_t &= ~0xC00000;
 	MCBSP_RSET(SPCR0, reg_t);
 
-	EDMA_disableChannel(hEdmaBSPLinkXmt);
-	EDMA_reset(hEdmaBSPLinkXmt);
+	//EDMA_disableChannel(hEdmaBSPLinkXmt);
+	//EDMA_reset(hEdmaBSPLinkXmt);
 
 	//MCBSP_close(hMcbsp_Link);
 
@@ -224,7 +224,7 @@ void BSPLink_EDMA_Start_Pong() {
 	EDMA_config(hEdmaBSPLinkXmt, &configEDMABSPLinkXmt_Pong);
 
 	EDMA_intClear(tccBSPLinkXmtPong);
-	EDMA_intEnable(tccBSPLinkXmtPong);
+	//EDMA_intEnable(tccBSPLinkXmtPong);
 
 	EDMA_enableChannel(hEdmaBSPLinkXmt);
 
@@ -246,7 +246,7 @@ void BSPLink_EDMA_Start_Ping() {
 
 	/* sind das alle? nein -> pong und alle für Sendeseite */
 	EDMA_intClear(tccBSPLinkXmtPing);
-	EDMA_intEnable(tccBSPLinkXmtPing);
+	//EDMA_intEnable(tccBSPLinkXmtPing);
 
 	EDMA_enableChannel(hEdmaBSPLinkXmt);
 

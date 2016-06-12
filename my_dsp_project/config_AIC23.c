@@ -8,8 +8,6 @@
 #include <csl_mcbsp.h>
 #include "config_AIC23.h"
 
-#define SAMPLING_RATE 32000 // 48000
-
 MCBSP_Handle hMcbsp_AIC23_Config;
 /***************************************************/
 /* Konfiguration des AIC23 aus Online-Help des CCS */
