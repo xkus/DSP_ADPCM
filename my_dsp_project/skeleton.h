@@ -11,7 +11,7 @@
 #define LINK_PREAM_START (short) 32767
 #define LINK_PREAM_STOP (short) -32768
 
-#define SEND_DEBUG_BUFFER
+//#define SEND_DEBUG_BUFFER
 
 /* BUFFER ARRAYS */
 

@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Wed Jun 15 08:50:06 2016" { 
+    global DATE :: "Wed Jun 15 13:12:48 2016" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -8809,7 +8809,7 @@ object SWI_BSPLink_In_Ping :: SWI {
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
     param function :: @_BSPLink_In_Ping
-    param pri :: 4
+    param pri :: 8
     param mailbox :: 0
     param arg0 :: 0
     param arg1 :: 0
@@ -8831,7 +8831,7 @@ object SWI_BSPLink_In_Pong :: SWI {
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
     param function :: @_BSPLink_In_Pong
-    param pri :: 4
+    param pri :: 7
     param mailbox :: 0
     param arg0 :: 0
     param arg1 :: 0

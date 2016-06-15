@@ -226,6 +226,10 @@ bios.SWI.instance("SWI_ADC_Out_Ping").priority = 4;
 bios.SWI.instance("SWI_ADC_In_Pong").priority = 4;
 bios.SWI.instance("SWI_ADC_In_Ping").priority = 4;
 bios.SWI.instance("SWI_Decode_Buffer").priority = 5;
+bios.SWI.instance("SWI_BSPLink_In_Pong").priority = 7;
+bios.SWI.instance("SWI_BSPLink_In_Ping").priority = 8;
+bios.SWI.instance("SWI_BSPLink_In_Ping").priority = 9;
+bios.SWI.instance("SWI_BSPLink_In_Ping").priority = 8;
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

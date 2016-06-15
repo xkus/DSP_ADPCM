@@ -167,7 +167,6 @@ void config_interrupts(void) {
 
 void EDMA_ISR(void) {
 
-	DSK6713_LED_on(2);
 	static volatile int rcvPingDone = 0;	//static
 	static volatile int rcvPongDone = 0;
 	static volatile int xmtPingDone = 0;
@@ -229,7 +228,7 @@ void EDMA_ISR(void) {
 		SWI_post(&SWI_BSPLink_In_Ping);
 	} else if (rcvBSPLinkPongDone) {
 		rcvBSPLinkPongDone = 0;
-		DSK6713_LED_on(0);
+		DSK6713_LED_off(0);
 		SWI_post(&SWI_BSPLink_In_Pong);
 	}
 
@@ -239,7 +238,6 @@ void EDMA_ISR(void) {
 		xmtPingDone = 0;
 		SWI_post(&SWI_ADC_Out_Ping);
 	} else if (xmtPongDone) {
-
 		xmtPongDone = 0;
 		SWI_post(&SWI_ADC_Out_Pong);
 	}
@@ -253,23 +251,22 @@ void EDMA_ISR(void) {
 		xmtBSPLinkPingDone = 0;
 		SWI_post(&SWI_BSPLink_Out_Ping);
 	} else if (xmtBSPLinkPongDone) {
-		DSK6713_LED_on(1);
+		DSK6713_LED_off(1);
 		xmtBSPLinkPongDone = 0;
 		SWI_post(&SWI_BSPLink_Out_Pong);
 	}
 
 	// ADC lesen -> Ringbuffer schreiben
 	if (rcvPingDone) {
-
+		DSK6713_LED_on(2);
 		rcvPingDone = 0;
 		SWI_post(&SWI_ADC_In_Ping);
 	} else if (rcvPongDone) {
-
+		DSK6713_LED_off(2);
 		rcvPongDone = 0;
 		SWI_post(&SWI_ADC_In_Pong);
 	}
 
-	DSK6713_LED_off(2);
 }
 
 /************************ SWI Section ****************************************/
@@ -307,16 +304,16 @@ void ADC_In_Pong(void) {
 
 // BSP Input RingBuffer schreiben
 void BSPLink_In_Ping(void) {
-
+	DSK6713_LED_on(3);
 	write_decoding_buffer(BSPLinkBuffer_in_ping);
-	DSK6713_LED_off(0);
 
+	DSK6713_LED_off(3);
 }
 
 void BSPLink_In_Pong(void) {
-
+	DSK6713_LED_on(3);
 	write_decoding_buffer(BSPLinkBuffer_in_pong);
-	DSK6713_LED_off(0);
+	DSK6713_LED_off(3);
 }
 
 // BSP Input RingBuffer schreiben
@@ -327,6 +324,7 @@ void BSPLink_Out_Ping(void) {
 
 		framing_link_data(BSPLinkBuffer_out_ping);
 		encoding_buff_valid = 0;
+
 	} else {
 		// Encoding Buffer hat neue Werte
 		for (i_write = 0; i_write < LINK_BUFFER_LEN; i_write++) {
@@ -335,7 +333,7 @@ void BSPLink_Out_Ping(void) {
 		}
 
 	}
-	DSK6713_LED_off(1);
+
 }
 
 void BSPLink_Out_Pong(void) {
@@ -354,7 +352,6 @@ void BSPLink_Out_Pong(void) {
 		}
 
 	}
-	DSK6713_LED_off(1);
 
 }
 
@@ -372,7 +369,6 @@ void decode_buffer(void) {
 		if (ringbuff_audio_out_write_i >= RINGBUFFER_LEN)
 			ringbuff_audio_out_write_i = 0;
 	}
-	DSK6713_LED_toggle(3);
 }
 
 void encode_buffer(void) {
@@ -418,7 +414,6 @@ void write_decoding_buffer(short * buffersrc) {
 // Daten extrahieren, Decoder füllen
 
 	Uint32 i_read;
-
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
 		// Ringbuffer einmal durchlaufen
 
@@ -426,44 +421,68 @@ void write_decoding_buffer(short * buffersrc) {
 		debug_buff_i++;
 		if (debug_buff_i >= 30000)
 			debug_buff_i = 0;
-
-		if (buffersrc[i_read] == LINK_PREAM_STOP) {
-			if (dataDetected == 1)
-				dataDetected = 0;
-			else if (dataDetected == 2)
-				dataDetected = 3;
-
-		} else if (buffersrc[i_read] == LINK_PREAM_START) {
-			dataDetected = 1;
-			continue;
-
-		} else if (dataDetected == 1) {
-			// Erstes Datum nach Start-Preämble
-			Decoding_Buffer_i = 0;	// Buffer Index an Anfang stellen
-			dataDetected = 2;
-		}
-
-		if (dataDetected == 2) {
-			Decoding_Buffer[Decoding_Buffer_i] = buffersrc[i_read];
-			Decoding_Buffer_i++;
-		} else if (dataDetected == 3) {
-			/* Stop detected. Buffer Valid */
-			// Nach STOP: Buffer mit Nullen füllen
-			DSK6713_LED_toggle(3);
-			//SWI_post(&SWI_Decode_Buffer);
-			dataDetected = 0;
-			break;
-//			Decoding_Buffer[Decoding_Buffer_i] = 0;
-//			Decoding_Buffer_i++;
-		}
-
-		if (Decoding_Buffer_i >= DECODING_BUFF_LEN) {
-			Decoding_Buffer_i = 0;
-			break;
-		}
-
 	}
 
+	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
+		// Ringbuffer einmal durchlaufen
+		if (buffersrc[i_read] == LINK_PREAM_STOP) {
+			if(dataDetected)
+			{
+				SWI_post(&SWI_Decode_Buffer);
+				dataDetected = 0;
+			}
+		} else if (buffersrc[i_read] == LINK_PREAM_START) {
+			Decoding_Buffer_i = 0;
+		} else {
+			dataDetected = 1;
+
+			Decoding_Buffer[Decoding_Buffer_i] = buffersrc[i_read];
+			Decoding_Buffer_i++;
+			if (Decoding_Buffer_i >= DECODING_BUFF_LEN) {
+				Decoding_Buffer_i = 0;
+			}
+		}
+	}
+
+	/*
+	 for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
+	 // Ringbuffer einmal durchlaufen
+	 if (buffersrc[i_read] == LINK_PREAM_STOP) {
+	 if (dataDetected == 1)
+	 dataDetected = 0;
+	 else if (dataDetected == 2)
+	 dataDetected = 3;
+
+	 } else if (buffersrc[i_read] == LINK_PREAM_START) {
+	 dataDetected = 1;
+	 continue;
+
+	 } else if (dataDetected == 1) {
+	 // Erstes Datum nach Start-Preämble
+	 Decoding_Buffer_i = 0;	// Buffer Index an Anfang stellen
+	 dataDetected = 2;
+	 }
+
+	 if (dataDetected == 2) {
+	 Decoding_Buffer[Decoding_Buffer_i] = buffersrc[i_read];
+	 Decoding_Buffer_i++;
+	 } else if (dataDetected == 3) {
+	 // Stop detected. Buffer Valid
+	 // Nach STOP: Buffer mit Nullen füllen
+	 SWI_post(&SWI_Decode_Buffer);
+	 dataDetected = 0;
+	 break;
+	 //			Decoding_Buffer[Decoding_Buffer_i] = 0;
+	 //			Decoding_Buffer_i++;
+	 }
+
+	 if (Decoding_Buffer_i >= DECODING_BUFF_LEN) {
+	 Decoding_Buffer_i = 0;
+	 break;
+	 }
+
+	 }
+	 */
 }
 
 void read_buffer_audio_out(short * bufferdes) {
