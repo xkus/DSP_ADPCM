@@ -2,10 +2,10 @@
 clear all
 % read wave file
 [FileName,PathName] = uigetfile('*','Select sound file');
-[a, Fs] = audioread([PathName FileName]);
+[a, Fs] = audioread([PathName FileName], 'native');
 
 % 50ms sample of wave file
-anz = Fs * 100;
+anz = 500;
 pos = Fs * 50;  % Set cut offset (Cut of top of song)
 x = a(pos:pos+anz-1, 1);    % left channel
 %sound(x,Fs);
@@ -49,7 +49,7 @@ for k = 1:N
 end;
 
 
-clearvars -except y e N Fs
+clearvars -except y e N Fs x
 
 e = e(7,:);
 

@@ -4,7 +4,7 @@ clear all
 [a, Fs] = audioread('Say My Name.mp3');
 
 % 50ms sample of wave file
-anz = Fs * 100;
+anz = Fs * 500;
 pos = Fs * 10;  % Set cut offset (Cut of top of song)
 x = a(pos:pos+anz-1, 1);    % left channel
 %sound(x,Fs);

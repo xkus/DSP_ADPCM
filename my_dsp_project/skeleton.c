@@ -19,6 +19,7 @@
 #include <swi.h>
 #include <sem.h>
 #include <dsk6713_led.h>
+#include <dsk6713_dip.h>
 #include <dsk6713.h>
 #include "config_AIC23.h"
 #include "config_BSPLink.h"
@@ -46,17 +47,26 @@ Uint16 time_cnt = 0;
 int configComplete = 0;
 Uint8 t_reg = 0;
 
+Uint32 ENCODER = 0;
+Uint32 DECODER = 0;
+
 main() {
 	Uint16 i = 0;
+	Uint16 j = 0;
 
 	DSK6713_init();
 	CSL_init();
 
-	for (i = 0; i < AIC_BUFFER_LEN; i++) {
+	ENCODER = !DSK6713_DIP_get(0);
+	DECODER = !DSK6713_DIP_get(1);
+
+	for (i = 0; i < SOUND_BUFF_LEN; i++, j += 2) {
 //		Debug_Buff_ping[i] = LINK_PREAM_START;
 //		Debug_Buff_pong[AIC_BUFFER_LEN-i-1] = LINK_PREAM_START;
-		Debug_Buff_ping[i] = (short) i;
-		Debug_Buff_pong[AIC_BUFFER_LEN - i - 1] = (short) i + 1;
+		Debug_Buff_ping[j] = MySound[i];
+		Debug_Buff_ping[j+1] = MySound[i];
+		Debug_Buff_pong[j] = MySound[i];
+		Debug_Buff_pong[j+1] = MySound[i];
 	}
 
 	/* Configure McBSP0 and AIC23 */
@@ -87,72 +97,77 @@ main() {
 void config_AIC23_EDMA(void) {
 	/* RECEIVE */
 	/* Konfiguration der EDMA zum Lesen*/
-	hEdmaRcv = EDMA_open(EDMA_CHA_REVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
-	hEdmaRcvRelPing = EDMA_allocTable(-1); // einen Reload-Parametersatz für Ping
-	hEdmaRcvRelPong = EDMA_allocTable(-1); // einen Reload-Parametersatz für Pong
+	if(ENCODER){
+		hEdmaRcv = EDMA_open(EDMA_CHA_REVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
+		hEdmaRcvRelPing = EDMA_allocTable(-1); // einen Reload-Parametersatz für Ping
+		hEdmaRcvRelPong = EDMA_allocTable(-1); // einen Reload-Parametersatz für Pong
 
-	configEDMARcv.src = MCBSP_getRcvAddr(hMcbsp_AIC23); //  Quell-Adresse zum Lesen
+		configEDMARcv.src = MCBSP_getRcvAddr(hMcbsp_AIC23); //  Quell-Adresse zum Lesen
 
-	tccRcvPing = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Ping
-	tccRcvPong = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Pong
-	configEDMARcv.opt |= EDMA_FMK(OPT, TCC, tccRcvPing); // dann der Grundkonfiguration des EDMA Empfangskanals zuweisen
+		tccRcvPing = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Ping
+		tccRcvPong = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Pong
+		configEDMARcv.opt |= EDMA_FMK(OPT, TCC, tccRcvPing); // dann der Grundkonfiguration des EDMA Empfangskanals zuweisen
 
-	/* ersten Transfer und Reload-Ping mit ConfigPing konfigurieren */
-	EDMA_config(hEdmaRcv, &configEDMARcv);
-	EDMA_config(hEdmaRcvRelPing, &configEDMARcv);
+		/* ersten Transfer und Reload-Ping mit ConfigPing konfigurieren */
+		EDMA_config(hEdmaRcv, &configEDMARcv);
+		EDMA_config(hEdmaRcvRelPing, &configEDMARcv);
 
-	/* braucht man auch noch andere EDMA-Konfigurationen fuer das Lesen? ja -> pong */
-	configEDMARcv.opt &= 0xFFF0FFFF;
-	configEDMARcv.opt |= EDMA_FMK(OPT, TCC, tccRcvPong);
-	configEDMARcv.dst = (Uint32) AIC_Buffer_in_pong;
-	EDMA_config(hEdmaRcvRelPong, &configEDMARcv);
+		/* braucht man auch noch andere EDMA-Konfigurationen fuer das Lesen? ja -> pong */
+		configEDMARcv.opt &= 0xFFF0FFFF;
+		configEDMARcv.opt |= EDMA_FMK(OPT, TCC, tccRcvPong);
+		configEDMARcv.dst = (Uint32) AIC_Buffer_in_pong;
+		EDMA_config(hEdmaRcvRelPong, &configEDMARcv);
 
-	/* Transfers verlinken ping -> pong -> ping */
-	EDMA_link(hEdmaRcv, hEdmaRcvRelPong); /* noch mehr verlinken? */
-	EDMA_link(hEdmaRcvRelPong, hEdmaRcvRelPing);
-	EDMA_link(hEdmaRcvRelPing, hEdmaRcvRelPong);
+		/* Transfers verlinken ping -> pong -> ping */
+		EDMA_link(hEdmaRcv, hEdmaRcvRelPong); /* noch mehr verlinken? */
+		EDMA_link(hEdmaRcvRelPong, hEdmaRcvRelPing);
+		EDMA_link(hEdmaRcvRelPing, hEdmaRcvRelPong);
 
-	/* TRANSMIT */
-	/* Konfiguration der EDMA zum Schreiben */
-	hEdmaXmt = EDMA_open(EDMA_CHA_XEVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
-	hEdmaXmtRelPing = EDMA_allocTable(-1); // einen Reload-Parametersatz für Ping
-	hEdmaXmtRelPong = EDMA_allocTable(-1); // einen Reload-Parametersatz für Pong
+		/* EDMA TCC-Interrupts freigeben */
+		EDMA_intClear(tccRcvPing);
+		EDMA_intEnable(tccRcvPing);
+		EDMA_intClear(tccRcvPong);
+		EDMA_intEnable(tccRcvPong);
+	}
 
-	configEDMAXmt.dst = MCBSP_getXmtAddr(hMcbsp_AIC23);	//  Ziel-Adresse zum Schreiben
+	if(DECODER){
+		/* TRANSMIT */
+		/* Konfiguration der EDMA zum Schreiben */
+		hEdmaXmt = EDMA_open(EDMA_CHA_XEVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
+		hEdmaXmtRelPing = EDMA_allocTable(-1); // einen Reload-Parametersatz für Ping
+		hEdmaXmtRelPong = EDMA_allocTable(-1); // einen Reload-Parametersatz für Pong
 
-	tccXmtPing = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Ping
-	tccXmtPong = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Pong
-	configEDMAXmt.opt |= EDMA_FMK(OPT, TCC, tccXmtPing); // dann der Grundkonfiguration des EDMA Sendekanal zuweisen
+		configEDMAXmt.dst = MCBSP_getXmtAddr(hMcbsp_AIC23);	//  Ziel-Adresse zum Schreiben
 
-	/* ersten Transfer und Reload-Ping mit ConfigPing konfigurieren */
-	EDMA_config(hEdmaXmt, &configEDMAXmt);
-	EDMA_config(hEdmaXmtRelPing, &configEDMAXmt);
+		tccXmtPing = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Ping
+		tccXmtPong = EDMA_intAlloc(-1); // nächsten freien Transfer-Complete-Code Pong
+		configEDMAXmt.opt |= EDMA_FMK(OPT, TCC, tccXmtPing); // dann der Grundkonfiguration des EDMA Sendekanal zuweisen
 
-	/* braucht man auch noch andere EDMA-Konfigurationen fuer das Schreiben? ja -> pong */
-	configEDMAXmt.opt &= 0xFFF0FFFF;
-	configEDMAXmt.opt |= EDMA_FMK(OPT, TCC, tccXmtPong);
-	configEDMAXmt.src = (Uint32) AIC_Buffer_out_pong;
-	EDMA_config(hEdmaXmtRelPong, &configEDMAXmt);
+		/* ersten Transfer und Reload-Ping mit ConfigPing konfigurieren */
+		EDMA_config(hEdmaXmt, &configEDMAXmt);
+		EDMA_config(hEdmaXmtRelPing, &configEDMAXmt);
 
-	/* Transfers verlinken ping -> pong -> ping */
-	EDMA_link(hEdmaXmt, hEdmaXmtRelPong); /* noch mehr verlinken? */
-	EDMA_link(hEdmaXmtRelPong, hEdmaXmtRelPing);
-	EDMA_link(hEdmaXmtRelPing, hEdmaXmtRelPong);
+		/* braucht man auch noch andere EDMA-Konfigurationen fuer das Schreiben? ja -> pong */
+		configEDMAXmt.opt &= 0xFFF0FFFF;
+		configEDMAXmt.opt |= EDMA_FMK(OPT, TCC, tccXmtPong);
+		configEDMAXmt.src = (Uint32) AIC_Buffer_out_pong;
+		EDMA_config(hEdmaXmtRelPong, &configEDMAXmt);
 
-	/* EDMA TCC-Interrupts freigeben */
-	EDMA_intClear(tccRcvPing);
-	EDMA_intEnable(tccRcvPing);
-	EDMA_intClear(tccRcvPong);
-	EDMA_intEnable(tccRcvPong);
-	/* sind das alle? nein -> pong und alle für Sendeseite */
-	EDMA_intClear(tccXmtPing);
-	EDMA_intEnable(tccXmtPing);
-	EDMA_intClear(tccXmtPong);
-	EDMA_intEnable(tccXmtPong);
+		/* Transfers verlinken ping -> pong -> ping */
+		EDMA_link(hEdmaXmt, hEdmaXmtRelPong); /* noch mehr verlinken? */
+		EDMA_link(hEdmaXmtRelPong, hEdmaXmtRelPing);
+		EDMA_link(hEdmaXmtRelPing, hEdmaXmtRelPong);
+
+		/* sind das alle? nein -> pong und alle für Sendeseite */
+		EDMA_intClear(tccXmtPing);
+		EDMA_intEnable(tccXmtPing);
+		EDMA_intClear(tccXmtPong);
+		EDMA_intEnable(tccXmtPong);
+	}
 
 	/* EDMA starten, wen alles? */
-	EDMA_enableChannel(hEdmaRcv);
-	EDMA_enableChannel(hEdmaXmt);
+	if(ENCODER) EDMA_enableChannel(hEdmaRcv);
+	if(DECODER) EDMA_enableChannel(hEdmaXmt);
 }
 
 void config_interrupts(void) {
@@ -358,31 +373,148 @@ void BSPLink_Out_Pong(void) {
 void decode_buffer(void) {
 
 	// Hier die Decodierung machen
+	//DECODER
+	int i = 0;
+	int k =0;
+	union gamma y[ORDER];
+	//uInt16 	e[BUFFER_LEN]={0};
+	short ef[ORDER + 1] = { 0 };
+	short bf[ORDER + 1] = { 0 };
+	/*
+	 //e(0) bis e(N-1)
+	 for(k=0;k<ORDER;k++)
+	 {
+	 e[k]=Decoding_Buffer[k];
+	 }
+	 */
 
-	for (Decoding_Buffer_i = 0; Decoding_Buffer_i < DECODING_BUFF_LEN;
-			Decoding_Buffer_i++) {
-		// Decodingbuffer einmal auslesen - direkt kopieren, da keine codierung
-		Ringbuffer_Audio_out[ringbuff_audio_out_write_i] =
-				Decoding_Buffer[Decoding_Buffer_i];
+	//Y berechnen / ausmaskieren
+	for (k = 0; k < (ORDER * 4); k = k + 4) {
+		i++;
+		//build a float Y from 4x 8 Bit
+		y[i].i = 0x0000;
+		y[i].i |= ((Decoding_Buffer[ORDER + k] & 0xFF00) >> 8);
+		y[i].i |= ((Decoding_Buffer[ORDER + k + 1] & 0xFF00));
+		y[i].i |= ((Decoding_Buffer[ORDER + k + 2] & 0xFF00) << 8);
+		y[i].i |= ((Decoding_Buffer[ORDER + k + 3] & 0xFF00) << 16);
+	}
+
+	for (k = 0; k <= DECODING_BUFF_LEN; k++) {
+		//Move the first Value in the Filter
+		if (k >= ORDER)	//is it an 8 BIT Value?
+			ef[ORDER] = Decoding_Buffer[k] & 0x00FF;
+		else
+			//it must be a 16 BIT Value
+			ef[ORDER] = Decoding_Buffer[k] * 5000/127;
+
+		for (i = (ORDER - 1); i >= 0; i--) {
+			ef[i] = ef[i + 1] + (bf[i] * y[i].f);
+			bf[i + 1] = ef[i] * (-y[i].f) + bf[i];
+		}
+		bf[0] = ef[0];
+
+		Ringbuffer_Audio_out[ringbuff_audio_out_write_i] = ef[0];
 		ringbuff_audio_out_write_i++;
 
 		if (ringbuff_audio_out_write_i >= RINGBUFFER_LEN)
 			ringbuff_audio_out_write_i = 0;
+
 	}
+
+
 }
 
 void encode_buffer(void) {
 	// Hier Encoding Machen
 
-	for (Encoding_Buffer_i = 0; Encoding_Buffer_i < ENCODING_BUFF_LEN;
-			Encoding_Buffer_i++) {
-		// Encodingbuffer einmal füllen - direkt kopieren, da keine codierung
-		Encoding_Buffer[Encoding_Buffer_i] =
-				Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
+	union gamma y[ORDER];
+	short e[ENCODING_BUFF_LEN];
+	short e_1[ENCODING_BUFF_LEN];
+	short b[ENCODING_BUFF_LEN];
+	short b_1[ENCODING_BUFF_LEN];
+
+	short * temp;
+	short * e_n = e;
+	short * e_n1 = e_1;
+	short * b_n = b;
+	short * b_n1 = b_1;
+
+	int i = 0;
+	int n = 0;
+
+	for(i = 0; i < ENCODING_BUFF_LEN; i++)
+	{
+		e_n[i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
+		b_n[i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
 		ringbuff_audio_in_read_i++;
 
 		if (ringbuff_audio_in_read_i >= RINGBUFFER_LEN)
 			ringbuff_audio_in_read_i = 0;
+	}
+
+	for(n = 0; n < ORDER; n++)
+	{
+		Int32 num = 0;
+		Uint32 den = 0;
+
+		for(i = 0; i < ENCODING_BUFF_LEN; i++)
+		{
+			e_n1[i] = 0;
+			b_n1[i] = 0;
+		}
+
+		// denominator
+		for(i = 1; i < ENCODING_BUFF_LEN; i++)
+		{
+			den += (Uint32)(e_n[i]*e_n[i]) + (Uint32)(b_n[i-1]*b_n[i-1]);
+		}
+
+		for(i = n+1; i < ENCODING_BUFF_LEN; i++)
+		{
+			// numerator
+			num = e_n[i] * b_n[i-1];
+			// reflection factor
+			y[n].f += (float)2 * (float)num / (float)den;
+		}
+
+		for(i = n+1; i < ENCODING_BUFF_LEN; i++)
+		{
+			e_n1[i] = e_n[i] - y[n].f * b_n[i-1];
+			b_n1[i] = b_n[i-1] - y[n].f * e_n[i];
+		}
+
+		temp = e_n;
+		e_n = e_n1;
+		e_n1 = temp;
+
+		temp = b_n;
+		b_n = b_n1;
+		b_n1 = temp;
+	}
+
+
+	// write error values in buffer
+	for(i = 0; i < ENCODING_BUFF_LEN; i++)
+	{
+		if (i < ORDER)
+		{
+			Encoding_Buffer[i] = e_n[i];
+		}
+		else
+		{
+			Encoding_Buffer[i] = 127/5000 * e_n[i];
+			Encoding_Buffer[i] &= 0x00FF;
+		}
+	}
+
+	// write y in buffer
+	i = 0;
+	for (n = 0; n < (ORDER * 4); n += 4) {
+		i++;
+		Encoding_Buffer[ORDER + n] = (y[i].i & (0xFF00)) << 8;
+		Encoding_Buffer[ORDER + n + 1] = (y[i].i & (0xFF00));
+		Encoding_Buffer[ORDER + n + 2] = (y[i].i & (0xFF00)) >> 8;
+		Encoding_Buffer[ORDER + n + 3] = (y[i].i & (0xFF00)) >> 16;
 	}
 
 	encoding_buff_valid = 1;
@@ -426,8 +558,7 @@ void write_decoding_buffer(short * buffersrc) {
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
 		// Ringbuffer einmal durchlaufen
 		if (buffersrc[i_read] == LINK_PREAM_STOP) {
-			if(dataDetected)
-			{
+			if (dataDetected) {
 				SWI_post(&SWI_Decode_Buffer);
 				dataDetected = 0;
 			}
