@@ -1,5 +1,5 @@
 SECTIONS {
-   .datenpuffer: {} > SDRAM
+   .datenpuffer: {} > IRAM
    }
 SECTIONS {
    .sounds: {} > SDRAM

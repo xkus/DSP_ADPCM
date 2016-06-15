@@ -25,8 +25,19 @@
 #include "Sounds.h"
 #include "skeleton.h"
 
-Uint32 ringbuff_in_read_i = RINGBUFFER_LEN / 2;
-Uint32 ringbuff_in_write_i = 0;
+Uint32 ringbuff_audio_in_read_i = RINGBUFFER_LEN / 2;
+Uint32 ringbuff_audio_in_write_i = 0;
+
+Uint32 ringbuff_audio_out_read_i = RINGBUFFER_LEN / 2;
+Uint32 ringbuff_audio_out_write_i = 0;
+
+Uint32 Decoding_Buffer_i = 0;
+Uint8 decoding_buff_valid = 0;
+
+Uint32 Encoding_Buffer_i = 0;
+Uint8 encoding_buff_valid = 0;
+
+Uint8 dataDetected = 0;
 
 Uint32 soundBuffer_i = 0;
 
@@ -41,18 +52,12 @@ main() {
 	DSK6713_init();
 	CSL_init();
 
-	for (ringbuff_in_write_i = 0; ringbuff_in_write_i < RINGBUFFER_LEN;
-			ringbuff_in_write_i++) {
-		*(Ringbuffer_in + ringbuff_in_write_i) = (short) 0;
-	}
-	ringbuff_in_write_i = 0;
-
 	for (i = 0; i < AIC_BUFFER_LEN; i++) {
+//		Debug_Buff_ping[i] = LINK_PREAM_START;
+//		Debug_Buff_pong[AIC_BUFFER_LEN-i-1] = LINK_PREAM_START;
 		Debug_Buff_ping[i] = (short) i;
 		Debug_Buff_pong[AIC_BUFFER_LEN - i - 1] = (short) i + 1;
 	}
-
-	ringbuff_in_write_i = 0;
 
 	/* Configure McBSP0 and AIC23 */
 	Config_DSK6713_AIC23();
@@ -64,7 +69,7 @@ main() {
 	/* configure EDMA */
 	config_AIC23_EDMA();
 
-	DSK6713_LED_on(0);
+	//DSK6713_LED_on(0);
 	//DSK6713_LED_on(1);
 	//DSK6713_LED_on(2);
 	//DSK6713_LED_on(3);
@@ -72,14 +77,15 @@ main() {
 	/* finally the interrupts */
 	config_interrupts();
 
-//	MCBSP_start(hMcbsp_AIC23, MCBSP_XMIT_START | MCBSP_RCV_START, 0xffffffff); // Start Audio IN & OUT transmision
-//	MCBSP_write(hMcbsp_AIC23, 0x0); /* one shot */
+	MCBSP_start(hMcbsp_AIC23, MCBSP_XMIT_START | MCBSP_RCV_START, 0xffffffff); // Start Audio IN & OUT transmision
+	MCBSP_write(hMcbsp_AIC23, 0x0); /* one shot */
 
 	configComplete = 1;
 
 } /* finished*/
 
 void config_AIC23_EDMA(void) {
+	/* RECEIVE */
 	/* Konfiguration der EDMA zum Lesen*/
 	hEdmaRcv = EDMA_open(EDMA_CHA_REVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
 	hEdmaRcvRelPing = EDMA_allocTable(-1); // einen Reload-Parametersatz für Ping
@@ -106,7 +112,7 @@ void config_AIC23_EDMA(void) {
 	EDMA_link(hEdmaRcvRelPong, hEdmaRcvRelPing);
 	EDMA_link(hEdmaRcvRelPing, hEdmaRcvRelPong);
 
-	/* muss man mittels EDMA auch schreiben? */
+	/* TRANSMIT */
 	/* Konfiguration der EDMA zum Schreiben */
 	hEdmaXmt = EDMA_open(EDMA_CHA_XEVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
 	hEdmaXmtRelPing = EDMA_allocTable(-1); // einen Reload-Parametersatz für Ping
@@ -160,6 +166,7 @@ void config_interrupts(void) {
 }
 
 void EDMA_ISR(void) {
+
 	DSK6713_LED_on(2);
 	static volatile int rcvPingDone = 0;	//static
 	static volatile int rcvPongDone = 0;
@@ -201,20 +208,14 @@ void EDMA_ISR(void) {
 		xmtBSPLinkPongDone = 1;
 	}
 
-	// BSPLink Anhalten, bis neuer Buffer verarbeitet
-	if (xmtBSPLinkPingDone == 1 || xmtBSPLinkPongDone == 1) {
-		BSPLink_EDMA_Stop();
-	}
-
 	// Receive
 	if (EDMA_intTest(tccBSPLinkRcvPing)) {
 		EDMA_intClear(tccBSPLinkRcvPing);
 		rcvBSPLinkPingDone = 1;
-		DSK6713_LED_on(3);
+
 	} else if (EDMA_intTest(tccBSPLinkRcvPong)) {
 		EDMA_intClear(tccBSPLinkRcvPong);
 		rcvBSPLinkPongDone = 1;
-		DSK6713_LED_on(3);
 	}
 
 	/*
@@ -224,19 +225,21 @@ void EDMA_ISR(void) {
 	 */
 	if (rcvBSPLinkPingDone) {
 		rcvBSPLinkPingDone = 0;
+		DSK6713_LED_on(0);
 		SWI_post(&SWI_BSPLink_In_Ping);
 	} else if (rcvBSPLinkPongDone) {
 		rcvBSPLinkPongDone = 0;
+		DSK6713_LED_on(0);
 		SWI_post(&SWI_BSPLink_In_Pong);
 	}
 
 // Ringbuffer lesen -> ADC schreiben
 	if (xmtPingDone) {
-		DSK6713_LED_on(0);
+
 		xmtPingDone = 0;
 		SWI_post(&SWI_ADC_Out_Ping);
 	} else if (xmtPongDone) {
-		DSK6713_LED_on(0);
+
 		xmtPongDone = 0;
 		SWI_post(&SWI_ADC_Out_Pong);
 	}
@@ -245,17 +248,24 @@ void EDMA_ISR(void) {
 	 *
 	 *  ADC_in_ping/pong -> BSPLink_out ping/pong
 	 */
-	if (xmtBSPLinkPingDone && rcvPingDone) {
+	if (xmtBSPLinkPingDone) {
 		DSK6713_LED_on(1);
 		xmtBSPLinkPingDone = 0;
-		rcvPingDone = 0;
-		BSPLink_EDMA_Start_Pong();
-		SWI_post(&SWI_ADC_In_Ping);
-	} else if (xmtBSPLinkPongDone && rcvPongDone) {
+		SWI_post(&SWI_BSPLink_Out_Ping);
+	} else if (xmtBSPLinkPongDone) {
 		DSK6713_LED_on(1);
 		xmtBSPLinkPongDone = 0;
+		SWI_post(&SWI_BSPLink_Out_Pong);
+	}
+
+	// ADC lesen -> Ringbuffer schreiben
+	if (rcvPingDone) {
+
+		rcvPingDone = 0;
+		SWI_post(&SWI_ADC_In_Ping);
+	} else if (rcvPongDone) {
+
 		rcvPongDone = 0;
-		BSPLink_EDMA_Start_Ping();
 		SWI_post(&SWI_ADC_In_Pong);
 	}
 
@@ -266,132 +276,231 @@ void EDMA_ISR(void) {
 
 // BSP Input RingBuffer lesen
 void ADC_Out_Ping(void) {
-	read_ring_buffer_in(AIC_Buffer_out_ping);
-	DSK6713_LED_off(0);
+	read_buffer_audio_out(AIC_Buffer_out_ping);
 }
 
 void ADC_Out_Pong(void) {
-	read_ring_buffer_in(AIC_Buffer_out_pong);
+	read_buffer_audio_out(AIC_Buffer_out_pong);
+
+}
+
+void ADC_In_Ping(void) {
+#ifdef SEND_DEBUG_BUFFER
+	write_buffer_audio_in(Debug_Buff_ping);
+#else
+	write_buffer_audio_in(AIC_Buffer_in_ping);
+#endif
+
+	SWI_post(&SWI_Encode_Buffer);
+
+}
+
+void ADC_In_Pong(void) {
+#ifdef SEND_DEBUG_BUFFER
+	write_buffer_audio_in(Debug_Buff_pong);
+#else
+	write_buffer_audio_in(AIC_Buffer_in_pong);
+#endif
+
+	SWI_post(&SWI_Encode_Buffer);
+}
+
+// BSP Input RingBuffer schreiben
+void BSPLink_In_Ping(void) {
+
+	write_decoding_buffer(BSPLinkBuffer_in_ping);
+	DSK6713_LED_off(0);
+
+}
+
+void BSPLink_In_Pong(void) {
+
+	write_decoding_buffer(BSPLinkBuffer_in_pong);
 	DSK6713_LED_off(0);
 }
 
-// BSP Output schreiben
-void ADC_In_Ping(void) {
-	Uint16 Link_Buff_i = 0;
-	Uint16 ADC_Buff_i = 0;
+// BSP Input RingBuffer schreiben
+void BSPLink_Out_Ping(void) {
 
-	for (Link_Buff_i = 0; Link_Buff_i < 20; Link_Buff_i++) {
-		BSPLinkBuffer_out_ping[Link_Buff_i] = LINK_PREAM_START;
+	Uint16 i_write;
+	if (encoding_buff_valid) {
+
+		framing_link_data(BSPLinkBuffer_out_ping);
+		encoding_buff_valid = 0;
+	} else {
+		// Encoding Buffer hat neue Werte
+		for (i_write = 0; i_write < LINK_BUFFER_LEN; i_write++) {
+			// Wenn encoder nicht bereit, STOP senden
+			BSPLinkBuffer_out_ping[i_write] = LINK_PREAM_STOP;
+		}
+
+	}
+	DSK6713_LED_off(1);
+}
+
+void BSPLink_Out_Pong(void) {
+
+	Uint16 i_write;
+	if (encoding_buff_valid) {
+
+		framing_link_data(BSPLinkBuffer_out_pong);
+		encoding_buff_valid = 0;
+
+	} else {
+		// Encoding Buffer hat neue Werte
+		for (i_write = 0; i_write < LINK_BUFFER_LEN; i_write++) {
+			// Wenn encoder nicht bereit, STOP senden
+			BSPLinkBuffer_out_pong[i_write] = LINK_PREAM_STOP;
+		}
+
+	}
+	DSK6713_LED_off(1);
+
+}
+
+void decode_buffer(void) {
+
+	// Hier die Decodierung machen
+
+	for (Decoding_Buffer_i = 0; Decoding_Buffer_i < DECODING_BUFF_LEN;
+			Decoding_Buffer_i++) {
+		// Decodingbuffer einmal auslesen - direkt kopieren, da keine codierung
+		Ringbuffer_Audio_out[ringbuff_audio_out_write_i] =
+				Decoding_Buffer[Decoding_Buffer_i];
+		ringbuff_audio_out_write_i++;
+
+		if (ringbuff_audio_out_write_i >= RINGBUFFER_LEN)
+			ringbuff_audio_out_write_i = 0;
+	}
+	DSK6713_LED_toggle(3);
+}
+
+void encode_buffer(void) {
+	// Hier Encoding Machen
+
+	for (Encoding_Buffer_i = 0; Encoding_Buffer_i < ENCODING_BUFF_LEN;
+			Encoding_Buffer_i++) {
+		// Encodingbuffer einmal füllen - direkt kopieren, da keine codierung
+		Encoding_Buffer[Encoding_Buffer_i] =
+				Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
+		ringbuff_audio_in_read_i++;
+
+		if (ringbuff_audio_in_read_i >= RINGBUFFER_LEN)
+			ringbuff_audio_in_read_i = 0;
 	}
 
-	for (ADC_Buff_i = 0; ADC_Buff_i < AIC_BUFFER_LEN; ADC_Buff_i++) {
-#ifdef SEND_DEBUG_BUFFER
-		BSPLinkBuffer_out_ping[Link_Buff_i] = Debug_Buff_ping[ADC_Buff_i];
-#else
-		BSPLinkBuffer_out_ping[Link_Buff_i] = AIC_Buffer_in_ping[ADC_Buff_i];
-#endif
+	encoding_buff_valid = 1;
+}
+
+/****************************************************************************/
+
+void framing_link_data(short * bufferdes) {
+	// Kapselt Encoding_Buffer mit START und STOP und schreibt in ping od. pong
+	// BSP Output schreiben
+	Uint16 Link_Buff_i = 0;
+	Uint16 Enc_Buff_i = 0;
+
+	for (Link_Buff_i = 0; Link_Buff_i < 20; Link_Buff_i++) {
+		bufferdes[Link_Buff_i] = LINK_PREAM_START;
+	}
+
+	for (Enc_Buff_i = 0; Enc_Buff_i < ENCODING_BUFF_LEN; Enc_Buff_i++) {
+		bufferdes[Link_Buff_i] = Encoding_Buffer[Enc_Buff_i];
 		Link_Buff_i++;
 	}
 
 	for (; Link_Buff_i < LINK_BUFFER_LEN; Link_Buff_i++) {
 		BSPLinkBuffer_out_ping[Link_Buff_i] = LINK_PREAM_STOP;
 	}
-	DSK6713_LED_off(1);
 }
 
-void ADC_In_Pong(void) {
-	Uint16 Link_Buff_i = 0;
-	Uint16 ADC_Buff_i = 0;
-
-	for (Link_Buff_i = 0; Link_Buff_i < 20; Link_Buff_i++) {
-		BSPLinkBuffer_out_pong[Link_Buff_i] = LINK_PREAM_START;
-	}
-
-	for (ADC_Buff_i = 0; ADC_Buff_i < AIC_BUFFER_LEN; ADC_Buff_i++) {
-#ifdef SEND_DEBUG_BUFFER
-		BSPLinkBuffer_out_pong[Link_Buff_i] = Debug_Buff_pong[ADC_Buff_i];
-#else
-		BSPLinkBuffer_out_pong[Link_Buff_i] = AIC_Buffer_in_pong[ADC_Buff_i];
-#endif
-		Link_Buff_i++;
-	}
-
-	for (; Link_Buff_i < LINK_BUFFER_LEN; Link_Buff_i++) {
-		BSPLinkBuffer_out_pong[Link_Buff_i] = LINK_PREAM_STOP;
-	}
-	DSK6713_LED_off(1);
-}
-
-// BSP Input RingBuffer schreiben
-void BSPLink_In_Ping(void) {
-	write_ring_buffer_in(BSPLinkBuffer_in_ping);
-	DSK6713_LED_off(3);
-}
-
-void BSPLink_In_Pong(void) {
-	write_ring_buffer_in(BSPLinkBuffer_in_pong);
-	DSK6713_LED_off(3);
-}
-
-/****************************************************************************/
-
-void write_ring_buffer_in(short * buffersrc) {
-	// BSP_in ping/pong Buffer in Ringbuffer schreiben
+void write_decoding_buffer(short * buffersrc) {
+// Daten extrahieren, Decoder füllen
 
 	Uint32 i_read;
+
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
-
-		*(Ringbuffer_in + ringbuff_in_write_i) = *(buffersrc + i_read);
-		inc_ringbuff_i(&ringbuff_in_write_i);
-	}
-}
-
-void read_ring_buffer_in(short * bufferdes) {
-// Ringbuffer nach Daten durchsuchen
-
-	Uint32 i_read;
-	Uint32 i_write = 0;
-	Uint8 dataDetected = 0;
-
-	for (i_read = 0; i_read < RINGBUFFER_LEN; ringbuff_in_read_i++, i_read++) {
 		// Ringbuffer einmal durchlaufen
 
-		if (ringbuff_in_read_i >= RINGBUFFER_LEN)
-			ringbuff_in_read_i = 0;
+		Debug_Buff[debug_buff_i] = buffersrc[i_read];
+		debug_buff_i++;
+		if (debug_buff_i >= 30000)
+			debug_buff_i = 0;
 
-		if (Ringbuffer_in[ringbuff_in_read_i] == LINK_PREAM_STOP) {
-			if (dataDetected)
+		if (buffersrc[i_read] == LINK_PREAM_STOP) {
+			if (dataDetected == 1)
+				dataDetected = 0;
+			else if (dataDetected == 2)
 				dataDetected = 3;
-			continue;
-		} else if (Ringbuffer_in[ringbuff_in_read_i] == LINK_PREAM_START) {
+
+		} else if (buffersrc[i_read] == LINK_PREAM_START) {
 			dataDetected = 1;
 			continue;
 
-		} else if (Ringbuffer_in[ringbuff_in_read_i] != LINK_PREAM_START
-				&& dataDetected == 1) {
+		} else if (dataDetected == 1) {
 			// Erstes Datum nach Start-Preämble
+			Decoding_Buffer_i = 0;	// Buffer Index an Anfang stellen
 			dataDetected = 2;
-
 		}
 
 		if (dataDetected == 2) {
-			bufferdes[i_write] = Ringbuffer_in[ringbuff_in_read_i];
-			i_write++;
+			Decoding_Buffer[Decoding_Buffer_i] = buffersrc[i_read];
+			Decoding_Buffer_i++;
 		} else if (dataDetected == 3) {
-			bufferdes[i_write] = 0;
-			i_write++;
+			/* Stop detected. Buffer Valid */
+			// Nach STOP: Buffer mit Nullen füllen
+			DSK6713_LED_toggle(3);
+			//SWI_post(&SWI_Decode_Buffer);
+			dataDetected = 0;
+			break;
+//			Decoding_Buffer[Decoding_Buffer_i] = 0;
+//			Decoding_Buffer_i++;
 		}
 
-		if (i_write >= AIC_BUFFER_LEN)
+		if (Decoding_Buffer_i >= DECODING_BUFF_LEN) {
+			Decoding_Buffer_i = 0;
 			break;
+		}
+
+	}
+
+}
+
+void read_buffer_audio_out(short * bufferdes) {
+// Ringbuffer nach BSPLink schreiben
+
+	Uint32 i_write;
+
+	for (i_write = 0; i_write < AIC_BUFFER_LEN - 1; i_write = i_write + 2) {
+		// Ringbuffer einmal durchlaufen
+		bufferdes[i_write] = Ringbuffer_Audio_out[ringbuff_audio_out_read_i];
+		bufferdes[i_write + 1] =
+				Ringbuffer_Audio_out[ringbuff_audio_out_read_i];
+
+		ringbuff_audio_out_read_i++;
+
+		if (ringbuff_audio_out_read_i >= RINGBUFFER_LEN)
+			ringbuff_audio_out_read_i = 0;
 	}
 }
 
-inline void inc_ringbuff_i(Uint32 * index) {
-	if (*index < RINGBUFFER_LEN - 1)
-		*index = *index + 1;
-	else
-		*index = 0;
+void write_buffer_audio_in(short * bufferscr) {
+// Audiodaten als MONO Signal in Buffer schreiben
+
+	Uint32 i_read;
+
+	for (i_read = 0; i_read < AIC_BUFFER_LEN - 1; i_read = i_read + 2) {
+		// Ringbuffer einmal durchlaufen
+
+		Ringbuffer_Audio_in[ringbuff_audio_in_write_i] =
+				(short) (bufferscr[i_read] / 2 + bufferscr[i_read + 1] / 2);
+
+		ringbuff_audio_in_write_i++;
+
+		if (ringbuff_audio_in_write_i >= RINGBUFFER_LEN)
+			ringbuff_audio_in_write_i = 0;
+	}
+
 }
 
 /* Periodic Function */
@@ -416,10 +525,6 @@ void tsk_led_toggle(void) {
 
 			/* configure BSPLink-Interface */
 			config_BSPLink();
-
-			/* Start AIC McBSP */
-			MCBSP_start(hMcbsp_AIC23, MCBSP_XMIT_START | MCBSP_RCV_START,0xffffffff); // Start Audio IN & OUT transmision
-			MCBSP_write(hMcbsp_AIC23, 0x0); /* one shot */
 
 			configComplete = 2;
 

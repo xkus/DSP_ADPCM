@@ -110,6 +110,8 @@
 	.global	_BSPLink_In_Pong
 	.global	_BSPLink_Out_Ping
 	.global	_BSPLink_Out_Pong
+	.global	_decode_buffer
+	.global	_encode_buffer
 
 ;; MODULE PARAMETERS
 GBL$                .set 1

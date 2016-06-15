@@ -13,5 +13,5 @@ plot(base, val)
 abl = diff(val);
 abl(find(abs(abl) >= 5000))=5000;
 hold on
-plot(base(2:end), ((abl-1))+500)
-ylim([min(val), max(val)]);
+%plot(base(2:end), ((abl-1))+500)
+%ylim([min(val), max(val)]);

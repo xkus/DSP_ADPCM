@@ -3,7 +3,10 @@
 
 /* DEFINES */
 #define AIC_BUFFER_LEN 1000
-#define RINGBUFFER_LEN	30000
+#define RINGBUFFER_LEN	3000
+
+#define DECODING_BUFF_LEN	500
+#define ENCODING_BUFF_LEN DECODING_BUFF_LEN
 
 #define LINK_PREAM_START (short) 32767
 #define LINK_PREAM_STOP (short) -32768
@@ -23,8 +26,17 @@ short AIC_Buffer_out_ping[AIC_BUFFER_LEN];
 #pragma DATA_SECTION(AIC_Buffer_out_pong, ".datenpuffer");
 short AIC_Buffer_out_pong[AIC_BUFFER_LEN];
 
-#pragma DATA_SECTION(Ringbuffer_in, ".datenpuffer");
-short Ringbuffer_in[RINGBUFFER_LEN];
+#pragma DATA_SECTION(Ringbuffer_Audio_in, ".datenpuffer");
+short Ringbuffer_Audio_in[RINGBUFFER_LEN];
+#pragma DATA_SECTION(Ringbuffer_Audio_out, ".datenpuffer");
+short Ringbuffer_Audio_out[RINGBUFFER_LEN];
+
+
+#pragma DATA_SECTION(Decoding_Buffer, ".datenpuffer");
+short Decoding_Buffer[DECODING_BUFF_LEN];
+
+#pragma DATA_SECTION(Encoding_Buffer, ".datenpuffer");
+short Encoding_Buffer[ENCODING_BUFF_LEN];
 
 /* Debug Buffer */
 #pragma DATA_SECTION(Debug_Buff_ping, ".datenpuffer");
@@ -32,19 +44,27 @@ short Debug_Buff_ping[AIC_BUFFER_LEN];
 #pragma DATA_SECTION(Debug_Buff_pong, ".datenpuffer");
 short Debug_Buff_pong[AIC_BUFFER_LEN];
 
+/* Debug Buffer */
+#pragma DATA_SECTION(Debug_Buff, ".datenpuffer");
+short Debug_Buff[30000];
+
+Uint16 debug_buff_i =0;
+
+
 /* function prototipes */
-extern void process_ping_SWI(void);
-extern void process_pong_SWI(void);
+extern void encode_audio_data(short * bufferdes);
+extern void write_decoding_buffer(short * buffersrc);
+extern void read_buffer_audio_out(short * bufferdes);
+extern void write_buffer_audio_in(short * bufferscr);
+extern void framing_link_data(short * bufferdes);
+
 extern void EDMA_interrupt_service(void);
 extern void config_AIC23_EDMA(void);
 void config_interrupts(void);
 // Datenverarbeitung
-void write_ring_buffer_in(short * buffersrc);
-void read_ring_buffer_in(short * bufferdes);
-void write_ring_buffer_out(short * buffersrc);
-void read_ring_buffer_out(short * bufferdes);
 
-inline void inc_ringbuff_i(Uint32 * index);
+
+extern void decode_buffer(void);
 extern void tsk_led_toggle(void);
 
 /* Global Handler */

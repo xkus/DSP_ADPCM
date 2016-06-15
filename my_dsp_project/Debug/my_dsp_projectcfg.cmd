@@ -97,6 +97,10 @@ _SWI_ADC_Out_Ping = SWI_ADC_Out_Ping;
 _SWI_ADC_Out_Pong = SWI_ADC_Out_Pong;
 _SWI_ADC_In_Ping = SWI_ADC_In_Ping;
 _SWI_ADC_In_Pong = SWI_ADC_In_Pong;
+_SWI_BSPLink_Out_Ping = SWI_BSPLink_Out_Ping;
+_SWI_BSPLink_Out_Pong = SWI_BSPLink_Out_Pong;
+_SWI_Decode_Buffer = SWI_Decode_Buffer;
+_SWI_Encode_Buffer = SWI_Encode_Buffer;
 _TSK_idle = TSK_idle;
 _TSK_LEDTOGGLE = TSK_LEDTOGGLE;
 _IDL_cpuLoad = IDL_cpuLoad;
@@ -179,7 +183,7 @@ SECTIONS {
    .swi: RUN_START(SWI_A_TABBEG), RUN_END(SWI_A_TABEND) {
    } > IRAM
 }
-SWI_A_TABLEN = 8;
+SWI_A_TABLEN = 12;
 
 /* MODULE TSK */
 SECTIONS {

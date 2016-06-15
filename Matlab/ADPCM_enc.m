@@ -1,7 +1,8 @@
 % ADPCM Encoder
 clear all
 % read wave file
-[a, Fs] = audioread('Say My Name.mp3');
+[FileName,PathName] = uigetfile('*','Select sound file');
+[a, Fs] = audioread([PathName FileName]);
 
 % 50ms sample of wave file
 anz = Fs * 100;
@@ -53,7 +54,7 @@ clearvars -except y e N Fs
 e = e(7,:);
 
 ef = zeros(1,7);
-bf = zeros(2,7);
+bf = zeros(1,7);
 
 % ADPCM decoder
 
@@ -61,10 +62,10 @@ for k = 1:length(e)
     ef(7) = e(k);  % Neuer Wert
     
 for i = N:-1:1
-   ef(i) = ef(i+1) + bf(1,i)*y(i);
-   bf(1,i+1) = ef(i)*(-y(i))+bf(1,i);
+   ef(i) = ef(i+1) + bf(i)*y(i);
+   bf(i+1) = ef(i)*(-y(i))+bf(i);
 end;
-bf(1,1) = ef(1);
+bf(1) = ef(1);
 x1(k) = ef(1);
 end;
 
