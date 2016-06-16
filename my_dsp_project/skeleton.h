@@ -14,7 +14,7 @@
 
 #define ORDER	6
 
-#define SEND_DEBUG_BUFFER
+//#define SEND_DEBUG_BUFFER
 
 /* BUFFER ARRAYS */
 
@@ -53,10 +53,7 @@ short Debug_Buff[30000];
 
 Uint16 debug_buff_i =0;
 
-union gamma{
-  float f;
-  unsigned int i;
-};
+
 
 
 /* function prototipes */

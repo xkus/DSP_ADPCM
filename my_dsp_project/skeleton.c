@@ -46,7 +46,12 @@ Uint8 ringbuffer_in_ready = 0;
 
 Uint16 time_cnt = 0;
 
-unsigned long debug_denum[6] ={0};
+union gamma{
+  float f;
+  Uint32 i;
+};
+
+unsigned long debug_denum[6] = { 0 };
 
 int configComplete = 0;
 Uint8 t_reg = 0;
@@ -56,10 +61,10 @@ Uint32 DECODER = 0;
 
 /* ENCODER VARS */
 union gamma y_enc[ORDER];
-short e_enc[ENCODING_BUFF_LEN] = { 0 };
-short e_1_enc[ENCODING_BUFF_LEN] = { 0 };
-short b_enc[ENCODING_BUFF_LEN] = { 0 };
-short b_1_enc[ENCODING_BUFF_LEN] = { 0 };
+short e_enc[ORDER+1][ENCODING_BUFF_LEN] = { 0 };
+//short e_1_enc[ENCODING_BUFF_LEN] = { 0 };
+short b_enc[ORDER+1][ENCODING_BUFF_LEN] = { 0 };
+//short b_1_enc[ENCODING_BUFF_LEN] = { 0 };
 
 float den_f;
 float num_f;
@@ -78,7 +83,6 @@ main() {
 	DSK6713_LED_off(1);
 	DSK6713_LED_off(2);
 	DSK6713_LED_off(3);
-
 
 	for (i = 0; i < SOUND_BUFF_LEN; i++, j += 2) {
 //		Debug_Buff_ping[i] = LINK_PREAM_START;
@@ -414,10 +418,10 @@ void decode_buffer(void) {
 	for (k = 0; k <= DECODING_BUFF_LEN; k++) {
 		//Move the first Value in the Filter
 		if (k >= ORDER)	//is it an 8 BIT Value?
-			ef[ORDER] = Decoding_Buffer[k] & 0x00FF;
+			ef[ORDER] = (short) ((Decoding_Buffer[k] & 0x00FF)  * (float) 5000 / (float) 127);
 		else
 			//it must be a 16 BIT Value
-			ef[ORDER] = Decoding_Buffer[k] * 5000 / 127;
+			ef[ORDER] = Decoding_Buffer[k];
 
 		for (i = (ORDER - 1); i >= 0; i--) {
 			ef[i] = ef[i + 1] + (bf[i] * y[i].f);
@@ -432,6 +436,7 @@ void decode_buffer(void) {
 			ringbuff_audio_out_write_i = 0;
 
 	}
+
 	DSK6713_LED_off(3);
 }
 
@@ -441,81 +446,68 @@ void encode_buffer(void) {
 	signed long num = 0;
 	unsigned long den = 0;
 
-	short * temp;
-	short * e_n = e_enc;
-	short * e_n1 = e_1_enc;
-	short * b_n = b_enc;
-	short * b_n1 = b_1_enc;
-
 	int i = 0;
 	int n = 0;
 
 	for (i = 0; i < ENCODING_BUFF_LEN; i++) {
-		e_n[i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
-		b_n[i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
+		e_enc[0][i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
+		b_enc[0][i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
 		ringbuff_audio_in_read_i++;
 
 		if (ringbuff_audio_in_read_i >= RINGBUFFER_LEN)
 			ringbuff_audio_in_read_i = 0;
 	}
+	Encoding_Buffer[0] = e_enc[0][0];
 
-	for (n = 0; n < ORDER; n++) {
+	for (n = 1; n <= ORDER; n++) {
 		num = 0;
 		den = 0;
-
-		for(i = 0; i < n+1; i++)
-		{
-			e_n1[i] = 0;
-			b_n1[i] = 0;
-		}
+			for (i = 0; i < n + 1; i++) {
+				e_enc[n][i] = 0;
+				b_enc[n][i] = 0;
+			}
 
 		// denominator
 		for (i = 1; i < ENCODING_BUFF_LEN; i++) {
-			den += (e_n[i] * e_n[i]) + (b_n[i - 1] * b_n[i - 1]);
+			den += (e_enc[n-1][i] * e_enc[n-1][i]) + (b_enc[n-1][i - 1] * b_enc[n-1][i - 1]);
 		}
 
 		//debug_denum[n] = den;
 
-		for (i = n + 1; i < ENCODING_BUFF_LEN; i++) {
+		for (i = n; i < ENCODING_BUFF_LEN; i++) {
 			// numerator
-			num += (signed long) e_n[i] * b_n[i - 1];
+			num += (signed long) e_enc[n-1][i] * b_enc[n-1][i - 1];
 		}
 		// reflection factor
-		den_f = (float)den;
-		num_f = (float)num;
-		y_enc[n].f = num_f / den_f;
-		y_enc[n].f *= 2;
+		den_f = (float) den;
+		num_f = (float) num;
+		y_enc[n-1].f = num_f / den_f;
+		y_enc[n-1].f *= 2;
 
-		for (i = n + 1; i < ENCODING_BUFF_LEN; i++) {
-			e_n1[i] = (short) (e_n[i] - y_enc[n].f * (float)b_n[i - 1]);
-			b_n1[i] = (short) (b_n[i - 1] - y_enc[n].f * (float)e_n[i]);
+		for (i = n; i < ENCODING_BUFF_LEN; i++) {
+			e_enc[n][i] = (short) (e_enc[n-1][i] - y_enc[n-1].f * (float) b_enc[n-1][i - 1]);
+			b_enc[n][i] = (short) (b_enc[n-1][i - 1] - y_enc[n-1].f * (float) e_enc[n-1][i]);
 		}
 
-
-		Encoding_Buffer[n] = e_n[n];
-
-		temp = e_n;
-		e_n = e_n1;
-		e_n1 = temp;
-
-		temp = b_n;
-		b_n = b_n1;
-		b_n1 = temp;
+		Encoding_Buffer[n] = e_enc[n][n];
 	}
 
 	// write error values in buffer
 	for (i = ORDER; i < ENCODING_BUFF_LEN; i++) {
-		Encoding_Buffer[i] = (short) (((float)127 / 5000) * e_n[i]);
+		Encoding_Buffer[i] = (short) (((float) 127 / 5000) * e_enc[ORDER][i]);
 		Encoding_Buffer[i] &= 0x00FF;
+		//Encoding_Buffer[i] = 0;
 	}
 
 	// write y in buffer
+	i = 0;
 	for (n = 0; n < (ORDER * 4); n += 4) {
-		i++;
+
 		Encoding_Buffer[ORDER + n] |= (y_enc[i].i & (0xFF)) << 8;
 		Encoding_Buffer[ORDER + n + 1] |= (y_enc[i].i & (0xFF00));
 		Encoding_Buffer[ORDER + n + 2] |= (y_enc[i].i & (0xFF0000)) >> 8;
 		Encoding_Buffer[ORDER + n + 3] |= (y_enc[i].i & (0xFF000000)) >> 16;
+		i++;
 	}
 
 	if (ringbuffer_in_ready)
@@ -561,14 +553,16 @@ void write_decoding_buffer(short * buffersrc) {
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
 		// Ringbuffer einmal durchlaufen
 		if (buffersrc[i_read] == LINK_PREAM_STOP) {
-			if (dataDetected) {
+			if (dataDetected == 200) {
 				SWI_post(&SWI_Decode_Buffer);
 				dataDetected = 0;
 			}
 		} else if (buffersrc[i_read] == LINK_PREAM_START) {
 			Decoding_Buffer_i = 0;
+			dataDetected ++;
 		} else {
-			dataDetected = 1;
+			if(dataDetected > 5)
+			dataDetected = 200;
 
 			Decoding_Buffer[Decoding_Buffer_i] = buffersrc[i_read];
 			Decoding_Buffer_i++;
