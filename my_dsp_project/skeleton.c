@@ -42,13 +42,27 @@ Uint8 dataDetected = 0;
 
 Uint32 soundBuffer_i = 0;
 
+Uint8 ringbuffer_in_ready = 0;
+
 Uint16 time_cnt = 0;
+
+unsigned long debug_denum[6] ={0};
 
 int configComplete = 0;
 Uint8 t_reg = 0;
 
 Uint32 ENCODER = 0;
 Uint32 DECODER = 0;
+
+/* ENCODER VARS */
+union gamma y_enc[ORDER];
+short e_enc[ENCODING_BUFF_LEN] = { 0 };
+short e_1_enc[ENCODING_BUFF_LEN] = { 0 };
+short b_enc[ENCODING_BUFF_LEN] = { 0 };
+short b_1_enc[ENCODING_BUFF_LEN] = { 0 };
+
+float den_f;
+float num_f;
 
 main() {
 	Uint16 i = 0;
@@ -60,13 +74,19 @@ main() {
 	ENCODER = !DSK6713_DIP_get(0);
 	DECODER = !DSK6713_DIP_get(1);
 
+	DSK6713_LED_off(0);
+	DSK6713_LED_off(1);
+	DSK6713_LED_off(2);
+	DSK6713_LED_off(3);
+
+
 	for (i = 0; i < SOUND_BUFF_LEN; i++, j += 2) {
 //		Debug_Buff_ping[i] = LINK_PREAM_START;
 //		Debug_Buff_pong[AIC_BUFFER_LEN-i-1] = LINK_PREAM_START;
 		Debug_Buff_ping[j] = MySound[i];
-		Debug_Buff_ping[j+1] = MySound[i];
+		Debug_Buff_ping[j + 1] = MySound[i];
 		Debug_Buff_pong[j] = MySound[i];
-		Debug_Buff_pong[j+1] = MySound[i];
+		Debug_Buff_pong[j + 1] = MySound[i];
 	}
 
 	/* Configure McBSP0 and AIC23 */
@@ -97,7 +117,7 @@ main() {
 void config_AIC23_EDMA(void) {
 	/* RECEIVE */
 	/* Konfiguration der EDMA zum Lesen*/
-	if(ENCODER){
+	if (ENCODER) {
 		hEdmaRcv = EDMA_open(EDMA_CHA_REVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
 		hEdmaRcvRelPing = EDMA_allocTable(-1); // einen Reload-Parametersatz für Ping
 		hEdmaRcvRelPong = EDMA_allocTable(-1); // einen Reload-Parametersatz für Pong
@@ -130,7 +150,7 @@ void config_AIC23_EDMA(void) {
 		EDMA_intEnable(tccRcvPong);
 	}
 
-	if(DECODER){
+	if (DECODER) {
 		/* TRANSMIT */
 		/* Konfiguration der EDMA zum Schreiben */
 		hEdmaXmt = EDMA_open(EDMA_CHA_XEVT1, EDMA_OPEN_RESET); // EDMA Kanal für das Event REVT1
@@ -166,8 +186,10 @@ void config_AIC23_EDMA(void) {
 	}
 
 	/* EDMA starten, wen alles? */
-	if(ENCODER) EDMA_enableChannel(hEdmaRcv);
-	if(DECODER) EDMA_enableChannel(hEdmaXmt);
+	if (ENCODER)
+		EDMA_enableChannel(hEdmaRcv);
+	if (DECODER)
+		EDMA_enableChannel(hEdmaXmt);
 }
 
 void config_interrupts(void) {
@@ -239,17 +261,14 @@ void EDMA_ISR(void) {
 	 */
 	if (rcvBSPLinkPingDone) {
 		rcvBSPLinkPingDone = 0;
-		DSK6713_LED_on(0);
 		SWI_post(&SWI_BSPLink_In_Ping);
 	} else if (rcvBSPLinkPongDone) {
 		rcvBSPLinkPongDone = 0;
-		DSK6713_LED_off(0);
 		SWI_post(&SWI_BSPLink_In_Pong);
 	}
 
 // Ringbuffer lesen -> ADC schreiben
 	if (xmtPingDone) {
-
 		xmtPingDone = 0;
 		SWI_post(&SWI_ADC_Out_Ping);
 	} else if (xmtPongDone) {
@@ -262,22 +281,18 @@ void EDMA_ISR(void) {
 	 *  ADC_in_ping/pong -> BSPLink_out ping/pong
 	 */
 	if (xmtBSPLinkPingDone) {
-		DSK6713_LED_on(1);
 		xmtBSPLinkPingDone = 0;
 		SWI_post(&SWI_BSPLink_Out_Ping);
 	} else if (xmtBSPLinkPongDone) {
-		DSK6713_LED_off(1);
 		xmtBSPLinkPongDone = 0;
 		SWI_post(&SWI_BSPLink_Out_Pong);
 	}
 
 	// ADC lesen -> Ringbuffer schreiben
 	if (rcvPingDone) {
-		DSK6713_LED_on(2);
 		rcvPingDone = 0;
 		SWI_post(&SWI_ADC_In_Ping);
 	} else if (rcvPongDone) {
-		DSK6713_LED_off(2);
 		rcvPongDone = 0;
 		SWI_post(&SWI_ADC_In_Pong);
 	}
@@ -297,6 +312,7 @@ void ADC_Out_Pong(void) {
 }
 
 void ADC_In_Ping(void) {
+	DSK6713_LED_on(0);
 #ifdef SEND_DEBUG_BUFFER
 	write_buffer_audio_in(Debug_Buff_ping);
 #else
@@ -308,6 +324,7 @@ void ADC_In_Ping(void) {
 }
 
 void ADC_In_Pong(void) {
+	DSK6713_LED_off(0);
 #ifdef SEND_DEBUG_BUFFER
 	write_buffer_audio_in(Debug_Buff_pong);
 #else
@@ -319,21 +336,16 @@ void ADC_In_Pong(void) {
 
 // BSP Input RingBuffer schreiben
 void BSPLink_In_Ping(void) {
-	DSK6713_LED_on(3);
 	write_decoding_buffer(BSPLinkBuffer_in_ping);
-
-	DSK6713_LED_off(3);
 }
 
 void BSPLink_In_Pong(void) {
-	DSK6713_LED_on(3);
 	write_decoding_buffer(BSPLinkBuffer_in_pong);
-	DSK6713_LED_off(3);
 }
 
 // BSP Input RingBuffer schreiben
 void BSPLink_Out_Ping(void) {
-
+	DSK6713_LED_on(1);
 	Uint16 i_write;
 	if (encoding_buff_valid) {
 
@@ -352,7 +364,7 @@ void BSPLink_Out_Ping(void) {
 }
 
 void BSPLink_Out_Pong(void) {
-
+	DSK6713_LED_off(1);
 	Uint16 i_write;
 	if (encoding_buff_valid) {
 
@@ -371,11 +383,11 @@ void BSPLink_Out_Pong(void) {
 }
 
 void decode_buffer(void) {
-
+	DSK6713_LED_on(3);
 	// Hier die Decodierung machen
 	//DECODER
 	int i = 0;
-	int k =0;
+	int k = 0;
 	union gamma y[ORDER];
 	//uInt16 	e[BUFFER_LEN]={0};
 	short ef[ORDER + 1] = { 0 };
@@ -405,7 +417,7 @@ void decode_buffer(void) {
 			ef[ORDER] = Decoding_Buffer[k] & 0x00FF;
 		else
 			//it must be a 16 BIT Value
-			ef[ORDER] = Decoding_Buffer[k] * 5000/127;
+			ef[ORDER] = Decoding_Buffer[k] * 5000 / 127;
 
 		for (i = (ORDER - 1); i >= 0; i--) {
 			ef[i] = ef[i + 1] + (bf[i] * y[i].f);
@@ -420,30 +432,25 @@ void decode_buffer(void) {
 			ringbuff_audio_out_write_i = 0;
 
 	}
-
-
+	DSK6713_LED_off(3);
 }
 
 void encode_buffer(void) {
 	// Hier Encoding Machen
-
-	union gamma y[ORDER];
-	short e[ENCODING_BUFF_LEN];
-	short e_1[ENCODING_BUFF_LEN];
-	short b[ENCODING_BUFF_LEN];
-	short b_1[ENCODING_BUFF_LEN];
+	DSK6713_LED_on(2);
+	signed long num = 0;
+	unsigned long den = 0;
 
 	short * temp;
-	short * e_n = e;
-	short * e_n1 = e_1;
-	short * b_n = b;
-	short * b_n1 = b_1;
+	short * e_n = e_enc;
+	short * e_n1 = e_1_enc;
+	short * b_n = b_enc;
+	short * b_n1 = b_1_enc;
 
 	int i = 0;
 	int n = 0;
 
-	for(i = 0; i < ENCODING_BUFF_LEN; i++)
-	{
+	for (i = 0; i < ENCODING_BUFF_LEN; i++) {
 		e_n[i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
 		b_n[i] = Ringbuffer_Audio_in[ringbuff_audio_in_read_i];
 		ringbuff_audio_in_read_i++;
@@ -452,36 +459,40 @@ void encode_buffer(void) {
 			ringbuff_audio_in_read_i = 0;
 	}
 
-	for(n = 0; n < ORDER; n++)
-	{
-		Int32 num = 0;
-		Uint32 den = 0;
+	for (n = 0; n < ORDER; n++) {
+		num = 0;
+		den = 0;
 
-		for(i = 0; i < ENCODING_BUFF_LEN; i++)
+		for(i = 0; i < n+1; i++)
 		{
 			e_n1[i] = 0;
 			b_n1[i] = 0;
 		}
 
 		// denominator
-		for(i = 1; i < ENCODING_BUFF_LEN; i++)
-		{
-			den += (Uint32)(e_n[i]*e_n[i]) + (Uint32)(b_n[i-1]*b_n[i-1]);
+		for (i = 1; i < ENCODING_BUFF_LEN; i++) {
+			den += (e_n[i] * e_n[i]) + (b_n[i - 1] * b_n[i - 1]);
 		}
 
-		for(i = n+1; i < ENCODING_BUFF_LEN; i++)
-		{
+		//debug_denum[n] = den;
+
+		for (i = n + 1; i < ENCODING_BUFF_LEN; i++) {
 			// numerator
-			num = e_n[i] * b_n[i-1];
-			// reflection factor
-			y[n].f += (float)2 * (float)num / (float)den;
+			num += (signed long) e_n[i] * b_n[i - 1];
+		}
+		// reflection factor
+		den_f = (float)den;
+		num_f = (float)num;
+		y_enc[n].f = num_f / den_f;
+		y_enc[n].f *= 2;
+
+		for (i = n + 1; i < ENCODING_BUFF_LEN; i++) {
+			e_n1[i] = (short) (e_n[i] - y_enc[n].f * (float)b_n[i - 1]);
+			b_n1[i] = (short) (b_n[i - 1] - y_enc[n].f * (float)e_n[i]);
 		}
 
-		for(i = n+1; i < ENCODING_BUFF_LEN; i++)
-		{
-			e_n1[i] = e_n[i] - y[n].f * b_n[i-1];
-			b_n1[i] = b_n[i-1] - y[n].f * e_n[i];
-		}
+
+		Encoding_Buffer[n] = e_n[n];
 
 		temp = e_n;
 		e_n = e_n1;
@@ -492,32 +503,24 @@ void encode_buffer(void) {
 		b_n1 = temp;
 	}
 
-
 	// write error values in buffer
-	for(i = 0; i < ENCODING_BUFF_LEN; i++)
-	{
-		if (i < ORDER)
-		{
-			Encoding_Buffer[i] = e_n[i];
-		}
-		else
-		{
-			Encoding_Buffer[i] = 127/5000 * e_n[i];
-			Encoding_Buffer[i] &= 0x00FF;
-		}
+	for (i = ORDER; i < ENCODING_BUFF_LEN; i++) {
+		Encoding_Buffer[i] = (short) (((float)127 / 5000) * e_n[i]);
+		Encoding_Buffer[i] &= 0x00FF;
 	}
 
 	// write y in buffer
-	i = 0;
 	for (n = 0; n < (ORDER * 4); n += 4) {
 		i++;
-		Encoding_Buffer[ORDER + n] = (y[i].i & (0xFF00)) << 8;
-		Encoding_Buffer[ORDER + n + 1] = (y[i].i & (0xFF00));
-		Encoding_Buffer[ORDER + n + 2] = (y[i].i & (0xFF00)) >> 8;
-		Encoding_Buffer[ORDER + n + 3] = (y[i].i & (0xFF00)) >> 16;
+		Encoding_Buffer[ORDER + n] |= (y_enc[i].i & (0xFF)) << 8;
+		Encoding_Buffer[ORDER + n + 1] |= (y_enc[i].i & (0xFF00));
+		Encoding_Buffer[ORDER + n + 2] |= (y_enc[i].i & (0xFF0000)) >> 8;
+		Encoding_Buffer[ORDER + n + 3] |= (y_enc[i].i & (0xFF000000)) >> 16;
 	}
 
-	encoding_buff_valid = 1;
+	if (ringbuffer_in_ready)
+		encoding_buff_valid = 1;
+	DSK6713_LED_off(2);
 }
 
 /****************************************************************************/
@@ -647,8 +650,10 @@ void write_buffer_audio_in(short * bufferscr) {
 
 		ringbuff_audio_in_write_i++;
 
-		if (ringbuff_audio_in_write_i >= RINGBUFFER_LEN)
+		if (ringbuff_audio_in_write_i >= RINGBUFFER_LEN) {
 			ringbuff_audio_in_write_i = 0;
+			ringbuffer_in_ready = 1;
+		}
 	}
 
 }

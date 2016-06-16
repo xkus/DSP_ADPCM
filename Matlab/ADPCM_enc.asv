@@ -51,6 +51,7 @@ for n = 1:N-1 +1
     
     for k = 1:K-1   % denominator sum
         den = den + e(n, k+1)^2 + b(n, k-1+1)^2;     
+    
     end;
     den
     y(n) = 2 * num / den;    % nth reflection factor

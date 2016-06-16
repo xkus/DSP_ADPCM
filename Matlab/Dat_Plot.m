@@ -8,7 +8,7 @@ val = val{1:1};
 fclose(file);
 
 base = 0:1:length(val)-1;
-figure('name',FileName);
+%figure('name',FileName);
 plot(base, val)
 abl = diff(val);
 abl(find(abs(abl) >= 5000))=5000;
