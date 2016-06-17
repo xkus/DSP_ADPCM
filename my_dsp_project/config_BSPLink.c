@@ -163,7 +163,7 @@ EDMA_FMKS(OPT, PRI, LOW) |  // auf beide Queues verteilen
 };
 
 
-void config_BSPLink() {
+void config_BSPLink(Uint32 encoder, Uint32 decoder) {
 	/* Configure Link McBSP*/
 
 	hMcbsp_Link = MCBSP_open(MCBSP_LINK_DEV, MCBSP_OPEN_RESET);
@@ -175,7 +175,13 @@ void config_BSPLink() {
 	/* configure EDMA */
 	config_BSPLink_EDMA();
 
-	MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);// Start Data Link IN & OUT transmision
+	if(encoder && decoder)
+		MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_RCV_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);// Start Data Link IN & OUT transmision
+	else if(encoder)
+		MCBSP_start(hMcbsp_Link, MCBSP_XMIT_START | MCBSP_SRGR_START | MCBSP_SRGR_FRAMESYNC, 220);// Start Data Link IN & OUT transmision
+	else if(decoder)
+		MCBSP_start(hMcbsp_Link, MCBSP_RCV_START, 220);// Start Data Link IN & OUT transmision
+
 	MCBSP_write(hMcbsp_Link, 0x0); 	/* one shot */
 }
 

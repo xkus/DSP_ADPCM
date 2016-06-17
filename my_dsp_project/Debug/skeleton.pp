@@ -54,6 +54,15 @@ skeleton.obj: ../config_AIC23.h
 skeleton.obj: ../config_BSPLink.h
 skeleton.obj: ../Sounds.h
 skeleton.obj: ../skeleton.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/math.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/float.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/access.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/linkage.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/elfnames.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathf.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathl.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h
 
 ../skeleton.c: 
 D:/Workspace/DSP_ADPCM/my_dsp_project/Debug/my_dsp_projectcfg.h: 
@@ -109,3 +118,12 @@ C:/ti/DSK6713/c6000/dsk6713/include/dsk6713.h:
 ../config_BSPLink.h: 
 ../Sounds.h: 
 ../skeleton.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/math.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/float.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/access.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/linkage.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/elfnames.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathf.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathl.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h: 

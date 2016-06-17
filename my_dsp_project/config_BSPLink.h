@@ -10,7 +10,7 @@
 
 /* Function Prototypes */
 void config_BSPLink_EDMA(void);
-void config_BSPLink();
+void config_BSPLink(Uint32 encoder, Uint32 decoder);
 
 void BSPLink_EDMA_Start_Ping();
 void BSPLink_EDMA_Start_Pong();
@@ -28,7 +28,7 @@ extern int tccBSPLinkRcvPong;
 extern int tccBSPLinkXmtPing;
 extern int tccBSPLinkXmtPong;
 
-#define LINK_BUFFER_LEN 550
+#define LINK_BUFFER_LEN 350
 
 //#pragma DATA_SECTION(BSPLinkBuffer_in_ping, ".datenpuffer");
 extern short BSPLinkBuffer_in_ping[LINK_BUFFER_LEN];

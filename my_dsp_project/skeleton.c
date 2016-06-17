@@ -25,6 +25,7 @@
 #include "config_BSPLink.h"
 #include "Sounds.h"
 #include "skeleton.h"
+#include <math.h>
 
 Uint32 ringbuff_audio_in_read_i = RINGBUFFER_LEN / 2;
 Uint32 ringbuff_audio_in_write_i = 0;
@@ -62,9 +63,7 @@ Uint32 DECODER = 0;
 /* ENCODER VARS */
 union gamma y_enc[ORDER];
 short e_enc[ORDER+1][ENCODING_BUFF_LEN] = { 0 };
-//short e_1_enc[ENCODING_BUFF_LEN] = { 0 };
 short b_enc[ORDER+1][ENCODING_BUFF_LEN] = { 0 };
-//short b_1_enc[ENCODING_BUFF_LEN] = { 0 };
 
 float den_f;
 float num_f;
@@ -307,10 +306,12 @@ void EDMA_ISR(void) {
 
 // BSP Input RingBuffer lesen
 void ADC_Out_Ping(void) {
+	DSK6713_LED_on(0);
 	read_buffer_audio_out(AIC_Buffer_out_ping);
 }
 
 void ADC_Out_Pong(void) {
+	DSK6713_LED_off(0);
 	read_buffer_audio_out(AIC_Buffer_out_pong);
 
 }
@@ -322,7 +323,6 @@ void ADC_In_Ping(void) {
 #else
 	write_buffer_audio_in(AIC_Buffer_in_ping);
 #endif
-
 	SWI_post(&SWI_Encode_Buffer);
 
 }
@@ -334,22 +334,25 @@ void ADC_In_Pong(void) {
 #else
 	write_buffer_audio_in(AIC_Buffer_in_pong);
 #endif
-
 	SWI_post(&SWI_Encode_Buffer);
 }
 
 // BSP Input RingBuffer schreiben
 void BSPLink_In_Ping(void) {
+	DSK6713_LED_on(1);
 	write_decoding_buffer(BSPLinkBuffer_in_ping);
+	DSK6713_LED_off(1);
 }
 
 void BSPLink_In_Pong(void) {
+	DSK6713_LED_on(1);
 	write_decoding_buffer(BSPLinkBuffer_in_pong);
+	DSK6713_LED_off(1);
 }
 
 // BSP Input RingBuffer schreiben
 void BSPLink_Out_Ping(void) {
-	DSK6713_LED_on(1);
+
 	Uint16 i_write;
 	if (encoding_buff_valid) {
 
@@ -368,7 +371,7 @@ void BSPLink_Out_Ping(void) {
 }
 
 void BSPLink_Out_Pong(void) {
-	DSK6713_LED_off(1);
+
 	Uint16 i_write;
 	if (encoding_buff_valid) {
 
@@ -403,22 +406,23 @@ void decode_buffer(void) {
 	 e[k]=Decoding_Buffer[k];
 	 }
 	 */
-
+	i = 0;
 	//Y berechnen / ausmaskieren
 	for (k = 0; k < (ORDER * 4); k = k + 4) {
-		i++;
+
 		//build a float Y from 4x 8 Bit
-		y[i].i = 0x0000;
+		y[i].i = 0;
 		y[i].i |= ((Decoding_Buffer[ORDER + k] & 0xFF00) >> 8);
 		y[i].i |= ((Decoding_Buffer[ORDER + k + 1] & 0xFF00));
 		y[i].i |= ((Decoding_Buffer[ORDER + k + 2] & 0xFF00) << 8);
 		y[i].i |= ((Decoding_Buffer[ORDER + k + 3] & 0xFF00) << 16);
+		i++;
 	}
 
 	for (k = 0; k <= DECODING_BUFF_LEN; k++) {
 		//Move the first Value in the Filter
 		if (k >= ORDER)	//is it an 8 BIT Value?
-			ef[ORDER] = (short) ((Decoding_Buffer[k] & 0x00FF)  * (float) 5000 / (float) 127);
+			ef[ORDER] = (short) ((signed char)(Decoding_Buffer[k] & 0x00FF)  * (float) 39.37007874);
 		else
 			//it must be a 16 BIT Value
 			ef[ORDER] = Decoding_Buffer[k];
@@ -494,7 +498,7 @@ void encode_buffer(void) {
 
 	// write error values in buffer
 	for (i = ORDER; i < ENCODING_BUFF_LEN; i++) {
-		Encoding_Buffer[i] = (short) (((float) 127 / 5000) * e_enc[ORDER][i]);
+		Encoding_Buffer[i] = (short) _nround((float) 0.0254 * e_enc[ORDER][i]);
 		Encoding_Buffer[i] &= 0x00FF;
 		//Encoding_Buffer[i] = 0;
 	}
@@ -673,7 +677,7 @@ void tsk_led_toggle(void) {
 			DSK6713_rset(DSK6713_MISC, t_reg);
 
 			/* configure BSPLink-Interface */
-			config_BSPLink();
+			config_BSPLink(ENCODER,DECODER);
 
 			configComplete = 2;
 
