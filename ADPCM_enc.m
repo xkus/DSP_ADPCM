@@ -60,13 +60,13 @@ bf = zeros(2,7);
 for k = 1:length(e)
     ef(7) = e(k);  % Neuer Wert
     
-for i = N:-1:1
-   ef(i) = ef(i+1) + bf(1,i)*y(i);
-   bf(1,i+1) = ef(i)*(-y(i))+bf(1,i);
-end;
+    for i = N:-1:1
+       ef(i) = ef(i+1) + bf(1,i)*y(i);
+       bf(1,i+1) = ef(i)*(-y(i))+bf(1,i);
+    end;
 
-bf(1,1) = ef(1);
-x(k) = ef(1);
+    bf(1,1) = ef(1);
+    x(k) = ef(1);
 end;
 
 sound(x,Fs);

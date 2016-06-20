@@ -83,7 +83,8 @@ main() {
 	DSK6713_LED_off(2);
 	DSK6713_LED_off(3);
 
-	for (i = 0; i < SOUND_BUFF_LEN; i++, j += 2) {
+#ifdef SEND_DEBUG_BUFFER
+	for (i = 0; i < AIC_BUFFER_LEN/2; i++, j += 2) {
 //		Debug_Buff_ping[i] = LINK_PREAM_START;
 //		Debug_Buff_pong[AIC_BUFFER_LEN-i-1] = LINK_PREAM_START;
 		Debug_Buff_ping[j] = MySound[i];
@@ -91,6 +92,13 @@ main() {
 		Debug_Buff_pong[j] = MySound[i];
 		Debug_Buff_pong[j + 1] = MySound[i];
 	}
+#endif
+
+	for (i = 0; i < RINGBUFFER_LEN; i++) {
+		Ringbuffer_Audio_out[i] = 0;
+		Ringbuffer_Audio_in[i] = 0;
+	}
+
 
 	/* Configure McBSP0 and AIC23 */
 	Config_DSK6713_AIC23();
@@ -330,7 +338,7 @@ void ADC_In_Ping(void) {
 void ADC_In_Pong(void) {
 	DSK6713_LED_off(0);
 #ifdef SEND_DEBUG_BUFFER
-	write_buffer_audio_in(Debug_Buff_pong);
+	write_buffer_audio_in(Debug_Buff_ping);
 #else
 	write_buffer_audio_in(AIC_Buffer_in_pong);
 #endif
@@ -397,8 +405,8 @@ void decode_buffer(void) {
 	int k = 0;
 	union gamma y[ORDER];
 	//uInt16 	e[BUFFER_LEN]={0};
-	short ef[ORDER + 1] = { 0 };
-	short bf[ORDER + 1] = { 0 };
+	short ef[ORDER + 1] = { 0, 0, 0, 0, 0, 0, 0 };
+	short bf[ORDER + 1] = { 0, 0, 0, 0, 0, 0, 0 };
 	/*
 	 //e(0) bis e(N-1)
 	 for(k=0;k<ORDER;k++)
@@ -419,7 +427,7 @@ void decode_buffer(void) {
 		i++;
 	}
 
-	for (k = 0; k <= DECODING_BUFF_LEN; k++) {
+	for (k = 0; k < DECODING_BUFF_LEN; k++) {
 		//Move the first Value in the Filter
 		if (k >= ORDER)	//is it an 8 BIT Value?
 			ef[ORDER] = (short) ((signed char)(Decoding_Buffer[k] & 0x00FF)  * (float) 39.37007874);
@@ -431,6 +439,7 @@ void decode_buffer(void) {
 			ef[i] = ef[i + 1] + (bf[i] * y[i].f);
 			bf[i + 1] = ef[i] * (-y[i].f) + bf[i];
 		}
+
 		bf[0] = ef[0];
 
 		Ringbuffer_Audio_out[ringbuff_audio_out_write_i] = ef[0];
@@ -545,6 +554,7 @@ void write_decoding_buffer(short * buffersrc) {
 // Daten extrahieren, Decoder füllen
 
 	Uint32 i_read;
+#ifdef DEBUG_BUF_ENABLE
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
 		// Ringbuffer einmal durchlaufen
 
@@ -553,7 +563,7 @@ void write_decoding_buffer(short * buffersrc) {
 		if (debug_buff_i >= 30000)
 			debug_buff_i = 0;
 	}
-
+#endif
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
 		// Ringbuffer einmal durchlaufen
 		if (buffersrc[i_read] == LINK_PREAM_STOP) {
