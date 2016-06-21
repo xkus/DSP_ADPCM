@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ExportImportMemento.1>
-<VarMeta IMemento.internal.id="Ringbuffer_in"/>
-<VarMeta IMemento.internal.id="Ringbuffer_out"/>
-<VarMeta IMemento.internal.id="BSPLinkBuffer_out_ping"/>
-<VarMeta IMemento.internal.id="BSPLinkBuffer_out_pong"/>
-<VarMeta IMemento.internal.id="Buffer_out_ping"/>
-<VarMeta IMemento.internal.id="Buffer_out_pong"/>
-</ExportImportMemento.1>
