@@ -41,6 +41,8 @@ int tccBSPLinkRcvPong;
 int tccBSPLinkXmtPing;
 int tccBSPLinkXmtPong;
 
+
+
 //Configuration for McBSP (data-interface)
 MCBSP_Config BSPLink_interface_config = {
 /* McBSP Control Register */

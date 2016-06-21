@@ -2,7 +2,6 @@
  * config_BSPLink.h
  *
  *  Created on: 30.05.2016
- *      Author: Simon
  */
 
 #ifndef CONFIG_BSPLINK_H_
@@ -30,13 +29,9 @@ extern int tccBSPLinkXmtPong;
 
 #define LINK_BUFFER_LEN 550
 
-//#pragma DATA_SECTION(BSPLinkBuffer_in_ping, ".datenpuffer");
 extern short BSPLinkBuffer_in_ping[LINK_BUFFER_LEN];
-//#pragma DATA_SECTION(BSPLinkBuffer_in_pong, ".datenpuffer");
 extern short BSPLinkBuffer_in_pong[LINK_BUFFER_LEN];
-//#pragma DATA_SECTION(BSPLinkBuffer_out_ping, ".datenpuffer");
 extern short BSPLinkBuffer_out_ping[LINK_BUFFER_LEN];
-//#pragma DATA_SECTION(BSPLinkBuffer_out_pong, ".datenpuffer");
 extern short BSPLinkBuffer_out_pong[LINK_BUFFER_LEN];
 
 #endif /* CONFIG_BSPLINK_H_ */

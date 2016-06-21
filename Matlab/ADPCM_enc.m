@@ -27,8 +27,6 @@ b = zeros(N+1, K);  % all indicies are +1
 b(0+1,:) = x;         % b(0)(k) = x(k)
 
 y = zeros(1, N-1 +1);    % prediction factor
-max_num = 0;
-min_num = 0;
 
 % Burg Algorithm Nth order predictor:
 for n = 1:N-1 +1

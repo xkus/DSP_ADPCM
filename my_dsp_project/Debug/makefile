@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/c6000_7.4.16
+CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/c6000_7.4.14
 
 GEN_OPTS__FLAG := 
 GEN_CMDS__FLAG := -l"./my_dsp_projectcfg.cmd"
@@ -142,13 +142,13 @@ all: my_dsp_project.out
 my_dsp_project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: C6000 Linker'
-	"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/cl6x" -mv6700 --abi=coffabi -g --define=CHIP_6713 --diag_wrap=off --diag_warning=225 --display_error_number -z -m"my_dsp_project.map" --stack_size=0x800 --heap_size=0x800 -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/lib" -i"C:/ti/C6xCSL/include" -i"C:/ti/DSK6713/c6000/dsk6713/include" -i"C:/ti/DSK6713/c6000/dsk6713/lib" -i"C:/ti/C6xCSL/lib_3x" -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include" -i"C:/ti/bios_5_42_01_09/packages/ti/rtdx/lib/c6000" -i"C:/ti/bios_5_42_01_09/packages/ti/bios/lib" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="my_dsp_project_linkInfo.xml" --rom_model -o "my_dsp_project.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/bin/cl6x" -mv6700 --abi=coffabi -g --define=CHIP_6713 --display_error_number --diag_warning=225 --diag_wrap=off -z --stack_size=0x800 -m"my_dsp_project.map" --heap_size=0x800 -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/lib" -i"C:/ti/C6xCSL/include" -i"C:/ti/DSK6713/c6000/dsk6713/include" -i"C:/ti/DSK6713/c6000/dsk6713/lib" -i"C:/ti/C6xCSL/lib_3x" -i"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include" -i"C:/ti/bios_5_42_01_09/packages/ti/rtdx/lib/c6000" -i"C:/ti/bios_5_42_01_09/packages/ti/bios/lib" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="my_dsp_project_linkInfo.xml" --rom_model -o "my_dsp_project.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 my_dsp_project.hex: $(EXE_OUTPUTS)
 	@echo 'Invoking: C6000 Hex Utility'
-	"C:/ti/ccsv6/tools/compiler/c6000_7.4.16/bin/hex6x"  -o "my_dsp_project.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv6/tools/compiler/c6000_7.4.14/bin/hex6x"  -o "my_dsp_project.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $@'
 	@echo ' '
 
