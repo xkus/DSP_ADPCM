@@ -15,7 +15,7 @@
 #define ORDER	6
 
 //#define SEND_DEBUG_BUFFER
-#define DEBUG_BUF_ENABLE
+//#define DEBUG_BUF_ENABLE
 
 /* BUFFER ARRAYS */
 

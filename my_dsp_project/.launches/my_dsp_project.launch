@@ -5,7 +5,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.Spectrum Digital DSK-EVM-eZdsp onboard USB Emulator/TMS320C671X" value="${build_artifact:my_dsp_project}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.Spectrum Digital DSK-EVM-eZdsp onboard USB Emulator/TMS320C671X" value="my_dsp_project"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:my_dsp_project}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Spectrum Digital DSK-EVM-eZdsp onboard USB Emulator/TMS320C671X" value="D:/Workspace\DSP_ADPCM\my_dsp_project\Debug\my_dsp_project.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.Spectrum Digital DSK-EVM-eZdsp onboard USB Emulator/TMS320C671X" value="D:/WORKSPACE\CodeComposerStudio\DSP_ADPCM\my_dsp_project\Debug\my_dsp_project.out"/>
 <mapAttribute key="com.ti.ccstudio.debug.ui.displayFormats">
 <mapEntry key="Spectrum Digital DSK-EVM-eZdsp onboard USB Emulator/TMS320C671X@##separator##@0" value="8-Bit Signed Int"/>
 </mapAttribute>

@@ -58,13 +58,13 @@ Uint32 ENCODER = 0;
 Uint32 DECODER = 0;
 
 /* ENCODER VARS */
-union gamma y_enc[ORDER + 1];
+union gamma y_enc[ORDER];
 short e_enc[ORDER + 1][ENCODING_BUFF_LEN] = { 0 };
 short b_enc[ORDER + 1][ENCODING_BUFF_LEN] = { 0 };
 
-union gamma y_dec[ORDER + 1];
-short e_dec[ORDER + 1][ENCODING_BUFF_LEN] = { 0 };
-short b_dec[ORDER + 1][ENCODING_BUFF_LEN] = { 0 };
+union gamma y_dec[ORDER];
+short e_dec[ORDER + 1][DECODING_BUFF_LEN] = { 0 };
+short b_dec[ORDER + 1][DECODING_BUFF_LEN] = { 0 };
 
 float den_f;
 float num_f;
@@ -395,229 +395,224 @@ void BSPLink_Out_Pong(void) {
 
 void decode_buffer(void) {
 	DSK6713_LED_on(3);
-	// Hier die Decodierung machen
+
 	//DECODER
 	int i = 0;
 	int k = 0;
 	int n = 0;
 
-	//e(0) bis e(N-1)
-	for (k = 0; k <= ORDER; k++) {
-	for(n = 0; n <= ORDER)
+	//Y berechnen / ausmaskieren
+	for (k = 0; k < (ORDER * 4); k = k + 4) {
+
+		//build a float Y from 4x 8 Bit
+		y_dec[i].i = 0;
+		y_dec[i].i |= ((Decoding_Buffer[ORDER + k] & 0xFF00) >> 8);
+		y_dec[i].i |= ((Decoding_Buffer[ORDER + k + 1] & 0xFF00));
+		y_dec[i].i |= ((Decoding_Buffer[ORDER + k + 2] & 0xFF00) << 8);
+		y_dec[i].i |= ((Decoding_Buffer[ORDER + k + 3] & 0xFF00) << 16);
+		i++;
+	}
+
+
+	for(k = 0; k < DECODING_BUFF_LEN; k++)
 	{
-		e[n][k]= 0;
-	}
-}
-
-i = 0;
-
-// first gamma = -1
-y[i].f = -1;
-i++;
-
-//Y berechnen / ausmaskieren
-for (k = 0; k < (ORDER * 4); k = k + 4) {
-
-	//build a float Y from 4x 8 Bit
-	y[i].i = 0;
-	y[i].i |= ((Decoding_Buffer[ORDER + k] & 0xFF00) >> 8);
-	y[i].i |= ((Decoding_Buffer[ORDER + k + 1] & 0xFF00));
-	y[i].i |= ((Decoding_Buffer[ORDER + k + 2] & 0xFF00) << 8);
-	y[i].i |= ((Decoding_Buffer[ORDER + k + 3] & 0xFF00) << 16);
-	i++;
-}
-
-N = length(v1_y) - 1;
-K = length(e);
-ef = zeros(N + 1, K);
-bf = zeros(N + 1, K);
-
-e_dec[0][0] = Decoding_Buffer[0];
-bf[0][0] = Decoding_Buffer[0];
-
-for (k = 0; k < DECODING_BUFF_LEN; k++) {
-
-	if (k >= ORDER) {
-		//e is a 8 BIT Value
-		e_dec[ORDER][k] = (short) ((signed char) (Decoding_Buffer[k + 1]
-				& 0x00FF) * (float) 39.37007874);
-	} else {
-		//it must be a 16 BIT Value
-		e_dec[k, k] = Decoding_Buffer[k + 1];
-	}
-
-	for(n=0;n>=-1;n--){
-		if(n>=ORDER){
-
-
+		// initialize with 0
+		for(n = 1; n < ORDER; n++)
+		{
+			e_enc[n][k] = 0;
+			b_enc[n][k] = 0;
 		}
 
+		if(k < ORDER)
+		{
+			//it must be a 16 BIT Value
+			e_dec[0][k] = Decoding_Buffer[k];
+		}
+		else
+		{
+			//e is a 8 BIT Value
+			e_dec[0][k] = (short) ((signed char) (Decoding_Buffer[k]
+							& 0x00FF) * (float) 39.37007874);
+		}
+		b_dec[0][k] = e_dec[0][k];
+	}
 
+	// algorithm
+	for (k = 1; k < DECODING_BUFF_LEN; k++)
+	{
+		if(k < ORDER)
+		{
+			i = k;
+			//it must be a 16 BIT Value
+			e_dec[k][k] = Decoding_Buffer[k];
+		}
+		else
+		{
+			i = ORDER;
+			//e is a 8 BIT Value
+			e_dec[ORDER][k] = (short) ((signed char) (Decoding_Buffer[k + 1]
+							& 0x00FF) * (float) 39.37007874);
+		}
+
+		for(n = i; n > 0; n--)
+		{
+			e_dec[n-1][k] = e_dec[n][k] + y_dec[n-1].f * b_dec[n-1][k-1];
+			b_dec[n][k] = b_dec[n-1][k-1] - y_dec[n-1].f * e_dec[n-1][k];
+		}
+
+		b_dec[0][k] = e_dec[0][k];
+	}
+
+	// write in output
+	for(k = 0; k < DECODING_BUFF_LEN; k++)
+	{
+		Ringbuffer_Audio_out[ringbuff_audio_out_write_i] = e_dec[0][k];
+		ringbuff_audio_out_write_i++;
+
+		if (ringbuff_audio_out_write_i >= RINGBUFFER_LEN)
+			ringbuff_audio_out_write_i = 0;
+	}
+
+	DSK6713_LED_off(3);
+}
+
+
+//void decode_buffer_alt(void) {
+//DSK6713_LED_on(3);
+//// Hier die Decodierung machen
+////DECODER
+//int i = 0;
+//int k = 0;
+//union gamma y[ORDER + 1];
+////uInt16 	e[BUFFER_LEN]={0};
+//short ef[ORDER + 1] = { 0, 0, 0, 0, 0, 0, 0 };
+//short bf[ORDER + 1] = { 0, 0, 0, 0, 0, 0, 0 };
+///*
+// //e(0) bis e(N-1)
+// for(k=0;k<ORDER;k++)
+// {
+// e[k]=Decoding_Buffer[k];
+// }
+// */
+//i = 0;
+////Y berechnen / ausmaskieren
+//for (k = 0; k < (ORDER * 4); k = k + 4) {
+//
+////build a float Y from 4x 8 Bit
+//y[i].i = 0;
+//y[i].i |= ((Decoding_Buffer[ORDER + k] & 0xFF00) >> 8);
+//y[i].i |= ((Decoding_Buffer[ORDER + k + 1] & 0xFF00));
+//y[i].i |= ((Decoding_Buffer[ORDER + k + 2] & 0xFF00) << 8);
+//y[i].i |= ((Decoding_Buffer[ORDER + k + 3] & 0xFF00) << 16);
+//i++;
+//}
+//
+//for (k = 0; k < DECODING_BUFF_LEN; k++) {
+////Move the first Value in the Filter
+//if (k >= ORDER)	//is it an 8 BIT Value?
+//	ef[ORDER] = (short) ((signed char) (Decoding_Buffer[k] & 0x00FF)
+//			* (float) 39.37007874);
+//else
+//	//it must be a 16 BIT Value
+//	ef[ORDER] = Decoding_Buffer[k];
+//
+//for (i = (ORDER - 1); i >= 0; i--) {
+//	ef[i] = ef[i + 1] + (bf[i] * y[i].f);
+//	bf[i + 1] = ef[i] * (-y[i].f) + bf[i];
+//}
+//
+//bf[0] = ef[0];
+//
+//Ringbuffer_Audio_out[ringbuff_audio_out_write_i] = ef[0];
+//ringbuff_audio_out_write_i++;
+//
+//if (ringbuff_audio_out_write_i >= RINGBUFFER_LEN)
+//	ringbuff_audio_out_write_i = 0;
+//
+//}
+//
+//DSK6713_LED_off(3);
+//}
+
+void encode_audio_data(short * buffersrc) {
+	// Hier Encoding Machen
+	DSK6713_LED_on(2);
+	signed long num = 0;
+	unsigned long den = 0;
+
+	int i = 0;
+	int n = 0;
+
+	// Audiodaten als MONO Signal in Buffer schreiben
+
+	Uint32 i_read;
+
+	for (i_read = 0; i_read < AIC_BUFFER_LEN - 1; i++, i_read = i_read + 2) {
+	// Ringbuffer einmal durchlaufen
+
+	e_enc[0][i] = (short) (buffersrc[i_read] / 2 + buffersrc[i_read + 1] / 2);
+	b_enc[0][i] = e_enc[0][i];
 
 	}
 
+	Encoding_Buffer[0] = e_enc[0][0];
 
-	// ToDo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	for (n = 1; n <= ORDER; n++) {
+	num = 0;
+	den = 0;
+	for (i = 0; i < n + 1; i++) {
+		e_enc[n][i] = 0;
+		b_enc[n][i] = 0;
+	}
 
+	// denominator
+	for (i = 1; i < ENCODING_BUFF_LEN; i++) {
+		den += (e_enc[n - 1][i] * e_enc[n - 1][i])
+				+ (b_enc[n - 1][i - 1] * b_enc[n - 1][i - 1]);
+	}
 
-	for n= min(k, N):-1:1
+	//debug_denum[n] = den;
 
-	ef(n,k +1) = ef(n +1,k +1) + y(n +1)*bf(n-1 +1,k-1 +1);
-	bf(n + 1, k + 1) = bf(n - 1 + 1, k - 1 + 1)
-			- y(n + 1) * ef(n - 1 + 1, k + 1);
-	end
-	bf(0 + 1, k + 1) = ef(0 + 1, k + 1);
-}
+	for (i = n; i < ENCODING_BUFF_LEN; i++) {
+		// numerator
+		num += (signed long) e_enc[n - 1][i] * b_enc[n - 1][i - 1];
+	}
+	// reflection factor
+	den_f = (float) den;
+	num_f = (float) num;
+	y_enc[n - 1].f = num_f / den_f;
+	y_enc[n - 1].f *= 2;
 
-x1 = e(0+1,:);
+	for (i = n; i < ENCODING_BUFF_LEN; i++) {
+		e_enc[n][i] = (short) (e_enc[n - 1][i]
+				- y_enc[n - 1].f * (float) b_enc[n - 1][i - 1]);
+		b_enc[n][i] = (short) (b_enc[n - 1][i - 1]
+				- y_enc[n - 1].f * (float) e_enc[n - 1][i]);
+	}
 
-Ringbuffer_Audio_out[ringbuff_audio_out_write_i] = ef[0];
-ringbuff_audio_out_write_i++;
+	Encoding_Buffer[n] = e_enc[n][n];
+	}
 
-if (ringbuff_audio_out_write_i >= RINGBUFFER_LEN)
-	ringbuff_audio_out_write_i = 0;
+	// write error values in buffer
+	for (i = ORDER; i < ENCODING_BUFF_LEN; i++) {
+	Encoding_Buffer[i] = (short) _nround((float) 0.0254 * e_enc[ORDER][i]);
+	Encoding_Buffer[i] &= 0x00FF;
+	//Encoding_Buffer[i] = 0;
+	}
 
-}
+	// write y in buffer
+	i = 0;
+	for (n = 0; n < (ORDER * 4); n += 4) {
 
-DSK6713_LED_off(3);
-}
+	Encoding_Buffer[ORDER + n] |= (y_enc[i].i & (0xFF)) << 8;
+	Encoding_Buffer[ORDER + n + 1] |= (y_enc[i].i & (0xFF00));
+	Encoding_Buffer[ORDER + n + 2] |= (y_enc[i].i & (0xFF0000)) >> 8;
+	Encoding_Buffer[ORDER + n + 3] |= (y_enc[i].i & (0xFF000000)) >> 16;
+	i++;
+	}
 
-void decode_buffer_alt(void) {
-DSK6713_LED_on(3);
-// Hier die Decodierung machen
-//DECODER
-int i = 0;
-int k = 0;
-union gamma y[ORDER + 1];
-//uInt16 	e[BUFFER_LEN]={0};
-short ef[ORDER + 1] = { 0, 0, 0, 0, 0, 0, 0 };
-short bf[ORDER + 1] = { 0, 0, 0, 0, 0, 0, 0 };
-/*
- //e(0) bis e(N-1)
- for(k=0;k<ORDER;k++)
- {
- e[k]=Decoding_Buffer[k];
- }
- */
-i = 0;
-//Y berechnen / ausmaskieren
-for (k = 0; k < (ORDER * 4); k = k + 4) {
-
-//build a float Y from 4x 8 Bit
-y[i].i = 0;
-y[i].i |= ((Decoding_Buffer[ORDER + k] & 0xFF00) >> 8);
-y[i].i |= ((Decoding_Buffer[ORDER + k + 1] & 0xFF00));
-y[i].i |= ((Decoding_Buffer[ORDER + k + 2] & 0xFF00) << 8);
-y[i].i |= ((Decoding_Buffer[ORDER + k + 3] & 0xFF00) << 16);
-i++;
-}
-
-for (k = 0; k < DECODING_BUFF_LEN; k++) {
-//Move the first Value in the Filter
-if (k >= ORDER)	//is it an 8 BIT Value?
-	ef[ORDER] = (short) ((signed char) (Decoding_Buffer[k] & 0x00FF)
-			* (float) 39.37007874);
-else
-	//it must be a 16 BIT Value
-	ef[ORDER] = Decoding_Buffer[k];
-
-for (i = (ORDER - 1); i >= 0; i--) {
-	ef[i] = ef[i + 1] + (bf[i] * y[i].f);
-	bf[i + 1] = ef[i] * (-y[i].f) + bf[i];
-}
-
-bf[0] = ef[0];
-
-Ringbuffer_Audio_out[ringbuff_audio_out_write_i] = ef[0];
-ringbuff_audio_out_write_i++;
-
-if (ringbuff_audio_out_write_i >= RINGBUFFER_LEN)
-	ringbuff_audio_out_write_i = 0;
-
-}
-
-DSK6713_LED_off(3);
-}
-
-void encode_audio_data(short * buffersrc) {
-// Hier Encoding Machen
-DSK6713_LED_on(2);
-signed long num = 0;
-unsigned long den = 0;
-
-int i = 0;
-int n = 0;
-
-// Audiodaten als MONO Signal in Buffer schreiben
-
-Uint32 i_read;
-
-for (i_read = 0; i_read < AIC_BUFFER_LEN - 1; i++, i_read = i_read + 2) {
-// Ringbuffer einmal durchlaufen
-
-e_enc[0][i] = (short) (buffersrc[i_read] / 2 + buffersrc[i_read + 1] / 2);
-b_enc[0][i] = e_enc[0][i];
-
-}
-
-Encoding_Buffer[0] = e_enc[0][0];
-
-for (n = 1; n <= ORDER; n++) {
-num = 0;
-den = 0;
-for (i = 0; i < n + 1; i++) {
-	e_enc[n][i] = 0;
-	b_enc[n][i] = 0;
-}
-
-// denominator
-for (i = 1; i < ENCODING_BUFF_LEN; i++) {
-	den += (e_enc[n - 1][i] * e_enc[n - 1][i])
-			+ (b_enc[n - 1][i - 1] * b_enc[n - 1][i - 1]);
-}
-
-//debug_denum[n] = den;
-
-for (i = n; i < ENCODING_BUFF_LEN; i++) {
-	// numerator
-	num += (signed long) e_enc[n - 1][i] * b_enc[n - 1][i - 1];
-}
-// reflection factor
-den_f = (float) den;
-num_f = (float) num;
-y_enc[n - 1].f = num_f / den_f;
-y_enc[n - 1].f *= 2;
-
-for (i = n; i < ENCODING_BUFF_LEN; i++) {
-	e_enc[n][i] = (short) (e_enc[n - 1][i]
-			- y_enc[n - 1].f * (float) b_enc[n - 1][i - 1]);
-	b_enc[n][i] = (short) (b_enc[n - 1][i - 1]
-			- y_enc[n - 1].f * (float) e_enc[n - 1][i]);
-}
-
-Encoding_Buffer[n] = e_enc[n][n];
-}
-
-// write error values in buffer
-for (i = ORDER; i < ENCODING_BUFF_LEN; i++) {
-Encoding_Buffer[i] = (short) _nround((float) 0.0254 * e_enc[ORDER][i]);
-Encoding_Buffer[i] &= 0x00FF;
-//Encoding_Buffer[i] = 0;
-}
-
-// write y in buffer
-i = 0;
-for (n = 0; n < (ORDER * 4); n += 4) {
-
-Encoding_Buffer[ORDER + n] |= (y_enc[i].i & (0xFF)) << 8;
-Encoding_Buffer[ORDER + n + 1] |= (y_enc[i].i & (0xFF00));
-Encoding_Buffer[ORDER + n + 2] |= (y_enc[i].i & (0xFF0000)) >> 8;
-Encoding_Buffer[ORDER + n + 3] |= (y_enc[i].i & (0xFF000000)) >> 16;
-i++;
-}
-
-encoding_buff_valid = 1;
-DSK6713_LED_off(2);
+	encoding_buff_valid = 1;
+	DSK6713_LED_off(2);
 }
 
 /****************************************************************************/
