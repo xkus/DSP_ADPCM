@@ -213,7 +213,7 @@ void config_interrupts(void) {
 }
 
 void EDMA_ISR(void) {
-
+	DSK6713_LED_on(2);
 	static volatile int rcvPingDone = 0;	//static
 	static volatile int rcvPongDone = 0;
 	static volatile int xmtPingDone = 0;
@@ -306,7 +306,7 @@ void EDMA_ISR(void) {
 		rcvPongDone = 0;
 		SWI_post(&SWI_ADC_In_Pong);
 	}
-
+	DSK6713_LED_off(2);
 }
 
 /************************ SWI Section ****************************************/
@@ -413,59 +413,42 @@ void decode_buffer(void) {
 		i++;
 	}
 
-
-	for(k = 0; k < DECODING_BUFF_LEN; k++)
-	{
+	for (k = 0; k < DECODING_BUFF_LEN; k++) {
 		// initialize with 0
-		for(n = 1; n < ORDER; n++)
-		{
+		for (n = 0; n < ORDER; n++) {
 			e_enc[n][k] = 0;
 			b_enc[n][k] = 0;
 		}
-
-		if(k < ORDER)
-		{
-			//it must be a 16 BIT Value
-			e_dec[0][k] = Decoding_Buffer[k];
-		}
-		else
-		{
-			//e is a 8 BIT Value
-			e_dec[0][k] = (short) ((signed char) (Decoding_Buffer[k]
-							& 0x00FF) * (float) 39.37007874);
-		}
-		b_dec[0][k] = e_dec[0][k];
 	}
 
+	e_dec[0][0] = Decoding_Buffer[0];
+	b_dec[0][0] = e_dec[0][0];
+
 	// algorithm
-	for (k = 1; k < DECODING_BUFF_LEN; k++)
-	{
-		if(k < ORDER)
-		{
+	for (k = 1; k < DECODING_BUFF_LEN; k++) {
+		if (k < ORDER) {
 			i = k;
 			//it must be a 16 BIT Value
 			e_dec[k][k] = Decoding_Buffer[k];
-		}
-		else
-		{
+		} else {
 			i = ORDER;
 			//e is a 8 BIT Value
-			e_dec[ORDER][k] = (short) ((signed char) (Decoding_Buffer[k + 1]
-							& 0x00FF) * (float) 39.37007874);
+			e_dec[ORDER][k] = (short) ((signed char) (Decoding_Buffer[k]
+					& 0x00FF) * (float) 39.37007874);
 		}
 
-		for(n = i; n > 0; n--)
-		{
-			e_dec[n-1][k] = e_dec[n][k] + y_dec[n-1].f * b_dec[n-1][k-1];
-			b_dec[n][k] = b_dec[n-1][k-1] - y_dec[n-1].f * e_dec[n-1][k];
+		for (n = i; n > 0; n--) {
+			e_dec[n - 1][k] = e_dec[n][k]
+					+ y_dec[n - 1].f * b_dec[n - 1][k - 1];
+			b_dec[n][k] = b_dec[n - 1][k - 1]
+					- y_dec[n - 1].f * e_dec[n - 1][k];
 		}
 
 		b_dec[0][k] = e_dec[0][k];
 	}
 
 	// write in output
-	for(k = 0; k < DECODING_BUFF_LEN; k++)
-	{
+	for (k = 0; k < DECODING_BUFF_LEN; k++) {
 		Ringbuffer_Audio_out[ringbuff_audio_out_write_i] = e_dec[0][k];
 		ringbuff_audio_out_write_i++;
 
@@ -475,7 +458,6 @@ void decode_buffer(void) {
 
 	DSK6713_LED_off(3);
 }
-
 
 //void decode_buffer_alt(void) {
 //DSK6713_LED_on(3);
@@ -536,7 +518,7 @@ void decode_buffer(void) {
 
 void encode_audio_data(short * buffersrc) {
 	// Hier Encoding Machen
-	DSK6713_LED_on(2);
+	DSK6713_LED_on(3);
 	signed long num = 0;
 	unsigned long den = 0;
 
@@ -612,7 +594,7 @@ void encode_audio_data(short * buffersrc) {
 	}
 
 	encoding_buff_valid = 1;
-	DSK6713_LED_off(2);
+	DSK6713_LED_off(3);
 }
 
 /****************************************************************************/
