@@ -75,7 +75,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Mon Jun 20 10:29:53 2016" { 
+    global DATE :: "Mon Jun 20 15:04:43 2016" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -4857,7 +4857,7 @@ type SWI {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global gNumOf :: 12 { 
+    global gNumOf :: 11 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -7045,7 +7045,7 @@ type STS {
         prop Writable :: 1
         prop NoGen :: 1
     }
-    global gNumEmbed :: 14 { 
+    global gNumEmbed :: 13 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -8750,7 +8750,7 @@ object IRAM :: MEM {
     param iDelUser :: "USER"
     param iDelMsg :: "ok"
     param base :: 0
-    param len :: 253952
+    param len :: 524288
     param iAllocHeap :: 0
     param iHeapSize :: 32768
     param iUserHeapId :: 0
@@ -9011,28 +9011,6 @@ object SWI_Decode_Buffer :: SWI {
     param arg1 :: 0
     param dorta :: 1
     param Order :: 11
-    param filter :: 2
-    param maxformat :: "%g inst"
-    param sumformat :: "%g inst"
-    param avgformat :: "%.2f inst"
-    param filtmaxmult :: 1
-    param filtsummult :: 1
-    param unittype :: 0
-}
-
-object SWI_Encode_Buffer :: SWI {
-    param iComment :: "<add comments here>"
-    param iIsUsed :: 1
-    param iId :: 0
-    param iDelUser :: "USER"
-    param iDelMsg :: "ok"
-    param function :: @_encode_buffer
-    param pri :: 4
-    param mailbox :: 0
-    param arg0 :: 0
-    param arg1 :: 0
-    param dorta :: 1
-    param Order :: 12
     param filter :: 2
     param maxformat :: "%g inst"
     param sumformat :: "%g inst"

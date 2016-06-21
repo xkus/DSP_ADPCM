@@ -2,7 +2,7 @@
 #define SKELETON_H
 
 /* DEFINES */
-#define AIC_BUFFER_LEN 3200
+#define AIC_BUFFER_LEN 2000
 #define RINGBUFFER_LEN	5000
 
 #define DECODING_BUFF_LEN	AIC_BUFFER_LEN/2
@@ -15,7 +15,7 @@
 #define ORDER	6
 
 //#define SEND_DEBUG_BUFFER
-//#define DEBUG_BUF_ENABLE
+#define DEBUG_BUF_ENABLE
 
 /* BUFFER ARRAYS */
 
@@ -30,8 +30,7 @@ short AIC_Buffer_out_ping[AIC_BUFFER_LEN];
 #pragma DATA_SECTION(AIC_Buffer_out_pong, ".datenpuffer");
 short AIC_Buffer_out_pong[AIC_BUFFER_LEN];
 
-#pragma DATA_SECTION(Ringbuffer_Audio_in, ".datenpuffer");
-short Ringbuffer_Audio_in[RINGBUFFER_LEN];
+
 #pragma DATA_SECTION(Ringbuffer_Audio_out, ".datenpuffer");
 short Ringbuffer_Audio_out[RINGBUFFER_LEN];
 
@@ -52,7 +51,7 @@ short Debug_Buff_pong[AIC_BUFFER_LEN];
 
 /* Debug Buffer */
 #ifdef DEBUG_BUF_ENABLE
-#define DEBUG_BUF_LEN 30000
+#define DEBUG_BUF_LEN 10000
 #pragma DATA_SECTION(Debug_Buff, ".datenpuffer");
 short Debug_Buff[DEBUG_BUF_LEN];
 #endif

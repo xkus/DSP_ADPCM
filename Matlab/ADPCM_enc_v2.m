@@ -5,7 +5,7 @@ clear all
 [a, Fs] = audioread([PathName FileName], 'native');
 
 % 50ms sample of wave file
-anz = 500;
+anz = 10;% Fs * 0.05;
 pos = Fs * 50;  % Set cut offset (Cut of top of song)
 x = a(pos:pos+anz-1, 1);    % left channel
 %sound(x,Fs);
@@ -26,7 +26,8 @@ e(0+1,:) = x;         % e(0)(k) = x(k)
 b = zeros(N+1, K);  % all indicies are +1
 b(0+1,:) = x;         % b(0)(k) = x(k)
 
-y = zeros(1, N-1 +1);    % prediction factor
+y = zeros(1, N+1);    % prediction factor
+y(0+1) = -1;
 max_num = 0;
 min_num = 0;
 
@@ -53,10 +54,10 @@ for n = 1:N-1 +1
         den = den + e(n, k+1)^2 + b(n, k-1+1)^2;     
     end;
     den
-    y(n) = 2 * num / den;    % nth reflection factor
+    y(n+1) = 2 * num / den;    % nth reflection factor
     
-    e(n+1, n+1:K) = e(n, n+1:K) - y(n) * b(n, n:K-1);
-    b(n+1, n+1:K) = b(n, n:K-1) - y(n) * e(n, n+1:K);
+    e(n+1, n+1:K) = e(n, n+1:K) - y(n+1) * b(n, n:K-1);
+    b(n+1, n+1:K) = b(n, n:K-1) - y(n+1) * e(n, n+1:K);
         
 end;
 
@@ -73,30 +74,34 @@ v1_e = e;
 %clearvars -except y e N Fs x
 
 
+N = length(v1_y)-1;
+K = length(e);
+ef = zeros(N+1,K);
+bf = zeros(N+1,K);
 
-ef = zeros(1,7);
-bf = zeros(1,7);
+ef(0+1,0+1) = e(0+1);
+bf(0+1,0+1) = e(0+1);
 
 % ADPCM decoder
 
-for k = 1:length(e)
-    ef(7) = e(k);  % Neuer Wert
+for k = 1:K-1
     
-    for i = N:-1:1
-       ef(i) = ef(i+1) + bf(i)*y(i);
-       bf(i+1) = ef(i)*(-y(i))+bf(i);
-    end;
+    if k > N
+        ef(N+1,k+1) = e(k+1);
+    else
+        ef(k+1,k+1) = e(k+1);
+    end
     
-    bf(1) = ef(1);
-    x1(k) = ef(1);
-end;
-
-e_dsp=e.*(127/500);
-
-error = 0;
-for i = 1:1:length(x)
-error = error + (x1(i)-x(i))^2;
+    for n= min(k, N):-1:1
+        
+        ef(n,k +1) = ef(n +1,k +1) + y(n +1)*bf(n-1 +1,k-1 +1);
+        bf(n +1, k +1) = bf(n-1 +1, k-1 +1) - y(n +1)*ef(n-1 +1, k +1);   
+    end
+    bf(0 +1,k +1)=ef(0 +1,k +1);
 end
-error
+
+
+x1 = e(0+1,:);
+
 %sound(x1,Fs);
 

@@ -32,7 +32,6 @@ extern far SWI_Obj SWI_ADC_In_Pong;
 extern far SWI_Obj SWI_BSPLink_Out_Ping;
 extern far SWI_Obj SWI_BSPLink_Out_Pong;
 extern far SWI_Obj SWI_Decode_Buffer;
-extern far SWI_Obj SWI_Encode_Buffer;
 extern far TSK_Obj TSK_idle;
 extern far TSK_Obj TSK_LEDTOGGLE;
 extern far LOG_Obj LOG_system;

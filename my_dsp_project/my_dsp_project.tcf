@@ -235,6 +235,8 @@ bios.SWI.instance("SWI_BSPLink_Out_Ping").priority = 8;
 bios.SWI.instance("SWI_BSPLink_Out_Pong").priority = 9;
 bios.SWI.instance("SWI_BSPLink_Out_Pong").priority = 7;
 bios.SWI.instance("SWI_Decode_Buffer").priority = 3;
+bios.SWI.instance("SWI_Encode_Buffer").destroy();
+bios.MEM.instance("IRAM").len = 0x00080000;
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

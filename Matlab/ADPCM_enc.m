@@ -5,7 +5,7 @@ clear all
 [a, Fs] = audioread([PathName FileName], 'native');
 
 % 50ms sample of wave file
-anz = 500;
+anz = Fs * 0.05;
 pos = Fs * 50;  % Set cut offset (Cut of top of song)
 x = a(pos:pos+anz-1, 1);    % left channel
 %sound(x,Fs);

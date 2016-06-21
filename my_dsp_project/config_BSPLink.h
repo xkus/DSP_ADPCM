@@ -28,7 +28,7 @@ extern int tccBSPLinkRcvPong;
 extern int tccBSPLinkXmtPing;
 extern int tccBSPLinkXmtPong;
 
-#define LINK_BUFFER_LEN 1650
+#define LINK_BUFFER_LEN 1050
 
 //#pragma DATA_SECTION(BSPLinkBuffer_in_ping, ".datenpuffer");
 extern short BSPLinkBuffer_in_ping[LINK_BUFFER_LEN];

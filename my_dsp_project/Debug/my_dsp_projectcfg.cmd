@@ -100,7 +100,6 @@ _SWI_ADC_In_Pong = SWI_ADC_In_Pong;
 _SWI_BSPLink_Out_Ping = SWI_BSPLink_Out_Ping;
 _SWI_BSPLink_Out_Pong = SWI_BSPLink_Out_Pong;
 _SWI_Decode_Buffer = SWI_Decode_Buffer;
-_SWI_Encode_Buffer = SWI_Encode_Buffer;
 _TSK_idle = TSK_idle;
 _TSK_LEDTOGGLE = TSK_LEDTOGGLE;
 _IDL_cpuLoad = IDL_cpuLoad;
@@ -134,7 +133,7 @@ _GBL_CACHE = GBL_CACHE;
 -stack 0x4000
 MEMORY {
    SDRAM       : origin = 0x80000000,  len = 0x800000
-   IRAM        : origin = 0x0,         len = 0x3e000
+   IRAM        : origin = 0x0,         len = 0x80000
 }
 /* MODULE CLK */
 SECTIONS {
@@ -183,7 +182,7 @@ SECTIONS {
    .swi: RUN_START(SWI_A_TABBEG), RUN_END(SWI_A_TABEND) {
    } > IRAM
 }
-SWI_A_TABLEN = 12;
+SWI_A_TABLEN = 11;
 
 /* MODULE TSK */
 SECTIONS {
