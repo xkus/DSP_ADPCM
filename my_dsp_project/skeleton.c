@@ -219,7 +219,7 @@ void config_interrupts(void) {
 }
 
 void EDMA_ISR(void) {
-	DSK6713_LED_on(2);
+	//DSK6713_LED_on(2);
 	static volatile int rcvPingDone = 0;
 	static volatile int rcvPongDone = 0;
 	static volatile int xmtPingDone = 0;
@@ -312,25 +312,25 @@ void EDMA_ISR(void) {
 		rcvPongDone = 0;
 		SWI_post(&SWI_ADC_In_Pong);
 	}
-	DSK6713_LED_off(2);
+	//DSK6713_LED_off(2);
 }
 
 /************************ SWI Section ****************************************/
 
 // BSP Input RingBuffer lesen
 void ADC_Out_Ping(void) {
-	DSK6713_LED_on(0);
+	//DSK6713_LED_on(0);
 	read_buffer_audio_out(AIC_Buffer_out_ping);
 }
 
 void ADC_Out_Pong(void) {
-	DSK6713_LED_off(0);
+	//DSK6713_LED_off(0);
 	read_buffer_audio_out(AIC_Buffer_out_pong);
 
 }
 
 void ADC_In_Ping(void) {
-	DSK6713_LED_on(0);
+	//DSK6713_LED_on(0);
 #ifdef SEND_DEBUG_BUFFER
 	encode_audio_data(Debug_Buff_ping);
 #else
@@ -339,7 +339,7 @@ void ADC_In_Ping(void) {
 }
 
 void ADC_In_Pong(void) {
-	DSK6713_LED_off(0);
+	//DSK6713_LED_off(0);
 #ifdef SEND_DEBUG_BUFFER
 	encode_audio_data(Debug_Buff_pong);
 #else
@@ -349,15 +349,15 @@ void ADC_In_Pong(void) {
 
 // BSP Input RingBuffer schreiben
 void BSPLink_In_Ping(void) {
-	DSK6713_LED_on(1);
+	//DSK6713_LED_on(1);
 	write_decoding_buffer(BSPLinkBuffer_in_ping);
-	DSK6713_LED_off(1);
+	//DSK6713_LED_off(1);
 }
 
 void BSPLink_In_Pong(void) {
-	DSK6713_LED_on(1);
+	//DSK6713_LED_on(1);
 	write_decoding_buffer(BSPLinkBuffer_in_pong);
-	DSK6713_LED_off(1);
+	//DSK6713_LED_off(1);
 }
 
 // BSP Input RingBuffer schreiben
@@ -400,7 +400,7 @@ void BSPLink_Out_Pong(void) {
 }
 
 void decode_buffer(void) {
-	DSK6713_LED_on(3);
+	//DSK6713_LED_on(3);
 
 	//DECODER
 	int i = 0;
@@ -462,12 +462,12 @@ void decode_buffer(void) {
 			ringbuff_audio_out_write_i = 0;
 	}
 
-	DSK6713_LED_off(3);
+	//DSK6713_LED_off(3);
 }
 
 void encode_audio_data(short * buffersrc) {
 	// Hier Encoding Machen
-	DSK6713_LED_on(3);
+	//DSK6713_LED_on(3);
 	signed long num = 0;
 	unsigned long den = 0;
 
@@ -540,7 +540,7 @@ void encode_audio_data(short * buffersrc) {
 	}
 
 	encoding_buff_valid = 1;
-	DSK6713_LED_off(3);
+	//DSK6713_LED_off(3);
 }
 
 /****************************************************************************/
