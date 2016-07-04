@@ -11,7 +11,7 @@
 #define LINK_PREAM_START (short) 32767
 #define LINK_PREAM_STOP (short) -32768
 
-
+#define DATA_DETECTED 222
 #define ORDER	6
 
 //#define SEND_DEBUG_BUFFER

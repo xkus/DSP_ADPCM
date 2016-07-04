@@ -215,11 +215,13 @@ void config_interrupts(void) {
 
 	SWI_enable();
 
+
 	IRQ_globalEnable();
 }
 
 void EDMA_ISR(void) {
-	//DSK6713_LED_on(2);
+	DSK6713_LED_on(2);
+	SWI_disable();
 	static volatile int rcvPingDone = 0;
 	static volatile int rcvPongDone = 0;
 	static volatile int xmtPingDone = 0;
@@ -312,19 +314,20 @@ void EDMA_ISR(void) {
 		rcvPongDone = 0;
 		SWI_post(&SWI_ADC_In_Pong);
 	}
-	//DSK6713_LED_off(2);
+	DSK6713_LED_off(2);
+	SWI_enable();
 }
 
 /************************ SWI Section ****************************************/
 
 // BSP Input RingBuffer lesen
 void ADC_Out_Ping(void) {
-	//DSK6713_LED_on(0);
+	DSK6713_LED_on(0);
 	read_buffer_audio_out(AIC_Buffer_out_ping);
 }
 
 void ADC_Out_Pong(void) {
-	//DSK6713_LED_off(0);
+	DSK6713_LED_off(0);
 	read_buffer_audio_out(AIC_Buffer_out_pong);
 
 }
@@ -349,15 +352,15 @@ void ADC_In_Pong(void) {
 
 // BSP Input RingBuffer schreiben
 void BSPLink_In_Ping(void) {
-	//DSK6713_LED_on(1);
+	DSK6713_LED_on(1);
 	write_decoding_buffer(BSPLinkBuffer_in_ping);
-	//DSK6713_LED_off(1);
+	DSK6713_LED_off(1);
 }
 
 void BSPLink_In_Pong(void) {
-	//DSK6713_LED_on(1);
+	DSK6713_LED_on(1);
 	write_decoding_buffer(BSPLinkBuffer_in_pong);
-	//DSK6713_LED_off(1);
+	DSK6713_LED_off(1);
 }
 
 // BSP Input RingBuffer schreiben
@@ -400,7 +403,7 @@ void BSPLink_Out_Pong(void) {
 }
 
 void decode_buffer(void) {
-	//DSK6713_LED_on(3);
+	DSK6713_LED_on(3);
 
 	//DECODER
 	int i = 0;
@@ -462,7 +465,7 @@ void decode_buffer(void) {
 			ringbuff_audio_out_write_i = 0;
 	}
 
-	//DSK6713_LED_off(3);
+	DSK6713_LED_off(3);
 }
 
 void encode_audio_data(short * buffersrc) {
@@ -479,7 +482,8 @@ void encode_audio_data(short * buffersrc) {
 	for (i_read = 0; i_read < AIC_BUFFER_LEN - 1; i++, i_read = i_read + 2) {
 
 		// Audiodaten als MONO Signal in Buffer schreiben
-		e_enc[0][i] = (short) (buffersrc[i_read] / 2 + buffersrc[i_read + 1] / 2);
+		e_enc[0][i] =
+				(short) (buffersrc[i_read] / 2 + buffersrc[i_read + 1] / 2);
 		b_enc[0][i] = e_enc[0][i];
 
 	}
@@ -583,16 +587,17 @@ void write_decoding_buffer(short * buffersrc) {
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
 
 		if (buffersrc[i_read] == LINK_PREAM_STOP) {
-			if (dataDetected == 200) {
-				SWI_post(&SWI_Decode_Buffer);
+			if (dataDetected == DATA_DETECTED) {
 				dataDetected = 0;
+				SWI_post(&SWI_Decode_Buffer);
 			}
 		} else if (buffersrc[i_read] == LINK_PREAM_START) {
 			Decoding_Buffer_i = 0;
-			dataDetected++;
+			//if (dataDetected < DATA_DETECTED - 1)
+				dataDetected++;
 		} else {
 			if (dataDetected > 5)
-				dataDetected = 200;
+				dataDetected = DATA_DETECTED;
 
 			Decoding_Buffer[Decoding_Buffer_i] = buffersrc[i_read];
 			Decoding_Buffer_i++;
@@ -611,7 +616,8 @@ void read_buffer_audio_out(short * bufferdes) {
 	for (i_write = 0; i_write < AIC_BUFFER_LEN - 1; i_write = i_write + 2) {
 
 		bufferdes[i_write] = Ringbuffer_Audio_out[ringbuff_audio_out_read_i];
-		bufferdes[i_write + 1] = Ringbuffer_Audio_out[ringbuff_audio_out_read_i];
+		bufferdes[i_write + 1] =
+				Ringbuffer_Audio_out[ringbuff_audio_out_read_i];
 
 		ringbuff_audio_out_read_i++;
 
