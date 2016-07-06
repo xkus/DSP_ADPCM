@@ -72,7 +72,7 @@ static unsigned short myAIC23_registers[10] = { \
 	            /* FOR     11         USB-Mode */                 				 \
 																				 \
 		0x0019, /* Set-Up Reg 8       Sample rate control - SR = 32 kHz  */                     \
-	    /*0x0001, /* Set-Up Reg 8       Sample rate control  - SR = 48 kHz */                     \
+	    /*0x0001,  Set-Up Reg 8       Sample rate control  - SR = 48 kHz */                     \
 	            /* X       0          reserved */                                \
 	            /* CLKOUT  0          clock output divider: 2 (MCLK/2) */        \
 	            /* CLKIN   0          clock input divider: 2 (MCLK/2) */         \

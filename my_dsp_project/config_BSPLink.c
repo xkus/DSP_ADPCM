@@ -30,18 +30,16 @@ MCBSP_Handle hMcbsp_Link = 0;
 EDMA_Handle hEdmaBSPLinkRcv; /* Empfang handle auf EDMA REVT1-Channel */
 EDMA_Handle hEdmaBSPLinkRcvRelPing; /* Empfang handle auf einen reload-Parametersatz */
 EDMA_Handle hEdmaBSPLinkRcvRelPong;
-/* braucht man noch mehr? ja -> pong */
+
 EDMA_Handle hEdmaBSPLinkXmt; /* handle auf EDMA XEVT1-Channel */
 EDMA_Handle hEdmaBSPLinkXmtRelPing;
 EDMA_Handle hEdmaBSPLinkXmtRelPong;
-/* Transfer-Complete-Codes for EDMA-Jobs */
 
+/* Transfer-Complete-Codes for EDMA-Jobs */
 int tccBSPLinkRcvPing;
 int tccBSPLinkRcvPong;
 int tccBSPLinkXmtPing;
 int tccBSPLinkXmtPong;
-
-
 
 //Configuration for McBSP (data-interface)
 MCBSP_Config BSPLink_interface_config = {
@@ -106,10 +104,9 @@ MCBSP_FMKS(SPCR, FREE, NO) |	//  Freilauf
 				MCBSP_FMKS(PCR, FSRP, ACTIVEHIGH) |// Framesync empfängerseitig ist "activehigh"
 				MCBSP_FMKS(PCR, CLKXP, FALLING) |// Datum wird bei fallender Flanke gesendet
 				MCBSP_FMKS(PCR, CLKRP, RISING)// Datum wird bei steigender Flanke übernommen
-
 };
 
-/* template for a EDMA configuration */
+/* EDMA configuration */
 /* Empfangen */
 EDMA_Config configEDMABSPLinkRcv = {
 EDMA_FMKS(OPT, PRI, LOW) |  // auf beide Queues verteilen

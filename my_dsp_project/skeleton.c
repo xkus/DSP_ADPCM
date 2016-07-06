@@ -28,7 +28,7 @@
 #include <math.h>
 
 /*******************************
- * 			Typedefs
+ * 			Typedefs / Unions
  *******************************/
 union gamma {
 	float f;
@@ -41,7 +41,7 @@ union gamma {
 
 Uint16 time_cnt = 0;
 
-int configComplete = 0;	// Flag for switching McBSP0 to extern
+int configComplete = 0;	// Flag for delayed switching McBSP0 to extern
 Uint8 t_reg = 0;		// Used for bit manipulation in MCBSP config register
 
 // Enable Encoder/Decoder with Switch 0 & 1
@@ -80,7 +80,7 @@ Uint32 ringbuff_audio_out_write_i = 0;
 
 main() {
 	Uint16 i = 0;
-	Uint16 j = 0;
+
 
 	DSK6713_init();
 	CSL_init();
@@ -94,6 +94,8 @@ main() {
 	DSK6713_LED_off(3);
 
 #ifdef SEND_DEBUG_BUFFER
+	Uint16 j = 0;
+
 	for (i = 0; i < AIC_BUFFER_LEN/2; i++, j += 2) {
 //		Debug_Buff_ping[i] = LINK_PREAM_START;
 //		Debug_Buff_pong[AIC_BUFFER_LEN-i-1] = LINK_PREAM_START;
@@ -221,7 +223,7 @@ void config_interrupts(void) {
 
 void EDMA_ISR(void) {
 	DSK6713_LED_on(2);
-	SWI_disable();
+
 	static volatile int rcvPingDone = 0;
 	static volatile int rcvPongDone = 0;
 	static volatile int xmtPingDone = 0;
@@ -230,7 +232,6 @@ void EDMA_ISR(void) {
 	// BSP Data Link Interface
 	static volatile int xmtBSPLinkPingDone = 0;
 	static volatile int xmtBSPLinkPongDone = 0;
-
 	static volatile int rcvBSPLinkPingDone = 0;
 	static volatile int rcvBSPLinkPongDone = 0;
 
@@ -315,7 +316,6 @@ void EDMA_ISR(void) {
 		SWI_post(&SWI_ADC_In_Pong);
 	}
 	DSK6713_LED_off(2);
-	SWI_enable();
 }
 
 /************************ SWI Section ****************************************/
@@ -329,7 +329,6 @@ void ADC_Out_Ping(void) {
 void ADC_Out_Pong(void) {
 	DSK6713_LED_off(0);
 	read_buffer_audio_out(AIC_Buffer_out_pong);
-
 }
 
 void ADC_In_Ping(void) {
@@ -368,31 +367,29 @@ void BSPLink_Out_Ping(void) {
 
 	Uint16 i_write;
 	if (encoding_buff_valid) {
-
+	// Encoding Buffer hat neue Werte
 		framing_link_data(BSPLinkBuffer_out_ping);
 		encoding_buff_valid = 0;
 
 	} else {
-		// Encoding Buffer hat neue Werte
+
 		for (i_write = 0; i_write < LINK_BUFFER_LEN; i_write++) {
 			// Wenn encoder nicht bereit, STOP senden
 			BSPLinkBuffer_out_ping[i_write] = LINK_PREAM_STOP;
 		}
-
 	}
-
 }
 
 void BSPLink_Out_Pong(void) {
 
 	Uint16 i_write;
 	if (encoding_buff_valid) {
-
+// Encoding Buffer hat neue Werte
 		framing_link_data(BSPLinkBuffer_out_pong);
 		encoding_buff_valid = 0;
 
 	} else {
-		// Encoding Buffer hat neue Werte
+
 		for (i_write = 0; i_write < LINK_BUFFER_LEN; i_write++) {
 			// Wenn encoder nicht bereit, STOP senden
 			BSPLinkBuffer_out_pong[i_write] = LINK_PREAM_STOP;
@@ -555,7 +552,7 @@ void framing_link_data(short * bufferdes) {
 	Uint16 Link_Buff_i = 0;
 	Uint16 Enc_Buff_i = 0;
 
-	for (Link_Buff_i = 0; Link_Buff_i < 20; Link_Buff_i++) {
+	for (Link_Buff_i = 0; Link_Buff_i < NUMBER_OF_START_PREAMS; Link_Buff_i++) {
 		bufferdes[Link_Buff_i] = LINK_PREAM_START;
 	}
 
@@ -575,8 +572,7 @@ void write_decoding_buffer(short * buffersrc) {
 	Uint32 i_read;
 #ifdef DEBUG_BUF_ENABLE
 	for (i_read = 0; i_read < LINK_BUFFER_LEN; i_read++) {
-// Ringbuffer einmal durchlaufen
-
+		// Daten in Debug_Buffer kopieren
 		Debug_Buff[debug_buff_i] = buffersrc[i_read];
 		debug_buff_i++;
 		if (debug_buff_i >= 30000)
@@ -651,8 +647,6 @@ void tsk_led_toggle(void) {
 
 			configComplete = 2;
 
-		} else if (configComplete == 2) {
 		}
-
 	}
 }

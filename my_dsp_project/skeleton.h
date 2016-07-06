@@ -8,10 +8,17 @@
 #define DECODING_BUFF_LEN	AIC_BUFFER_LEN/2
 #define ENCODING_BUFF_LEN DECODING_BUFF_LEN
 
+#define NUMBER_OF_START_PREAMS 20
+
 #define LINK_PREAM_START (short) 32767
 #define LINK_PREAM_STOP (short) -32768
 
+#if ENCODING_BUFF_LEN + NUMBER_OF_START_PREAMS > LINK_BUFFER_LEN-1
+#error "Encoding Buffer will not fit into Linkbuffer!"
+#endif
+
 #define DATA_DETECTED 222
+
 #define ORDER	6
 
 //#define SEND_DEBUG_BUFFER
@@ -61,18 +68,15 @@ Uint16 debug_buff_i =0;
 
 
 /* function prototipes */
-extern void encode_audio_data(short * bufferdes);
+
 extern void write_decoding_buffer(short * buffersrc);
 extern void read_buffer_audio_out(short * bufferdes);
-extern void write_buffer_audio_in(short * bufferscr);
 extern void framing_link_data(short * bufferdes);
-
 extern void EDMA_interrupt_service(void);
 extern void config_AIC23_EDMA(void);
 void config_interrupts(void);
-// Datenverarbeitung
 
-
+extern void encode_audio_data(short * bufferdes);
 extern void decode_buffer(void);
 extern void tsk_led_toggle(void);
 
