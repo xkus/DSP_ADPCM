@@ -1,7 +1,7 @@
 # FIXED
 
 skeleton.obj: ../skeleton.c
-skeleton.obj: D:/Workspace/DSP_ADPCM/my_dsp_project/Debug/my_dsp_projectcfg.h
+skeleton.obj: D:/WORKSPACE/CodeComposerStudio/DSP_ADPCM/my_dsp_project/Debug/my_dsp_projectcfg.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/std.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/tistdtypes.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/prd.h
@@ -9,25 +9,25 @@ skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/fxn.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/sts.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/hst.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/pip.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/swi.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/hwi.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/tsk.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stdarg.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stdarg.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/knl.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/atm.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/que.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/mem.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stdarg.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stdarg.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/sem.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/obj.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/sys.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stdarg.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stdarg.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/trg.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/_hook.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/log.h
 skeleton.obj: C:/ti/bios_5_42_01_09/packages/ti/bios/include/_log.h
@@ -54,18 +54,18 @@ skeleton.obj: ../config_AIC23.h
 skeleton.obj: ../config_BSPLink.h
 skeleton.obj: ../Sounds.h
 skeleton.obj: ../skeleton.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/math.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/float.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/access.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/linkage.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/elfnames.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathf.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathl.h
-skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/math.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/float.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/access.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/linkage.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/elfnames.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/mathf.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/unaccess.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/mathl.h
+skeleton.obj: C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/unaccess.h
 
 ../skeleton.c: 
-D:/Workspace/DSP_ADPCM/my_dsp_project/Debug/my_dsp_projectcfg.h: 
+D:/WORKSPACE/CodeComposerStudio/DSP_ADPCM/my_dsp_project/Debug/my_dsp_projectcfg.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/std.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/tistdtypes.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/prd.h: 
@@ -73,25 +73,25 @@ C:/ti/bios_5_42_01_09/packages/ti/bios/include/fxn.h:
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/sts.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/hst.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/pip.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/swi.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/hwi.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/tsk.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stdarg.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stdarg.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/knl.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/atm.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/que.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/mem.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stdarg.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stdarg.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/sem.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/obj.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/sys.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stdarg.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stdarg.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/trg.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/stddef.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/stddef.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/_hook.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/log.h: 
 C:/ti/bios_5_42_01_09/packages/ti/bios/include/_log.h: 
@@ -118,12 +118,12 @@ C:/ti/DSK6713/c6000/dsk6713/include/dsk6713.h:
 ../config_BSPLink.h: 
 ../Sounds.h: 
 ../skeleton.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/math.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/float.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/access.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/linkage.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/elfnames.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathf.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/mathl.h: 
-C:/ti/ccsv6/tools/compiler/c6000_7.4.14/include/unaccess.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/math.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/float.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/access.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/linkage.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/elfnames.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/mathf.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/unaccess.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/mathl.h: 
+C:/ti/ccsv6/tools/compiler/c6000_7.4.16/include/unaccess.h: 
